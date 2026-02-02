@@ -3,7 +3,6 @@
 skinparam classAttributeIconSize 0
 skinparam shadowing false
 
-' Couleurs beige du thème FLOTTE
 skinparam classBackgroundColor #faf8f5
 skinparam classBorderColor #8b7659
 skinparam classFontColor #3d3329
@@ -15,314 +14,326 @@ skinparam noteBorderColor #c4b39e
 skinparam noteFontColor #3d3329
 
 ' ============================================
-' DIAGRAMME DE CLASSES - SYSTÈME FLOTTE
+' DIAGRAMME DE CLASSES - SYSTÈME FLOTTE (aligné sur models.py)
 ' ============================================
+
+package "Paramétrage" {
+    class Marque {
+        - id : Integer
+        - nom : String {unique}
+        - archive : Boolean
+        - created_at : DateTime
+        --
+        + __str__() : String
+    }
+    class Modele {
+        - id : Integer
+        - marque_id : FK
+        - nom : String
+        - version : String
+        - annee_min : Integer
+        - annee_max : Integer
+        - archive : Boolean
+        - created_at : DateTime
+        --
+        + __str__() : String
+    }
+    class TypeCarburant {
+        - id : Integer
+        - libelle : String {unique}
+        - created_at : DateTime
+        --
+        + __str__() : String
+    }
+    class TypeTransmission {
+        - id : Integer
+        - libelle : String {unique}
+        - created_at : DateTime
+        --
+        + __str__() : String
+    }
+    class TypeVehicule {
+        - id : Integer
+        - libelle : String {unique}
+        - created_at : DateTime
+        --
+        + __str__() : String
+    }
+    Marque "1" -- "0..*" Modele : contient
+}
 
 package "Gestion Flotte" {
     class Vehicule {
         - id : Integer
-        - marque : String
-        - modele : String
-        - type : TypeVehicule
+        - numero_chassis : String {unique}
+        - marque_id : FK
+        - modele_id : FK
         - annee : Integer
-        - vin : String
-        - dateEntreeParc : Date
-        - datePremiereImmatriculation : Date
-        - kmEntree : Integer
-        - kilometrageActuel : Integer
-        - prixAchat : Decimal
-        - origine : String
-        - etatEntree : EtatVehicule
-        - numeroImmatriculation : String
+        - type_vehicule_id : FK
+        - type_carburant_id : FK
+        - type_transmission_id : FK
+        - couleur_exterieure : String
+        - couleur_interieure : String
+        - date_entree_parc : Date
+        - km_entree : Integer
+        - kilometrage_actuel : Integer
+        - prix_achat : Decimal
+        - origine_pays : String
+        - etat_entree : String
         - statut : StatutVehicule
-        - carburant : TypeCarburant
-        - consommationMoyenne : Decimal
-        - rejetCO2 : Integer
-        - puissanceFiscale : Integer
+        - numero_immatriculation : String
+        - date_premiere_immat : Date
+        - consommation_moyenne : Decimal
+        - rejet_co2 : Integer
+        - puissance_fiscale : Integer
+        - km_prochaine_vidange : Integer
+        - created_at : DateTime
+        - updated_at : DateTime
         --
-        + ajouter()
-        + modifier()
-        + consulter()
-        + mettreAJourKilometrage()
-        + calculerCoutTotal() : Decimal
-        + calculerMarge() : Decimal
-        + calculerTCO() : Decimal
-        + calculerCoutParKm() : Decimal
+        + libelle_court : String {property}
+        + __str__() : String
     }
 
-    class Import {
+    class ImportDemarche {
         - id : Integer
-        - dateEntree : Date
-        - dateDouane : Date
-        - dateHomologation : Date
-        - dateImmatriculation : Date
-        - dateCarteGrise : Date
-        - etat : EtatImport
+        - vehicule_id : FK
+        - etape : String
+        - date_etape : Date
+        - statut_etape : String
+        - remarque : Text
+        - created_at : DateTime
         --
-        + suivreDemarche()
-        + mettreAJourEtape()
-        + obtenirEtapeCourante() : String
+        + __str__() : String
     }
 
-    class Document {
+    class DocumentVehicule {
         - id : Integer
-        - type : TypeDocument
-        - dateEmission : Date
-        - dateEcheance : Date
+        - vehicule_id : FK
+        - type_document : String
         - numero : String
-        - fichier : String
-        - estValide : Boolean
+        - date_emission : Date
+        - date_echeance : Date
+        - disponible : Boolean
+        - remarque : Text
+        - created_at : DateTime
         --
-        + ajouter()
-        + consulter()
-        + verifierEcheance() : Boolean
-        + archiver()
+        + __str__() : String
+    }
+
+    class Depense {
+        - id : Integer
+        - vehicule_id : FK
+        - type_depense : TypeDepense
+        - libelle : String
+        - phase : String
+        - montant : Decimal
+        - date_depense : Date
+        - remarque : Text
+        - created_at : DateTime
+        --
+        + __str__() : String
     }
 
     class Reparation {
         - id : Integer
-        - date : Date
+        - vehicule_id : FK
+        - date_reparation : Date
         - kilometrage : Integer
-        - type : TypeReparation
-        - description : String
+        - type_rep : String
+        - description : Text
         - cout : Decimal
         - prestataire : String
+        - a_faire : Boolean
+        - created_at : DateTime
         --
-        + enregistrer()
-        + consulter()
-        + calculerCoutTotal() : Decimal
+        + __str__() : String
+    }
+
+    class Location {
+        - id : Integer
+        - vehicule_id : FK
+        - locataire : String
+        - type_location : String
+        - date_debut : Date
+        - date_fin : Date
+        - loyer_mensuel : Decimal
+        - km_inclus_mois : Integer
+        - prix_km_supplementaire : Decimal
+        - date_expiration_ct : Date
+        - date_expiration_assurance : Date
+        - km_prochaine_vidange : Integer
+        - remarques : Text
+        - statut : StatutLocation
+        - created_at : DateTime
+        - updated_at : DateTime
+        --
+        + __str__() : String
     }
 
     class Vente {
         - id : Integer
-        - dateVente : Date
-        - prixVente : Decimal
-        - kilometrageVente : Integer
-        - dureeGarantie : Integer
-        - kilometrageGarantie : Integer
-        - etatLivraison : EtatVehicule
-        - marge : Decimal
+        - vehicule_id : FK
+        - date_vente : Date
+        - acquereur : String
+        - prix_vente : Decimal
+        - km_vente : Integer
+        - garantie_duree : String
+        - etat_livraison : String
+        - created_at : DateTime
         --
-        + enregistrer()
-        + calculerMarge() : Decimal
-        + genererFacture()
-        + genererPVLivraison()
+        + __str__() : String
     }
 
-    class Acquereur {
+    class Facture {
         - id : Integer
-        - nom : String
-        - type : TypeAcquereur
-        - contact : String
+        - vehicule_id : FK
+        - numero : String
+        - fournisseur : String
+        - date_facture : Date
+        - montant : Decimal
+        - type_facture : String
+        - remarque : Text
+        - created_at : DateTime
         --
-        + ajouter()
-        + consulter()
-        + modifier()
+        + __str__() : String
     }
 
-    class Prestataire {
+    class Maintenance {
         - id : Integer
-        - nom : String
-        - type : TypePrestataire
-        - contact : String
+        - vehicule_id : FK
+        - type_maintenance : TypeMaintenance
+        - date_prevue : Date
+        - kilometrage_prevu : Integer
+        - date_effectuee : Date
+        - kilometrage_effectue : Integer
+        - cout : Decimal
+        - prestataire : String
+        - statut : StatutMaintenance
+        - remarque : Text
+        - created_at : DateTime
         --
-        + ajouter()
-        + consulter()
+        + __str__() : String
     }
 
-    class MaintenancePreventive {
+    class ReleveCarburant {
         - id : Integer
-        - type : TypeMaintenance
-        - dateDerniere : Date
-        - kilometrageDerniere : Integer
-        - cadenceKm : Integer
-        - cadenceMois : Integer
-        - prochaineDate : Date
-        - prochainKilometrage : Integer
-        --
-        + calculerProchaineMaintenance()
-        + verifierAlerte() : Boolean
-        + enregistrerMaintenance()
-    }
-
-    class PleinCarburant {
-        - id : Integer
-        - date : Date
+        - vehicule_id : FK
+        - date_releve : Date
         - kilometrage : Integer
-        - quantite : Decimal
-        - prixLitre : Decimal
-        - coutTotal : Decimal
+        - litres : Decimal
+        - montant_fcfa : Decimal
+        - prix_litre : Decimal
         - lieu : String
-        - typeCarburant : String
+        - remarque : Text
+        - created_at : DateTime
         --
-        + calculerConsommation() : Decimal
-        + enregistrer()
+        + __str__() : String
     }
 
     class Conducteur {
         - id : Integer
+        - user_id : FK (optional)
         - nom : String
         - prenom : String
-        - service : String
-        - dateAttribution : Date
-        - consommationMoyenne : Decimal
-        - nombreAccidents : Integer
-        - nombreInfractions : Integer
+        - email : String
+        - telephone : String
+        - permis_numero : String
+        - permis_date_expiration : Date
+        - actif : Boolean
+        - remarque : Text
+        - created_at : DateTime
+        - updated_at : DateTime
         --
-        + assignerVehicule()
-        + enregistrerAccident()
-        + enregistrerInfraction()
-        + calculerConsommationMoyenne() : Decimal
+        + __str__() : String
     }
-}
 
-package "Gestion Financière" {
-    class ChiffreAffaires {
+    class RapportJournalier {
         - id : Integer
-        - periode : Date
-        - nombreVentes : Integer
-        - montantCA : Decimal
-        - couts : Decimal
-        - marge : Decimal
-        - pourcentageMarge : Decimal
+        - date_rapport : Date
+        - titre : String
+        - type_rapport : TypeRapport
+        - fichier : FileField
+        - remarque : Text
+        - created_at : DateTime
         --
-        + calculerCA() : Decimal
-        + calculerMarge() : Decimal
-        + genererRapport()
+        + __str__() : String
     }
 }
 
 package "Gestion Utilisateurs" {
-    class Utilisateur {
+    class User {
         - id : Integer
-        - nom : String
-        - role : Role
+        - username : String
+        - password : String
+        - is_staff : Boolean
+        - is_superuser : Boolean
         - email : String
         --
-        + seConnecter()
-        + seDeconnecter()
-        + consulterDashboard()
+        + __str__() : String
     }
-}
-
-package "Tableau de Bord" {
-    class Dashboard {
-        - kpiParc : Integer
-        - kpiImport : Integer
-        - kpiVendus : Integer
-        - kpiCA : Decimal
-        --
-        + afficherKPIs()
-        + afficherActiviteRecente()
-        + afficherDemarchesAttente()
-        + afficherAlertes()
-    }
-
-    class Alerte {
+    class ProfilUtilisateur {
         - id : Integer
-        - type : TypeAlerte
-        - message : String
-        - dateEcheance : Date
-        - vehicule : Vehicule
+        - user_id : FK {unique}
+        - role : Role
         --
-        + generer()
-        + consulter()
+        + __str__() : String
     }
+    User "1" -- "0..1" ProfilUtilisateur : a
+    User "0..1" -- "0..1" Conducteur : conducteur_flotte
 }
 
-' ============================================
-' RELATIONS
-' ============================================
+' Relations
+Vehicule "1" -- "0..*" ImportDemarche : import_demarches
+Vehicule "1" -- "0..*" DocumentVehicule : documents
+Vehicule "1" -- "0..*" Depense : depenses
+Vehicule "1" -- "0..*" Reparation : reparations
+Vehicule "1" -- "0..*" Location : locations
+Vehicule "1" -- "0..*" Vente : ventes
+Vehicule "1" -- "0..*" Facture : factures
+Vehicule "1" -- "0..*" Maintenance : maintenances
+Vehicule "1" -- "0..*" ReleveCarburant : releves_carburant
 
-' Relations principales
-Vehicule "1" -- "0..*" Import : a
-Vehicule "1" -- "0..*" Document : possède
-Vehicule "1" -- "0..*" Reparation : subit
-Vehicule "1" -- "0..1" Vente : peut être vendu
-Vehicule "1" -- "0..*" Alerte : génère
-Vehicule "1" -- "0..*" MaintenancePreventive : nécessite
-Vehicule "1" -- "0..*" PleinCarburant : consomme
-Conducteur "0..1" -- "0..*" Vehicule : conduit
-
-Reparation "0..*" -- "1" Prestataire : réalisée par
-Vente "0..1" -- "1" Acquereur : vendue à
-ChiffreAffaires "1" -- "0..*" Vente : calculé à partir de
-
-Dashboard "1" -- "0..*" Vehicule : affiche
-Dashboard "1" -- "0..*" Import : affiche
-Dashboard "1" -- "0..*" Vente : affiche
-Dashboard "1" -- "0..*" Alerte : affiche
-
-Utilisateur "1" -- "0..*" Vehicule : gère
-Utilisateur "1" -- "0..*" Dashboard : consulte
+Marque "1" -- "0..*" Vehicule : vehicules
+Modele "1" -- "0..*" Vehicule : vehicules
+TypeCarburant "1" -- "0..*" Vehicule : vehicules
+TypeTransmission "1" -- "0..*" Vehicule : vehicules
+TypeVehicule "1" -- "0..*" Vehicule : vehicules
 
 note right of Vehicule
   <b>StatutVehicule:</b>
-  - Au parc
-  - En import
-  - Vendu
+  - parc (Au parc)
+  - import (En cours d'importation)
+  - vendu (Vendu)
   
-  <b>TypeVehicule:</b>
-  - Voiture
-  - SUV
-  - Fourgon
-  - Camion
-  - Bus
-  - Utilitaire
-  - Engin de chantier
-  
-  <b>TypeCarburant:</b>
-  - Essence
-  - Diesel
-  - Électrique
-  - Hybride
-  - GPL
-  - GNV
-  
-  <b>Note:</b> Le VIN est unique
+  Identifiant principal :
+  numero_chassis (unique)
 end note
 
-note right of Import
-  <b>EtatImport:</b>
-  - Douane
-  - Homologation
-  - Immatriculation
-  - Carte grise
-  - Complet
-end note
-
-note right of Document
-  <b>TypeDocument:</b>
-  - Carte grise
-  - Douane
-  - COC
-  - Homologation DREAL
-  - Assurance
-  - Contrôle technique
-end note
-
-note right of Reparation
-  <b>TypeReparation:</b>
-  - Mécanique
-  - Carrosserie
-  - Freinage
-  - Électricité
-end note
-
-note right of Utilisateur
+note right of ProfilUtilisateur
   <b>Role:</b>
-  - Admin
-  - Utilisateur
+  - admin
+  - manager (Gestionnaire)
+  - user (Utilisateur)
 end note
 
-note right of MaintenancePreventive
+note right of Maintenance
   <b>TypeMaintenance:</b>
-  - Vidange
-  - Courroie
-  - Pneus
-  - Filtres
-  - Plaquettes
-  - Batterie
+  vidange, courroie, pneus,
+  filtres, plaquettes, batterie, autre
+  
+  <b>StatutMaintenance:</b>
+  a_faire, en_cours, effectue
+end note
+
+note right of Location
+  <b>StatutLocation:</b>
+  en_cours, a_venir, termine
+end note
+
+note right of Depense
+  <b>TypeDepense:</b>
+  entretien, reparation,
+  carburant, assurance, autre
 end note
 
 @enduml
