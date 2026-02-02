@@ -1,5 +1,7 @@
 # FLOTTE — Gestion d'import & parc véhicules
 
+Application Django de gestion de flotte automobile (import, parc, ventes, CA).
+
 ## Contexte du projet
 
 **FLOTTE** est une application **Django** de **gestion de flotte automobile** centrée sur l’**import de véhicules**. Elle vise les professionnels qui :
