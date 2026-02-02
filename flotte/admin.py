@@ -1,4 +1,4 @@
-"""Admin Django pour FLOTTE."""
+"""Admin Django pour FLOTTE — interface d'administration des modèles."""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
