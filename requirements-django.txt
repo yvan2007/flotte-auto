@@ -1,3 +1,4 @@
+# Application FLOTTE
 Django>=5.0,<6
 
 # Tests fonctionnels (Selenium + Chrome)
