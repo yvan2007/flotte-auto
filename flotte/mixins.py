@@ -1,4 +1,5 @@
-"""Mixins pour les vues FLOTTE (restriction admin, manager, user)."""
+"""Mixins pour les vues FLOTTE (restriction admin, manager, user).
+Décorateurs et classes pour contrôle d'accès par rôle."""
 from functools import wraps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
