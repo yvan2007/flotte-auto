@@ -1,4 +1,5 @@
-"""FLOTTE — URLs principales."""
+"""FLOTTE — URLs principales (racine du projet).
+Inclut les URLs statiques en DEBUG et pendant les tests."""
 import sys
 from django.contrib import admin
 from django.urls import path, include, re_path
