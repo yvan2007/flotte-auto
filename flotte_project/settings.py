@@ -1,5 +1,6 @@
 """
 Django settings for FLOTTE — Gestion import & parc véhicules.
+Variables d'environnement : DJANGO_SECRET_KEY, DJANGO_DEBUG, ALLOWED_HOSTS.
 """
 import os
 from pathlib import Path
