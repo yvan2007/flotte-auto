@@ -24,7 +24,8 @@ def is_admin(request):
 
 
 def is_manager_or_admin(request):
-    """True si l'utilisateur peut créer/modifier (manager ou admin)."""
+    """True si l'utilisateur peut créer/modifier (manager ou admin).
+    Utilisé pour afficher les liens Ventes, CA, Import, etc."""
     role = user_role(request)
     return request.user.is_authenticated and role in ('admin', 'manager')
 
