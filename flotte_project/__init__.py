@@ -1,0 +1,1 @@
+# Projet FLOTTE — configuration Django

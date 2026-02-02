@@ -1,4 +1,4 @@
-"""WSGI config for flotte_project."""
+"""WSGI config for flotte_project — point d'entrée pour déploiement."""
 import os
 from django.core.wsgi import get_wsgi_application
 
