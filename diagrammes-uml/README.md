@@ -1,6 +1,7 @@
 # Diagrammes UML - Système FLOTTE
 
 Ce dossier contient les 4 diagrammes UML complets du système de gestion de flotte automobile FLOTTE.
+Les fichiers sont au format PlantUML (.puml).
 
 ## 📋 Contenu
 
