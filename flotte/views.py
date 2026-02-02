@@ -46,7 +46,8 @@ User = get_user_model()
 
 
 def get_sidebar_context(request):
-    """Contexte commun : rôle, is_admin, is_manager_or_admin pour la sidebar et les boutons."""
+    """Contexte commun : rôle, is_admin, is_manager_or_admin pour la sidebar et les boutons.
+    Utilisé par toutes les vues pour l'affichage du menu latéral."""
     return {
         'user_role': user_role(request) if request.user.is_authenticated else None,
         'is_admin': is_admin(request),
