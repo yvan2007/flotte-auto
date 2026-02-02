@@ -670,7 +670,8 @@ def ventes_list(request):
 
 
 def _ca_evolution_queryset(granularite, annee, mois=None):
-    """Retourne les valeurs annotées (date/mois/année, total) pour l'évolution du CA."""
+    """Retourne les valeurs annotées (date/mois/année, total) pour l'évolution du CA.
+    Utilisé par l'API ca_api_evolution pour les graphiques."""
     qs = Vente.objects.exclude(prix_vente__isnull=True).exclude(prix_vente=0)
     if annee:
         qs = qs.filter(date_vente__year=annee)
