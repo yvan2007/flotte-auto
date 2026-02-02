@@ -1,4 +1,4 @@
-"""URLs FLOTTE."""
+"""URLs FLOTTE — routes de l'application de gestion de flotte."""
 from django.urls import path
 from . import views
 
