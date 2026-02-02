@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Paramétrage — Utilisateurs{% endblock %}
+{% block page_title %}Paramétrage — Utilisateurs{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:parametrage_index' %}">Paramétrage</a><span>›</span><span class="current">Utilisateurs</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Connecter le manager ou l'utilisateur. Créer, modifier, archiver les utilisateurs et leurs rôles. Gérer les droits et accès selon les rôles (Admin, Gestionnaire, Utilisateur). <strong>Archiver</strong> = désactiver le compte (décocher « Compte actif »).</p>
+</div>
+<div class="toolbar">
+  <a href="{% url 'flotte:utilisateur_create' %}" class="btn btn-primary">Créer un utilisateur</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Login</th>
+        <th>Nom</th>
+        <th>Rôle</th>
+        <th>Statut</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.get_full_name|default:"—" }}</td>
+        <td>
+          {% if u.is_superuser %}<span class="badge badge-ok">Superuser</span>
+          {% else %}{{ u.role_display|default:"—" }}{% endif %}
+        </td>
+        <td>{% if u.is_active %}<span class="badge badge-ok">Actif</span>{% else %}<span class="badge badge-muted">Archivé</span>{% endif %}</td>
+        <td><a href="{% url 'flotte:utilisateur_update' u.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">Aucun utilisateur. <a href="{% url 'flotte:utilisateur_create' %}">Créer un utilisateur</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="parametrage-nav">
+  <a href="{% url 'flotte:parametrage_index' %}" class="btn btn-ghost btn-sm">Retour au paramétrage</a>
+  <a href="{% url 'flotte:parametrage_marques' %}" class="btn btn-ghost btn-sm">Marques</a>
+  <a href="{% url 'flotte:parametrage_modeles' %}" class="btn btn-ghost btn-sm">Modèles</a>
+  <a href="{% url 'flotte:parametrage_carburant' %}" class="btn btn-ghost btn-sm">Types carburant</a>
+  <a href="{% url 'flotte:parametrage_transmission' %}" class="btn btn-ghost btn-sm">Types transmission</a>
+  <a href="{% url 'flotte:parametrage_type_vehicule' %}" class="btn btn-ghost btn-sm">Types véhicule</a>
+</p>
+{% endblock %}

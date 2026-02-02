@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Parc / Flotte{% endblock %}
+{% block page_title %}Parc / Flotte{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Parc / Flotte</span></nav>
+{% endblock %}
+{% block content %}
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <span class="kpi-label">Total véhicules</span>
+    <span class="kpi-value">{{ total }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Au parc</span>
+    <span class="kpi-value">{{ parc_count }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">En import</span>
+    <span class="kpi-value">{{ import_count }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Vendus</span>
+    <span class="kpi-value">{{ vendu_count }}</span>
+  </div>
+</div>
+<div class="card">
+  <h2 class="card-title">Répartition par marque</h2>
+  <div class="parc-marque-grid">
+    {% for item in by_marque %}
+    <span class="parc-marque-item"><strong>{{ item.marque__nom|default:"—" }}</strong> <span>{{ item.n }} véhicule{{ item.n|pluralize }}</span></span>
+    {% empty %}
+    <span class="parc-marque-item">Aucun véhicule</span>
+    {% endfor %}
+  </div>
+</div>
+<div class="toolbar">
+  <form method="get" class="filters" style="flex: 1; min-width: 0;">
+    <select name="statut" class="select" aria-label="Filtrer par état">
+      <option value="">Tous les statuts</option>
+      <option value="parc" {% if request.GET.statut == 'parc' %}selected{% endif %}>Au parc</option>
+      <option value="import" {% if request.GET.statut == 'import' %}selected{% endif %}>En import</option>
+      <option value="vendu" {% if request.GET.statut == 'vendu' %}selected{% endif %}>Vendus</option>
+    </select>
+    <input type="search" name="q" class="search" placeholder="Châssis, immat., marque…" value="{{ request.GET.q }}" aria-label="Rechercher">
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+  </form>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Châssis</th>
+        <th>Marque / Modèle</th>
+        <th>Type</th>
+        <th>Année</th>
+        <th>Carburant</th>
+        <th>Transmission</th>
+        <th>Km actuel</th>
+        <th>Date entrée</th>
+        <th>Prix achat (FCFA)</th>
+        <th>État</th>
+        <th>Statut</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in vehicules %}
+      <tr>
+        <td><strong>{{ v.numero_chassis|default:"—" }}</strong></td>
+        <td><strong>{{ v.marque.nom|default:"—" }}</strong> {{ v.modele.nom|default:"" }}</td>
+        <td>{{ v.type_vehicule.libelle|default:"—" }}</td>
+        <td>{{ v.annee|default:"—" }}</td>
+        <td>{{ v.type_carburant.libelle|default:"—" }}</td>
+        <td>{{ v.type_transmission.libelle|default:"—" }}</td>
+        <td class="num">{{ v.kilometrage_actuel|default:"—"|intcomma }}</td>
+        <td>{{ v.date_entree_parc|default:"—" }}</td>
+        <td class="num">{% if v.prix_achat %}{{ v.prix_achat|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>{{ v.etat_entree|default:"—" }}</td>
+        <td>
+          {% if v.statut == 'parc' %}<span class="badge badge-ok">Au parc</span>
+          {% elif v.statut == 'import' %}<span class="badge badge-warn">Import</span>
+          {% else %}<span class="badge badge-muted">Vendu</span>{% endif %}
+        </td>
+        <td>
+          <a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche</a>
+          {% if is_manager_or_admin %}<a href="{% url 'flotte:vehicule_update' v.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="12"><div class="empty-state">Aucun véhicule. {% if is_manager_or_admin %}<a href="{% url 'flotte:vehicule_create' %}" class="btn btn-primary btn-sm">Ajouter un véhicule</a>{% endif %}</div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="Pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost btn-sm">← Précédent</a>{% endif %}
+  <span class="page-info">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost btn-sm">Suivant →</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

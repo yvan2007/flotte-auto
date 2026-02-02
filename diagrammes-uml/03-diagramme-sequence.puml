@@ -1,0 +1,318 @@
+@startuml Diagramme de Séquence - FLOTTE
+!theme plain
+skinparam shadowing false
+
+' Couleurs beige du thème FLOTTE
+skinparam actorBackgroundColor #faf8f5
+skinparam actorBorderColor #8b7659
+skinparam actorFontColor #3d3329
+skinparam participantBackgroundColor #f2ede6
+skinparam participantBorderColor #a8957a
+skinparam participantFontColor #534636
+skinparam noteBackgroundColor #f2ede6
+skinparam noteBorderColor #c4b39e
+skinparam noteFontColor #3d3329
+skinparam boxBackgroundColor #e8dfd4
+skinparam boxBorderColor #a8957a
+skinparam boxFontColor #534636
+
+' ============================================
+' DIAGRAMME DE SÉQUENCE - SYSTÈME FLOTTE
+' ============================================
+
+' ============================================
+' SÉQUENCE 1 : AJOUT D'UN VÉHICULE
+' ============================================
+
+title Ajout d'un véhicule
+
+actor "Administrateur" as Admin
+participant "Interface" as UI
+participant "Contrôleur" as Controller
+participant "Service Véhicule" as VehiculeService
+participant "Base de Données" as DB
+
+Admin -> UI : Clique sur "Nouveau véhicule"
+activate UI
+UI -> UI : Affiche formulaire modal
+UI -> Admin : Formulaire avec champs requis
+Admin -> UI : Remplit les informations\n(marque, modèle, VIN, etc.)
+Admin -> UI : Clique sur "Enregistrer"
+UI -> Controller : submitForm(vehiculeData)
+activate Controller
+Controller -> Controller : Valide les données
+alt Données valides
+    Controller -> VehiculeService : creerVehicule(vehiculeData)
+    activate VehiculeService
+    VehiculeService -> VehiculeService : Vérifie unicité VIN
+    VehiculeService -> DB : INSERT INTO Vehicule
+    activate DB
+    DB -> DB : Enregistre véhicule
+    DB --> VehiculeService : idVehicule
+    deactivate DB
+    VehiculeService -> VehiculeService : Initialise statut "En import"
+    VehiculeService --> Controller : Vehicule créé
+    deactivate VehiculeService
+    Controller -> Controller : Crée enregistrement Import
+    Controller -> VehiculeService : creerImport(idVehicule)
+    activate VehiculeService
+    VehiculeService -> DB : INSERT INTO Import
+    activate DB
+    DB --> VehiculeService : Import créé
+    deactivate DB
+    deactivate VehiculeService
+    Controller --> UI : Succès
+    deactivate Controller
+    UI -> UI : Affiche message de confirmation
+    UI -> UI : Ferme modal
+    UI -> UI : Rafraîchit liste parc
+else Données invalides
+    Controller --> UI : Erreurs de validation
+    deactivate Controller
+    UI -> UI : Affiche erreurs
+end
+deactivate UI
+
+' ============================================
+' SÉQUENCE 2 : SUIVI DES DÉMARCHES D'IMPORT
+' ============================================
+
+newpage
+title Mise à jour étape import
+
+actor "Administrateur" as Admin2
+participant "Interface" as UI2
+participant "Contrôleur" as Controller2
+participant "Service Import" as ImportService
+participant "Service Document" as DocumentService
+participant "Base de Données" as DB2
+
+Admin2 -> UI2 : Consulte section "Import & démarches"
+activate UI2
+UI2 -> Controller2 : chargerDemarches()
+activate Controller2
+Controller2 -> ImportService : obtenirDemarchesEnCours()
+activate ImportService
+ImportService -> DB2 : SELECT * FROM Import WHERE etat != 'Complet'
+activate DB2
+DB2 --> ImportService : Liste des imports
+deactivate DB2
+ImportService --> Controller2 : Demarches
+deactivate ImportService
+Controller2 --> UI2 : Affiche tableau démarches
+deactivate Controller2
+deactivate UI2
+
+Admin2 -> UI2 : Clique sur "Mettre à jour étape"
+activate UI2
+UI2 -> Admin2 : Formulaire étape
+Admin2 -> UI2 : Sélectionne véhicule et étape\n(Ex: Douane terminée)
+Admin2 -> UI2 : Saisit date
+Admin2 -> UI2 : Clique sur "Valider"
+UI2 -> Controller2 : mettreAJourEtape(idVehicule, etape, date)
+activate Controller2
+Controller2 -> ImportService : mettreAJourEtape(idVehicule, etape, date)
+activate ImportService
+ImportService -> DB2 : UPDATE Import SET dateEtape = date
+activate DB2
+DB2 --> ImportService : Étape mise à jour
+deactivate DB2
+
+alt Étape = "Carte grise"
+    ImportService -> ImportService : Vérifie si toutes étapes complètes
+    ImportService -> DB2 : UPDATE Import SET etat = 'Complet'
+    activate DB2
+    DB2 --> ImportService : Import complété
+    deactivate DB2
+    ImportService -> DocumentService : creerDocument(type='Carte grise')
+    activate DocumentService
+    DocumentService -> DB2 : INSERT INTO Document
+    activate DB2
+    DB2 --> DocumentService : Document créé
+    deactivate DB2
+    deactivate DocumentService
+    ImportService -> VehiculeService : mettreAJourStatut(idVehicule, 'Au parc')
+    activate VehiculeService
+    VehiculeService -> DB2 : UPDATE Vehicule SET statut = 'Au parc'
+    activate DB2
+    DB2 --> VehiculeService : Statut mis à jour
+    deactivate DB2
+    deactivate VehiculeService
+end
+
+ImportService --> Controller2 : Étape mise à jour
+deactivate ImportService
+Controller2 --> UI2 : Succès
+deactivate Controller2
+UI2 -> UI2 : Rafraîchit tableau démarches
+deactivate UI2
+
+' ============================================
+' SÉQUENCE 3 : ENREGISTREMENT D'UNE VENTE
+' ============================================
+
+newpage
+title Enregistrement d'une vente
+
+actor "Administrateur" as Admin3
+participant "Interface" as UI3
+participant "Contrôleur" as Controller3
+participant "Service Vente" as VenteService
+participant "Service Véhicule" as VehiculeService3
+participant "Service CA" as CAService
+participant "Base de Données" as DB3
+
+Admin3 -> UI3 : Consulte fiche véhicule
+activate UI3
+UI3 -> Controller3 : chargerFicheVehicule(idVehicule)
+activate Controller3
+Controller3 -> VehiculeService3 : obtenirVehicule(idVehicule)
+activate VehiculeService3
+VehiculeService3 -> DB3 : SELECT * FROM Vehicule WHERE id = idVehicule
+activate DB3
+DB3 --> VehiculeService3 : Données véhicule
+deactivate DB3
+VehiculeService3 -> VehiculeService3 : calculerCoutTotal()
+VehiculeService3 --> Controller3 : Vehicule avec coûts
+deactivate VehiculeService3
+Controller3 --> UI3 : Affiche fiche complète
+deactivate Controller3
+deactivate UI3
+
+Admin3 -> UI3 : Clique sur "Enregistrer vente"
+activate UI3
+UI3 -> Admin3 : Formulaire vente
+Admin3 -> UI3 : Remplit informations\n(acquéreur, prix, garantie)
+Admin3 -> UI3 : Clique sur "Enregistrer"
+UI3 -> Controller3 : enregistrerVente(venteData)
+activate Controller3
+Controller3 -> VenteService : creerVente(venteData)
+activate VenteService
+VenteService -> VehiculeService3 : obtenirCoutTotal(idVehicule)
+activate VehiculeService3
+VehiculeService3 -> DB3 : SELECT prixAchat FROM Vehicule\nJOIN Reparation
+activate DB3
+DB3 --> VehiculeService3 : Coût total
+deactivate DB3
+deactivate VehiculeService3
+VenteService -> VenteService : marge = prixVente - coutTotal
+VenteService -> DB3 : INSERT INTO Vente
+activate DB3
+DB3 --> VenteService : Vente créée
+deactivate DB3
+VenteService -> VehiculeService3 : mettreAJourStatut(idVehicule, 'Vendu')
+activate VehiculeService3
+VehiculeService3 -> DB3 : UPDATE Vehicule SET statut = 'Vendu'
+activate DB3
+DB3 --> VehiculeService3 : Statut mis à jour
+deactivate DB3
+deactivate VehiculeService3
+VenteService -> CAService : mettreAJourCA(montant, marge)
+activate CAService
+CAService -> DB3 : UPDATE ChiffreAffaires\nSET montantCA += montant
+activate DB3
+DB3 --> CAService : CA mis à jour
+deactivate DB3
+deactivate CAService
+VenteService --> Controller3 : Vente enregistrée
+deactivate VenteService
+Controller3 --> UI3 : Succès
+deactivate Controller3
+UI3 -> UI3 : Affiche confirmation
+UI3 -> UI3 : Rafraîchit données
+deactivate UI3
+
+' ============================================
+' SÉQUENCE 4 : CONSULTATION TABLEAU DE BORD
+' ============================================
+
+newpage
+title Consultation tableau de bord
+
+actor "Utilisateur" as User
+participant "Interface" as UI4
+participant "Contrôleur" as Controller4
+participant "Service Dashboard" as DashboardService
+participant "Service Véhicule" as VehiculeService4
+participant "Service Import" as ImportService4
+participant "Service Vente" as VenteService4
+participant "Service Alerte" as AlerteService
+participant "Base de Données" as DB4
+
+User -> UI4 : Accède au tableau de bord
+activate UI4
+UI4 -> Controller4 : chargerDashboard()
+activate Controller4
+
+par Chargement parallèle des données
+    Controller4 -> DashboardService : obtenirKPIs()
+    activate DashboardService
+    DashboardService -> VehiculeService4 : compterVehiculesParc()
+    activate VehiculeService4
+    VehiculeService4 -> DB4 : SELECT COUNT(*) FROM Vehicule\nWHERE statut = 'Au parc'
+    activate DB4
+    DB4 --> VehiculeService4 : Nombre véhicules
+    deactivate DB4
+    deactivate VehiculeService4
+    
+    DashboardService -> ImportService4 : compterImportsEnCours()
+    activate ImportService4
+    ImportService4 -> DB4 : SELECT COUNT(*) FROM Import\nWHERE etat != 'Complet'
+    activate DB4
+    DB4 --> ImportService4 : Nombre imports
+    deactivate DB4
+    deactivate ImportService4
+    
+    DashboardService -> VenteService4 : obtenirVentesMois()
+    activate VenteService4
+    VenteService4 -> DB4 : SELECT COUNT(*), SUM(prixVente)\nFROM Vente WHERE MONTH(dateVente) = MONTH(NOW())
+    activate DB4
+    DB4 --> VenteService4 : Ventes du mois
+    deactivate DB4
+    deactivate VenteService4
+    
+    DashboardService -> CAService : obtenirCAMois()
+    activate CAService
+    CAService -> DB4 : SELECT montantCA FROM ChiffreAffaires\nWHERE periode = MONTH(NOW())
+    activate DB4
+    DB4 --> CAService : CA du mois
+    deactivate DB4
+    deactivate CAService
+    
+    DashboardService --> Controller4 : KPIs
+    deactivate DashboardService
+    
+    Controller4 -> DashboardService : obtenirActiviteRecente()
+    activate DashboardService
+    DashboardService -> DB4 : SELECT * FROM Vehicule\nORDER BY dateEntreeParc DESC LIMIT 5
+    activate DB4
+    DB4 --> DashboardService : Activité récente
+    deactivate DB4
+    DashboardService --> Controller4 : Activité
+    deactivate DashboardService
+    
+    Controller4 -> ImportService4 : obtenirDemarchesAttente()
+    activate ImportService4
+    ImportService4 -> DB4 : SELECT * FROM Import\nWHERE etat != 'Complet'
+    activate DB4
+    DB4 --> ImportService4 : Démarches en attente
+    deactivate DB4
+    ImportService4 --> Controller4 : Démarches
+    deactivate ImportService4
+    
+    Controller4 -> AlerteService : obtenirAlertes()
+    activate AlerteService
+    AlerteService -> DB4 : SELECT * FROM Alerte\nWHERE dateEcheance <= DATE_ADD(NOW(), INTERVAL 30 DAY)
+    activate DB4
+    DB4 --> AlerteService : Alertes
+    deactivate DB4
+    AlerteService --> Controller4 : Alertes
+    deactivate AlerteService
+end
+
+Controller4 --> UI4 : Données complètes dashboard
+deactivate Controller4
+UI4 -> UI4 : Affiche KPIs, activité, démarches, alertes
+deactivate UI4
+
+@enduml

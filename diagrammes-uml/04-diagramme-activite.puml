@@ -1,0 +1,355 @@
+@startuml Diagramme d'Activité - FLOTTE
+start
+skinparam shadowing false
+
+' Couleurs beige du thème FLOTTE
+skinparam activityBackgroundColor #f2ede6
+skinparam activityBorderColor #a8957a
+skinparam activityFontColor #534636
+skinparam activityFontSize 12
+skinparam noteBackgroundColor #faf8f5
+skinparam noteBorderColor #c4b39e
+skinparam noteFontColor #3d3329
+skinparam backgroundColor #faf8f5
+skinparam defaultFontColor #534636
+
+' ============================================
+' DIAGRAMME D'ACTIVITÉ - SYSTÈME FLOTTE
+' ============================================
+
+' ============================================
+' PROCESSUS 1 : PROCESSUS D'IMPORT COMPLET
+' ============================================
+
+partition "Processus d'import d'un véhicule" {
+:Administrateur ajoute véhicule;
+note right
+  Saisie des informations:
+  - Marque/Modèle
+  - VIN (17 caractères)
+  - Année
+  - Date entrée parc
+  - Kilométrage entrée
+  - Prix d'achat
+  - Origine
+  - État à l'entrée
+end note
+
+:Vérification unicité VIN;
+
+if (VIN existe déjà ?) then (oui)
+  :Afficher erreur;
+  stop
+else (non)
+endif
+
+:Enregistrement véhicule en base;
+:Initialisation statut "En import";
+:Création enregistrement Import;
+
+partition "Étape 1: Douane" {
+  :Attente arrivée véhicule;
+  :Déclaration douane;
+  :Paiement droits et taxes;
+  :Obtention attestation douane;
+  :Enregistrement date douane;
+  :Création document "Douane";
+}
+
+partition "Étape 2: Homologation" {
+  if (Véhicule a COC ?) then (oui)
+    :Utiliser COC européen;
+    :Enregistrement date homologation (COC);
+  else (non)
+    :Demande réception RTI DREAL;
+    :Dépôt dossier DREAL;
+    :Attente instruction DREAL;
+    :Obtention homologation DREAL;
+    :Enregistrement date homologation (RTI);
+  endif
+  :Création document "Homologation";
+}
+
+partition "Étape 3: Immatriculation" {
+  :Préparation dossier ANTS;
+  :Demande immatriculation ANTS;
+  :Attente traitement ANTS;
+  :Obtention numéro immatriculation;
+  :Enregistrement date immatriculation;
+  :Mise à jour numéro immatriculation véhicule;
+}
+
+partition "Étape 4: Carte grise" {
+  :Demande carte grise ANTS;
+  :Attente délivrance carte grise;
+  :Obtention carte grise;
+  :Enregistrement date carte grise;
+  :Création document "Carte grise";
+}
+
+partition "Étape 5: Assurance" {
+  :Souscription assurance;
+  :Obtention attestation assurance;
+  :Enregistrement date souscription;
+  :Enregistrement date échéance;
+  :Création document "Assurance";
+}
+
+:Vérification toutes étapes complètes;
+
+if (Toutes étapes complètes ?) then (oui)
+  :Mise à jour statut Import = "Complet";
+  :Mise à jour statut Véhicule = "Au parc";
+  :Génération alerte "Véhicule prêt";
+else (non)
+  :Mise à jour état Import (étape courante);
+endif
+
+}
+stop
+
+' ============================================
+' PROCESSUS 2 : PROCESSUS DE VENTE
+' ============================================
+
+partition "Processus de vente d'un véhicule" {
+start
+
+:Administrateur consulte fiche véhicule;
+
+if (Véhicule disponible à la vente ?) then (non)
+  :Afficher message "Véhicule non disponible";
+  stop
+else (oui)
+endif
+
+:Vérification documents requis;
+note right
+  Documents requis:
+  - Carte grise
+  - Assurance valide
+  - Contrôle technique (si nécessaire)
+end note
+
+if (Documents complets ?) then (non)
+  :Afficher alertes documents manquants;
+  stop
+else (oui)
+endif
+
+:Administrateur saisit informations vente;
+note right
+  Informations:
+  - Acquéreur (nom, type)
+  - Prix de vente
+  - Kilométrage à la vente
+  - Durée garantie
+  - Kilométrage garantie
+  - État à la livraison
+end note
+
+:Calcul coût total véhicule;
+note right
+  Coût total = Prix achat
+  + Somme réparations
+end note
+
+:Calcul marge;
+note right
+  Marge = Prix vente
+  - Coût total
+end note
+
+:Enregistrement vente en base;
+
+:Création/Enregistrement acquéreur;
+
+:Mise à jour statut véhicule = "Vendu";
+
+:Calcul et mise à jour chiffre d'affaires;
+note right
+  CA mois += Prix vente
+  Marge mois += Marge
+end note
+
+partition "Génération documents" {
+  :Génération facture de vente;
+  :Génération PV de livraison;
+  :Archivage documents;
+}
+
+:Enregistrement date vente;
+
+:Enregistrement kilométrage vente;
+
+:Enregistrement garantie;
+
+:Affichage confirmation vente;
+
+}
+stop
+
+' ============================================
+' PROCESSUS 3 : GESTION DES RÉPARATIONS
+' ============================================
+
+partition "Enregistrement d'une réparation" {
+start
+
+:Administrateur consulte véhicule;
+
+:Clique sur "Ajouter réparation";
+
+:Saisit informations réparation;
+note right
+  Informations:
+  - Date réparation
+  - Kilométrage
+  - Type (Mécanique, Carrosserie, etc.)
+  - Description
+  - Coût
+  - Prestataire
+end note
+
+:Validation données;
+
+if (Données valides ?) then (non)
+  :Afficher erreurs;
+  stop
+else (oui)
+endif
+
+:Enregistrement réparation en base;
+
+:Association réparation au véhicule;
+
+:Association réparation au prestataire;
+
+:Mise à jour coût total véhicule;
+note right
+  Coût total véhicule
+  inclut maintenant cette réparation
+end note
+
+if (Véhicule vendu ?) then (oui)
+  :Recalcul marge vente;
+  note right
+    Marge = Prix vente
+    - (Prix achat + Nouvelles réparations)
+  end note
+  :Mise à jour marge enregistrée;
+else (non)
+endif
+
+:Affichage confirmation;
+
+}
+stop
+
+' ============================================
+' PROCESSUS 4 : GESTION DES ALERTES
+' ============================================
+
+partition "Génération et gestion des alertes" {
+start
+
+partition "Vérification échéances" {
+  :Système vérifie échéances documents;
+  
+  :Pour chaque véhicule;
+  
+  partition "Vérification Assurance" {
+    if (Date échéance assurance <= 30 jours ?) then (oui)
+      :Créer alerte "Échéance assurance";
+      :Associer alerte au véhicule;
+    else (non)
+    endif
+  }
+  
+  partition "Vérification Contrôle Technique" {
+    if (Date prochain CT <= 30 jours ?) then (oui)
+      :Créer alerte "Prochain CT";
+      :Associer alerte au véhicule;
+    else (non)
+    endif
+  }
+  
+  partition "Vérification Démarches Import" {
+    if (Démarche en attente > 15 jours ?) then (oui)
+      :Créer alerte "Démarche en attente";
+      :Associer alerte au véhicule;
+    else (non)
+    endif
+  }
+}
+
+partition "Affichage alertes" {
+  :Récupération alertes actives;
+  
+  :Tri par priorité et date;
+  
+  :Affichage dans tableau de bord;
+}
+
+:Administrateur consulte alertes;
+
+if (Alerte traitée ?) then (oui)
+  :Marquer alerte comme traitée;
+  :Archiver alerte;
+else (non)
+  :Conserver alerte active;
+endif
+
+}
+stop
+
+' ============================================
+' PROCESSUS 5 : CALCUL CHIFFRE D'AFFAIRES
+' ============================================
+
+partition "Calcul du chiffre d'affaires" {
+start
+
+partition "Calcul CA mensuel" {
+  :Sélection ventes du mois;
+  
+  :Somme prix de vente;
+  
+  :Somme coûts (achat + réparations);
+  
+  :Calcul marge = CA - Coûts;
+  
+  :Calcul pourcentage marge;
+  note right
+    % Marge = (Marge / CA) * 100
+  end note
+  
+  :Enregistrement CA mensuel;
+}
+
+partition "Calcul CA annuel" {
+  :Somme CA mensuels année;
+  
+  :Somme marges mensuelles année;
+  
+  :Calcul marge globale année;
+  
+  :Calcul pourcentage marge annuel;
+  
+  :Enregistrement CA annuel;
+}
+
+partition "Génération rapport" {
+  :Préparation données graphiques;
+  
+  :Génération graphique évolution CA;
+  
+  :Génération tableau détail mensuel;
+  
+  :Affichage rapport;
+}
+
+}
+stop
+
+@enduml

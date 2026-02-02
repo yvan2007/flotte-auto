@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc</a><span>›</span><a href="{% url 'flotte:vehicule_detail' vehicule.pk %}">{{ vehicule.libelle_court }}</a><span>›</span><span class="current">{{ title }}</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p><strong>Véhicule:</strong> {{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</p>
+  <form method="post" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}</label>
+      {{ field }}
+      {{ field.errors }}
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      <a href="{% url 'flotte:vehicule_detail' vehicule.pk %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

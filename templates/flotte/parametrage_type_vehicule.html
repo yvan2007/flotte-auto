@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Paramétrage — Types véhicule{% endblock %}
+{% block page_title %}Paramétrage — Types véhicule{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:parametrage_index' %}">Paramétrage</a><span>›</span><span class="current">Types véhicule</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Types de véhicule : Voiture, SUV, Fourgon, Utilitaire, Camion, Bus, etc.</p>
+</div>
+<div class="toolbar">
+  <a href="{% url 'flotte:type_vehicule_create' %}" class="btn btn-primary">Ajouter un type</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Libellé</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in types %}
+      <tr>
+        <td>{{ t.libelle }}</td>
+        <td><a href="{% url 'flotte:type_vehicule_update' t.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2">Aucun type. <a href="{% url 'flotte:type_vehicule_create' %}">Ajouter un type</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p>
+  <a href="{% url 'flotte:parametrage_marques' %}" class="btn btn-ghost btn-sm">Marques</a>
+  <a href="{% url 'flotte:parametrage_modeles' %}" class="btn btn-ghost btn-sm">Modèles</a>
+  <a href="{% url 'flotte:parametrage_carburant' %}" class="btn btn-ghost btn-sm">Types carburant</a>
+  <a href="{% url 'flotte:parametrage_transmission' %}" class="btn btn-ghost btn-sm">Types transmission</a>
+  <a href="{% url 'flotte:parametrage_utilisateurs' %}" class="btn btn-ghost btn-sm">Utilisateurs</a>
+</p>
+{% endblock %}

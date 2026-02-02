@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Conducteurs{% endblock %}
+{% block page_title %}Conducteurs{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Conducteurs</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Conducteurs</h2>
+  <p class="card-desc">Gestion des chauffeurs : permis, coordonnées, statut actif.</p>
+</div>
+{% if is_manager_or_admin %}
+<div class="toolbar">
+  <a href="{% url 'flotte:conducteur_create' %}" class="btn btn-primary">Nouveau conducteur</a>
+</div>
+{% endif %}
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>N° permis</th>
+        <th>Exp. permis</th>
+        <th>Actif</th>
+        {% if is_manager_or_admin %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in conducteurs %}
+      <tr>
+        <td><strong>{{ c.nom }}</strong></td>
+        <td>{{ c.prenom|default:"—" }}</td>
+        <td>{{ c.email|default:"—" }}</td>
+        <td>{{ c.telephone|default:"—" }}</td>
+        <td>{{ c.permis_numero|default:"—" }}</td>
+        <td>{{ c.permis_date_expiration|default:"—" }}</td>
+        <td>{% if c.actif %}<span class="badge badge-ok">Oui</span>{% else %}<span class="badge badge-muted">Non</span>{% endif %}</td>
+        {% if is_manager_or_admin %}<td><a href="{% url 'flotte:conducteur_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>{% endif %}
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">Aucun conducteur enregistré.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

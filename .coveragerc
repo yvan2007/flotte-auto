@@ -1,0 +1,24 @@
+# Configuration coverage pour FLOTTE
+# https://coverage.readthedocs.io/
+
+[run]
+source = flotte,flotte_project
+omit =
+    */migrations/*
+    */tests/*
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+branch = true
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if TYPE_CHECKING:
+show_missing = true
+skip_covered = false
+
+[html]
+directory = htmlcov

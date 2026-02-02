@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Suivi carburant{% endblock %}
+{% block page_title %}Suivi carburant{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Carburant</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Relevés carburant</h2>
+  <p class="card-desc">Suivi des pleins et consommations par véhicule (litres, montant, kilométrage).</p>
+</div>
+{% if is_manager_or_admin %}
+<div class="toolbar">
+  <a href="{% url 'flotte:carburant_create' %}" class="btn btn-primary">Nouveau relevé</a>
+</div>
+{% endif %}
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Date</th>
+        <th>Kilométrage</th>
+        <th>Litres</th>
+        <th>Montant (FCFA)</th>
+        <th>Lieu</th>
+        {% if is_manager_or_admin %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in releves %}
+      <tr>
+        <td><strong><a href="{% url 'flotte:vehicule_detail' r.vehicule.pk %}">{{ r.vehicule.libelle_court }}</a></strong></td>
+        <td>{{ r.date_releve }}</td>
+        <td>{{ r.kilometrage|intcomma }}</td>
+        <td>{% if r.litres %}{{ r.litres }}{% else %}—{% endif %}</td>
+        <td>{% if r.montant_fcfa %}{{ r.montant_fcfa|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>{{ r.lieu|default:"—" }}</td>
+        {% if is_manager_or_admin %}<td><a href="{% url 'flotte:carburant_update' r.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>{% endif %}
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">Aucun relevé carburant enregistré.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

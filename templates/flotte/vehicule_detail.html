@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Fiche véhicule{% endblock %}
+{% block page_title %}Fiche véhicule — {{ vehicule.numero_chassis }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc / Flotte</a><span>›</span><span class="current">{{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</span></nav>
+{% endblock %}
+{% block content %}
+<div class="fiche-grid">
+  <div class="card fiche-block">
+    <h3>Identification</h3>
+    <p><strong>Châssis:</strong> {{ vehicule.numero_chassis }}</p>
+    <p><strong>Marque / Modèle:</strong> {{ vehicule.marque.nom|default:"—" }} {{ vehicule.modele.nom|default:"" }}</p>
+    <p><strong>Type:</strong> {{ vehicule.type_vehicule.libelle|default:"—" }}</p>
+    <p><strong>Année:</strong> {{ vehicule.annee|default:"—" }}</p>
+    <p><strong>Carburant:</strong> {{ vehicule.type_carburant.libelle|default:"—" }}</p>
+    <p><strong>Transmission:</strong> {{ vehicule.type_transmission.libelle|default:"—" }}</p>
+    <p><strong>Couleur ext.:</strong> {{ vehicule.couleur_exterieure|default:"—" }}</p>
+    <p><strong>Couleur int.:</strong> {{ vehicule.couleur_interieure|default:"—" }}</p>
+    <p><strong>N° immat.:</strong> {{ vehicule.numero_immatriculation|default:"—" }}</p>
+    <p><strong>Km actuel:</strong> {{ vehicule.kilometrage_actuel|intcomma }}</p>
+    <p><strong>Statut:</strong> {{ vehicule.get_statut_display }}</p>
+    <p><strong>Date entrée parc:</strong> {{ vehicule.date_entree_parc|default:"—" }}</p>
+    <p><strong>Prix d'achat:</strong> {% if vehicule.prix_achat %}{{ vehicule.prix_achat|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Pays d'origine (ou d'achat):</strong> {{ vehicule.origine_pays|default:"—" }}</p>
+    <p><strong>Km prochaine vidange:</strong> {% if vehicule.km_prochaine_vidange %}{{ vehicule.km_prochaine_vidange|intcomma }} km{% else %}—{% endif %}</p>
+    {% if is_manager_or_admin %}
+    <p><a href="{% url 'flotte:vehicule_update' vehicule.pk %}" class="btn btn-primary btn-sm">Modifier</a></p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Démarches import</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:import_demarche_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une démarche</a></p>{% endif %}
+    {% if vehicule.import_demarches.all %}
+    <ul class="activity-list">
+      {% for d in vehicule.import_demarches.all %}
+      <li><span class="badge badge-ok">{{ d.etape }}</span> {{ d.date_etape|default:"" }} {{ d.statut_etape|default:"" }}{% if d.remarque %} — {{ d.remarque|truncatewords:10 }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:import_demarche_update' d.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune démarche enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Dépenses (coûts véhicule)</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:depense_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une dépense</a></p>{% endif %}
+    {% if vehicule.depenses.all %}
+    <ul class="activity-list">
+      {% for dep in vehicule.depenses.all %}
+      <li><span class="badge badge-muted">{{ dep.get_type_depense_display }}</span> {{ dep.libelle }}{% if dep.phase %} — {{ dep.phase }}{% endif %} : {% if dep.montant %}{{ dep.montant|floatformat:0 }} FCFA{% endif %}{% if dep.date_depense %} ({{ dep.date_depense }}){% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:depense_update' dep.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    <p><strong>Total dépenses:</strong> {{ total_depenses|floatformat:0 }} FCFA</p>
+    {% else %}
+    <p>Aucune dépense enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Documents</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:document_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter un document</a></p>{% endif %}
+    {% if vehicule.documents.all %}
+    <ul class="activity-list">
+      {% for doc in vehicule.documents.all %}
+      <li>{% if doc.disponible %}<span class="badge badge-ok">Disponible</span>{% else %}<span class="badge badge-warn">À faire</span>{% endif %} {{ doc.type_document }}{% if doc.numero %} ({{ doc.numero }}){% endif %}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:document_update' doc.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucun document enregistré.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Réparations</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:reparation_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une réparation</a></p>{% endif %}
+    {% if vehicule.reparations.all %}
+    <ul class="activity-list">
+      {% for r in vehicule.reparations.all %}
+      <li>{{ r.date_reparation|default:"" }} — {{ r.type_rep|default:"" }} : {{ r.description|truncatewords:12 }}{% if r.cout %} — {{ r.cout|floatformat:0 }} FCFA{% endif %}{% if r.a_faire %} <span class="badge badge-warn">À faire</span>{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:reparation_update' r.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    <p><strong>Total réparations:</strong> {{ total_reparations|floatformat:0 }} FCFA</p>
+    {% else %}
+    <p>Aucune réparation enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Ventes</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:vente_create' vehicule.pk %}" class="btn btn-primary btn-sm">Enregistrer une vente</a></p>{% endif %}
+    {% if vehicule.ventes.all %}
+    <ul class="activity-list">
+      {% for v in vehicule.ventes.all %}
+      <li>{{ v.date_vente }}{% if v.acquereur %} — {{ v.acquereur }}{% endif %}{% if v.prix_vente %} : {{ v.prix_vente|floatformat:0 }} FCFA{% endif %}{% if is_manager_or_admin %} <a href="{% url 'flotte:vente_update' v.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune vente enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Locations</h3>
+    {% if vehicule.locations.all %}
+    <ul class="activity-list">
+      {% for loc in vehicule.locations.all %}
+      <li><a href="{% url 'flotte:location_detail' loc.pk %}">{{ loc.locataire }}</a> — {{ loc.type_location }} ({{ loc.date_debut }} → {{ loc.date_fin }}) — {{ loc.get_statut_display }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune location.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Factures</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:facture_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une facture</a></p>{% endif %}
+    {% if vehicule.factures.all %}
+    <ul class="activity-list">
+      {% for f in vehicule.factures.all %}
+      <li>{{ f.numero }}{% if f.fournisseur %} — {{ f.fournisseur }}{% endif %}{% if f.date_facture %} ({{ f.date_facture }}){% endif %} : {% if f.montant %}{{ f.montant|floatformat:0 }} FCFA{% endif %}{% if f.type_facture %} — {{ f.type_facture }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:facture_update' f.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune facture enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Coûts & marge</h3>
+    <p><strong>Prix d'achat:</strong> {% if vehicule.prix_achat %}{{ vehicule.prix_achat|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Total dépenses:</strong> {{ total_depenses|floatformat:0 }} FCFA</p>
+    <p><strong>Total réparations:</strong> {{ total_reparations|floatformat:0 }} FCFA</p>
+    <p><strong>Coût total:</strong> {{ cout_total|floatformat:0 }} FCFA</p>
+    {% if derniere_vente %}
+    <p><strong>Dernière vente:</strong> {{ derniere_vente.prix_vente|floatformat:0 }} FCFA ({{ derniere_vente.date_vente }}) — {{ derniere_vente.acquereur|default:"" }}</p>
+    {% if marge is not None %}
+    <p><strong>Marge:</strong> {{ marge|floatformat:0 }} FCFA</p>
+    {% endif %}
+    {% endif %}
+  </div>
+
+  {% if vehicule.statut == 'vendu' and derniere_vente %}
+  <div class="card fiche-block">
+    <h3>Vente / Cession</h3>
+    <p><strong>Date:</strong> {{ derniere_vente.date_vente }}</p>
+    <p><strong>Acquéreur:</strong> {{ derniere_vente.acquereur|default:"—" }}</p>
+    <p><strong>Prix vente:</strong> {% if derniere_vente.prix_vente %}{{ derniere_vente.prix_vente|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Km à la vente:</strong> {{ derniere_vente.km_vente|default:"—"|intcomma }}</p>
+    <p><strong>Garantie:</strong> {{ derniere_vente.garantie_duree|default:"—" }}</p>
+    <p><strong>État livraison:</strong> {{ derniere_vente.etat_livraison|default:"—" }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

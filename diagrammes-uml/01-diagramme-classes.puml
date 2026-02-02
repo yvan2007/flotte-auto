@@ -1,0 +1,328 @@
+@startuml Diagramme de Classes - FLOTTE
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+' Couleurs beige du thème FLOTTE
+skinparam classBackgroundColor #faf8f5
+skinparam classBorderColor #8b7659
+skinparam classFontColor #3d3329
+skinparam packageBackgroundColor #e8dfd4
+skinparam packageBorderColor #a8957a
+skinparam packageFontColor #534636
+skinparam noteBackgroundColor #f2ede6
+skinparam noteBorderColor #c4b39e
+skinparam noteFontColor #3d3329
+
+' ============================================
+' DIAGRAMME DE CLASSES - SYSTÈME FLOTTE
+' ============================================
+
+package "Gestion Flotte" {
+    class Vehicule {
+        - id : Integer
+        - marque : String
+        - modele : String
+        - type : TypeVehicule
+        - annee : Integer
+        - vin : String
+        - dateEntreeParc : Date
+        - datePremiereImmatriculation : Date
+        - kmEntree : Integer
+        - kilometrageActuel : Integer
+        - prixAchat : Decimal
+        - origine : String
+        - etatEntree : EtatVehicule
+        - numeroImmatriculation : String
+        - statut : StatutVehicule
+        - carburant : TypeCarburant
+        - consommationMoyenne : Decimal
+        - rejetCO2 : Integer
+        - puissanceFiscale : Integer
+        --
+        + ajouter()
+        + modifier()
+        + consulter()
+        + mettreAJourKilometrage()
+        + calculerCoutTotal() : Decimal
+        + calculerMarge() : Decimal
+        + calculerTCO() : Decimal
+        + calculerCoutParKm() : Decimal
+    }
+
+    class Import {
+        - id : Integer
+        - dateEntree : Date
+        - dateDouane : Date
+        - dateHomologation : Date
+        - dateImmatriculation : Date
+        - dateCarteGrise : Date
+        - etat : EtatImport
+        --
+        + suivreDemarche()
+        + mettreAJourEtape()
+        + obtenirEtapeCourante() : String
+    }
+
+    class Document {
+        - id : Integer
+        - type : TypeDocument
+        - dateEmission : Date
+        - dateEcheance : Date
+        - numero : String
+        - fichier : String
+        - estValide : Boolean
+        --
+        + ajouter()
+        + consulter()
+        + verifierEcheance() : Boolean
+        + archiver()
+    }
+
+    class Reparation {
+        - id : Integer
+        - date : Date
+        - kilometrage : Integer
+        - type : TypeReparation
+        - description : String
+        - cout : Decimal
+        - prestataire : String
+        --
+        + enregistrer()
+        + consulter()
+        + calculerCoutTotal() : Decimal
+    }
+
+    class Vente {
+        - id : Integer
+        - dateVente : Date
+        - prixVente : Decimal
+        - kilometrageVente : Integer
+        - dureeGarantie : Integer
+        - kilometrageGarantie : Integer
+        - etatLivraison : EtatVehicule
+        - marge : Decimal
+        --
+        + enregistrer()
+        + calculerMarge() : Decimal
+        + genererFacture()
+        + genererPVLivraison()
+    }
+
+    class Acquereur {
+        - id : Integer
+        - nom : String
+        - type : TypeAcquereur
+        - contact : String
+        --
+        + ajouter()
+        + consulter()
+        + modifier()
+    }
+
+    class Prestataire {
+        - id : Integer
+        - nom : String
+        - type : TypePrestataire
+        - contact : String
+        --
+        + ajouter()
+        + consulter()
+    }
+
+    class MaintenancePreventive {
+        - id : Integer
+        - type : TypeMaintenance
+        - dateDerniere : Date
+        - kilometrageDerniere : Integer
+        - cadenceKm : Integer
+        - cadenceMois : Integer
+        - prochaineDate : Date
+        - prochainKilometrage : Integer
+        --
+        + calculerProchaineMaintenance()
+        + verifierAlerte() : Boolean
+        + enregistrerMaintenance()
+    }
+
+    class PleinCarburant {
+        - id : Integer
+        - date : Date
+        - kilometrage : Integer
+        - quantite : Decimal
+        - prixLitre : Decimal
+        - coutTotal : Decimal
+        - lieu : String
+        - typeCarburant : String
+        --
+        + calculerConsommation() : Decimal
+        + enregistrer()
+    }
+
+    class Conducteur {
+        - id : Integer
+        - nom : String
+        - prenom : String
+        - service : String
+        - dateAttribution : Date
+        - consommationMoyenne : Decimal
+        - nombreAccidents : Integer
+        - nombreInfractions : Integer
+        --
+        + assignerVehicule()
+        + enregistrerAccident()
+        + enregistrerInfraction()
+        + calculerConsommationMoyenne() : Decimal
+    }
+}
+
+package "Gestion Financière" {
+    class ChiffreAffaires {
+        - id : Integer
+        - periode : Date
+        - nombreVentes : Integer
+        - montantCA : Decimal
+        - couts : Decimal
+        - marge : Decimal
+        - pourcentageMarge : Decimal
+        --
+        + calculerCA() : Decimal
+        + calculerMarge() : Decimal
+        + genererRapport()
+    }
+}
+
+package "Gestion Utilisateurs" {
+    class Utilisateur {
+        - id : Integer
+        - nom : String
+        - role : Role
+        - email : String
+        --
+        + seConnecter()
+        + seDeconnecter()
+        + consulterDashboard()
+    }
+}
+
+package "Tableau de Bord" {
+    class Dashboard {
+        - kpiParc : Integer
+        - kpiImport : Integer
+        - kpiVendus : Integer
+        - kpiCA : Decimal
+        --
+        + afficherKPIs()
+        + afficherActiviteRecente()
+        + afficherDemarchesAttente()
+        + afficherAlertes()
+    }
+
+    class Alerte {
+        - id : Integer
+        - type : TypeAlerte
+        - message : String
+        - dateEcheance : Date
+        - vehicule : Vehicule
+        --
+        + generer()
+        + consulter()
+    }
+}
+
+' ============================================
+' RELATIONS
+' ============================================
+
+' Relations principales
+Vehicule "1" -- "0..*" Import : a
+Vehicule "1" -- "0..*" Document : possède
+Vehicule "1" -- "0..*" Reparation : subit
+Vehicule "1" -- "0..1" Vente : peut être vendu
+Vehicule "1" -- "0..*" Alerte : génère
+Vehicule "1" -- "0..*" MaintenancePreventive : nécessite
+Vehicule "1" -- "0..*" PleinCarburant : consomme
+Conducteur "0..1" -- "0..*" Vehicule : conduit
+
+Reparation "0..*" -- "1" Prestataire : réalisée par
+Vente "0..1" -- "1" Acquereur : vendue à
+ChiffreAffaires "1" -- "0..*" Vente : calculé à partir de
+
+Dashboard "1" -- "0..*" Vehicule : affiche
+Dashboard "1" -- "0..*" Import : affiche
+Dashboard "1" -- "0..*" Vente : affiche
+Dashboard "1" -- "0..*" Alerte : affiche
+
+Utilisateur "1" -- "0..*" Vehicule : gère
+Utilisateur "1" -- "0..*" Dashboard : consulte
+
+note right of Vehicule
+  <b>StatutVehicule:</b>
+  - Au parc
+  - En import
+  - Vendu
+  
+  <b>TypeVehicule:</b>
+  - Voiture
+  - SUV
+  - Fourgon
+  - Camion
+  - Bus
+  - Utilitaire
+  - Engin de chantier
+  
+  <b>TypeCarburant:</b>
+  - Essence
+  - Diesel
+  - Électrique
+  - Hybride
+  - GPL
+  - GNV
+  
+  <b>Note:</b> Le VIN est unique
+end note
+
+note right of Import
+  <b>EtatImport:</b>
+  - Douane
+  - Homologation
+  - Immatriculation
+  - Carte grise
+  - Complet
+end note
+
+note right of Document
+  <b>TypeDocument:</b>
+  - Carte grise
+  - Douane
+  - COC
+  - Homologation DREAL
+  - Assurance
+  - Contrôle technique
+end note
+
+note right of Reparation
+  <b>TypeReparation:</b>
+  - Mécanique
+  - Carrosserie
+  - Freinage
+  - Électricité
+end note
+
+note right of Utilisateur
+  <b>Role:</b>
+  - Admin
+  - Utilisateur
+end note
+
+note right of MaintenancePreventive
+  <b>TypeMaintenance:</b>
+  - Vidange
+  - Courroie
+  - Pneus
+  - Filtres
+  - Plaquettes
+  - Batterie
+end note
+
+@enduml

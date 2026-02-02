@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc / Flotte</a><span>›</span><span class="current">{{ title }}</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="post" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-group">
+      <label for="id_numero_chassis">Numéro de châssis (identifiant principal) <span class="required">*</span></label>
+      {{ form.numero_chassis }}
+      {{ form.numero_chassis.errors }}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.marque.label }}</label>
+        {{ form.marque }}
+        {{ form.marque.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.modele.label }}</label>
+        {{ form.modele }}
+        {{ form.modele.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.annee.label }}</label>
+        {{ form.annee }}
+        {{ form.annee.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.statut.label }}</label>
+        {{ form.statut }}
+        {{ form.statut.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.type_vehicule.label }}</label>
+        {{ form.type_vehicule }}
+        {{ form.type_vehicule.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.type_carburant.label }}</label>
+        {{ form.type_carburant }}
+        {{ form.type_carburant.errors }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>{{ form.type_transmission.label }}</label>
+      {{ form.type_transmission }}
+      {{ form.type_transmission.errors }}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.couleur_exterieure.label }}</label>
+        {{ form.couleur_exterieure }}
+        {{ form.couleur_exterieure.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.couleur_interieure.label }}</label>
+        {{ form.couleur_interieure }}
+        {{ form.couleur_interieure.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.date_entree_parc.label }}</label>
+        {{ form.date_entree_parc }}
+        {{ form.date_entree_parc.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.km_entree.label }}</label>
+        {{ form.km_entree }}
+        {{ form.km_entree.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.prix_achat.label }}</label>
+        {{ form.prix_achat }}
+        {{ form.prix_achat.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.origine_pays.label }}</label>
+        {{ form.origine_pays }}
+        {{ form.origine_pays.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.numero_immatriculation.label }}</label>
+        {{ form.numero_immatriculation }}
+        {{ form.numero_immatriculation.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.date_premiere_immat.label }}</label>
+        {{ form.date_premiere_immat }}
+        {{ form.date_premiere_immat.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.consommation_moyenne.label }}</label>
+        {{ form.consommation_moyenne }}
+        {{ form.consommation_moyenne.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.rejet_co2.label }}</label>
+        {{ form.rejet_co2 }}
+        {{ form.rejet_co2.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.puissance_fiscale.label }}</label>
+        {{ form.puissance_fiscale }}
+        {{ form.puissance_fiscale.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.etat_entree.label }}</label>
+        {{ form.etat_entree }}
+        {{ form.etat_entree.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.kilometrage_actuel.label }}</label>
+        {{ form.kilometrage_actuel }}
+        {{ form.kilometrage_actuel.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.km_prochaine_vidange.label }}</label>
+        {{ form.km_prochaine_vidange }}
+        {{ form.km_prochaine_vidange.errors }}
+      </div>
+    </div>
+    <div class="form-actions">
+      <a href="{% url 'flotte:parc' %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function() {
+  var marqueSelect = document.getElementById('id_marque');
+  var modeleSelect = document.getElementById('id_modele');
+  if (!marqueSelect || !modeleSelect) return;
+  var apiUrl = '{% url "flotte:api_modeles_par_marque" %}';
+  function updateModeles() {
+    var marqueId = marqueSelect.value;
+    if (!marqueId) {
+      modeleSelect.innerHTML = '<option value="">---------</option>';
+      return;
+    }
+    fetch(apiUrl + '?marque_id=' + encodeURIComponent(marqueId))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var html = '<option value="">---------</option>';
+        (data.modeles || []).forEach(function(m) {
+          html += '<option value="' + m.id + '">' + (m.nom || '').replace(/</g, '&lt;') + '</option>';
+        });
+        modeleSelect.innerHTML = html;
+      })
+      .catch(function() { modeleSelect.innerHTML = '<option value="">---------</option>'; });
+  }
+  marqueSelect.addEventListener('change', updateModeles);
+})();
+</script>
+{% endblock %}

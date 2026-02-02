@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Ventes{% endblock %}
+{% block page_title %}Ventes & cession{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Ventes & cession</h2>
+  <p class="card-desc">Historique des ventes — acquéreur, prix, km à la vente, garantie, état livraison.</p>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Date vente</th>
+        <th>Acquéreur</th>
+        <th>Prix vente (FCFA)</th>
+        <th>Km vente</th>
+        <th>Garantie</th>
+        <th>État livraison</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in ventes %}
+      <tr>
+        <td><strong><a href="{% url 'flotte:vehicule_detail' v.vehicule.pk %}">{{ v.vehicule.libelle_court }}</a></strong></td>
+        <td>{{ v.date_vente }}</td>
+        <td>{{ v.acquereur|default:"—" }}</td>
+        <td>{% if v.prix_vente %}{{ v.prix_vente|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>{{ v.km_vente|default:"—"|intcomma }}</td>
+        <td>{{ v.garantie_duree|default:"—" }}</td>
+        <td>{{ v.etat_livraison|default:"—" }}</td>
+        <td><a href="{% url 'flotte:vehicule_detail' v.vehicule.pk %}" class="btn btn-ghost btn-sm">Fiche</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">Aucune vente enregistrée.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

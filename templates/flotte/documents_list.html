@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Documents{% endblock %}
+{% block page_title %}Documents par véhicule{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Documents par véhicule</h2>
+  <p class="card-desc">Carte grise, douane, COC, assurance, contrôle technique — disponibles ou à faire.</p>
+</div>
+<div class="docs-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+  {% for v in vehicules %}
+  <div class="card doc-card">
+    <div class="doc-header">
+      <strong><a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a></strong>
+      <span class="badge {% if v.documents.exists %}badge-ok{% else %}badge-warn{% endif %}">
+        {{ v.documents.count }} doc{{ v.documents.count|pluralize }}
+      </span>
+      <a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a>
+    </div>
+    <ul class="doc-list">
+      {% for doc in v.documents.all %}
+      <li>{% if doc.disponible %}✓{% else %}—{% endif %} {{ doc.type_document }}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %}</li>
+      {% empty %}
+      <li>Aucun document enregistré</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% empty %}
+  <p>Aucun véhicule.</p>
+  {% endfor %}
+</div>
+{% endblock %}

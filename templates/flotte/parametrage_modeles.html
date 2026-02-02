@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Paramétrage — Modèles{% endblock %}
+{% block page_title %}Paramétrage — Modèles{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:parametrage_index' %}">Paramétrage</a><span>›</span><span class="current">Modèles</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Gérer les modèles par marque. <strong>Règles :</strong> version et année obligatoires ; un même modèle ne peut exister qu'une fois par marque. Créer, modifier, archiver un modèle.</p>
+</div>
+<div class="toolbar">
+  <form method="get" class="filters" style="display: inline-flex; gap: 0.75rem; align-items: center;">
+    <label>Marque
+      <select name="marque_id" class="select">
+        <option value="">Toutes</option>
+        {% for ma in marques %}
+        <option value="{{ ma.id }}" {% if request.GET.marque_id == ma.id|stringformat:"s" %}selected{% endif %}>{{ ma.nom }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
+    <a href="?{% if request.GET.marque_id %}marque_id={{ request.GET.marque_id }}&{% endif %}archives=1" class="btn btn-ghost btn-sm">Afficher archivés</a>
+    {% if request.GET.archives %}<a href="?{% if request.GET.marque_id %}marque_id={{ request.GET.marque_id }}{% endif %}" class="btn btn-ghost btn-sm">Masquer archivés</a>{% endif %}
+  </form>
+  <a href="{% url 'flotte:modele_create' %}" class="btn btn-primary" style="margin-left: 1rem;">Ajouter un modèle</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Marque</th>
+        <th>Modèle</th>
+        <th>Version</th>
+        <th>Année min</th>
+        <th>Archivé</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in modeles %}
+      <tr>
+        <td>{{ m.marque.nom }}</td>
+        <td>{{ m.nom }}</td>
+        <td>{{ m.version|default:"—" }}</td>
+        <td>{{ m.annee_min|default:"—" }}</td>
+        <td>{% if m.archive %}<span class="badge badge-muted">Oui</span>{% else %}Non{% endif %}</td>
+        <td><a href="{% url 'flotte:modele_update' m.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Aucun modèle. <a href="{% url 'flotte:modele_create' %}">Ajouter un modèle</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="parametrage-nav">
+  <a href="{% url 'flotte:parametrage_index' %}" class="btn btn-ghost btn-sm">Retour au paramétrage</a>
+  <a href="{% url 'flotte:parametrage_marques' %}" class="btn btn-ghost btn-sm">Marques</a>
+  <a href="{% url 'flotte:parametrage_carburant' %}" class="btn btn-ghost btn-sm">Types carburant</a>
+  <a href="{% url 'flotte:parametrage_transmission' %}" class="btn btn-ghost btn-sm">Types transmission</a>
+  <a href="{% url 'flotte:parametrage_type_vehicule' %}" class="btn btn-ghost btn-sm">Types véhicule</a>
+  <a href="{% url 'flotte:parametrage_utilisateurs' %}" class="btn btn-ghost btn-sm">Utilisateurs</a>
+</p>
+{% endblock %}

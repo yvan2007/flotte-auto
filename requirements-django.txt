@@ -1,0 +1,8 @@
+Django>=5.0,<6
+
+# Tests fonctionnels (Selenium + Chrome)
+selenium>=4.0,<6
+webdriver-manager>=4.0,<5
+
+# Couverture de code (coverage)
+coverage[toml]>=7.0,<9

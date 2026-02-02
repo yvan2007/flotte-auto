@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FLOTTE{% endblock %} — Gestion import & parc véhicules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/></svg>
+        </span>
+        <span class="logo-text">FLOTTE</span>
+      </div>
+      <nav class="nav">
+        <a href="{% url 'flotte:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
+          Tableau de bord
+        </a>
+        <a href="{% url 'flotte:parc' %}" class="nav-link {% if request.resolver_match.url_name == 'parc' or request.resolver_match.url_name == 'vehicule_detail' or request.resolver_match.url_name == 'vehicule_create' or request.resolver_match.url_name == 'vehicule_update' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5H5v5z"/><path d="M5 9h14V6H5v3z"/><path d="M3 4h18v16H3z"/></svg></span>
+          Parc / Flotte
+        </a>
+        {% if is_manager_or_admin %}
+        <a href="{% url 'flotte:import_list' %}" class="nav-link {% if request.resolver_match.url_name == 'import_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h6v13H6"/><path d="M16 8v5l4-2.5-4-2.5z"/></svg></span>
+          Import & démarches
+        </a>
+        {% endif %}
+        <a href="{% url 'flotte:reparations_list' %}" class="nav-link {% if request.resolver_match.url_name == 'reparations_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+          Réparations
+        </a>
+        <a href="{% url 'flotte:documents_list' %}" class="nav-link {% if request.resolver_match.url_name == 'documents_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span>
+          Documents
+        </a>
+        {% if is_manager_or_admin %}
+        <a href="{% url 'flotte:ventes_list' %}" class="nav-link {% if request.resolver_match.url_name == 'ventes_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+          Ventes
+        </a>
+        <a href="{% url 'flotte:ca' %}" class="nav-link {% if request.resolver_match.url_name == 'ca' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          Chiffre d'affaires
+        </a>
+        {% endif %}
+        <a href="{% url 'flotte:maintenance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'maintenance_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          Maintenance préventive
+        </a>
+        <a href="{% url 'flotte:carburant_list' %}" class="nav-link {% if request.resolver_match.url_name == 'carburant_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v4h2l2 12h6l2-12h2V2H3z"/><path d="M7 6h10"/><path d="M12 10v8"/><path d="M9 14h6"/></svg></span>
+          Carburant
+        </a>
+        <a href="{% url 'flotte:conducteurs_list' %}" class="nav-link {% if request.resolver_match.url_name == 'conducteurs_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          Conducteurs
+        </a>
+        {% if is_manager_or_admin %}
+        <a href="{% url 'flotte:location_list' %}" class="nav-link {% if 'location' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          Location
+        </a>
+        {% endif %}
+        {% if is_admin %}
+        <a href="{% url 'flotte:parametrage_index' %}" class="nav-link {% if 'parametrage' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          Paramétrage
+        </a>
+        {% endif %}
+      </nav>
+      {% if is_manager_or_admin %}
+      <div class="sidebar-footer">
+        <a href="{% url 'flotte:vehicule_create' %}" class="btn btn-primary btn-sm">Nouveau véhicule</a>
+      </div>
+      {% endif %}
+    </aside>
+    <main class="main">
+      <header class="header">
+        <h1 class="page-title">{% block page_title %}Tableau de bord{% endblock %}</h1>
+        <div class="header-actions">
+          <span class="user-badge">{{ user.get_full_name|default:user.username }}</span>
+          <form method="post" action="{% url 'flotte:logout' %}" class="logout-form-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost btn-sm">Déconnexion</button>
+          </form>
+        </div>
+      </header>
+      <div class="content">
+        <div class="content-wrap">
+          {% if messages %}
+          <div class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% block breadcrumb %}{% endblock %}
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </main>
+  </div>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

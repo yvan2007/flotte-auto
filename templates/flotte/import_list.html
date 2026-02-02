@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Import & démarches{% endblock %}
+{% block page_title %}Import & démarches{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Import & démarches</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Suivi des démarches par véhicule</h2>
+  <p class="card-desc">Véhicules en cours d'importation — Douane → Homologation → Immatriculation → Carte grise → Assurance.</p>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule (châssis)</th>
+        <th>Date entrée</th>
+        <th>Démarches</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in vehicules %}
+      <tr>
+        <td><strong>{{ v.libelle_court }}</strong><br><small>{{ v.numero_chassis }}</small></td>
+        <td>{{ v.date_entree_parc|default:"—" }}</td>
+        <td>
+          {% for d in v.import_demarches.all %}
+          <span class="badge badge-ok">{{ d.etape }}</span> {{ d.date_etape|default:"" }} {{ d.statut_etape|default:"" }}<br>
+          {% empty %}
+          <span class="badge badge-warn">Aucune étape enregistrée</span>
+          {% endfor %}
+        </td>
+        <td><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">Aucun véhicule en cours d'import.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

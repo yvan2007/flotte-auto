@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Fiche location{% endblock %}
+{% block page_title %}Fiche location — {{ location.vehicule.libelle_court }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:location_list' %}">Location</a><span>›</span><a href="{% url 'flotte:vehicule_detail' location.vehicule.pk %}">{{ location.vehicule.libelle_court }}</a><span>›</span><span class="current">Contrat</span></nav>
+{% endblock %}
+{% block content %}
+<div class="fiche-grid">
+  <div class="card fiche-block">
+    <h3>Contrat</h3>
+    <p><strong>Véhicule:</strong> <a href="{% url 'flotte:vehicule_detail' location.vehicule.pk %}">{{ location.vehicule.libelle_court }}</a> (châssis {{ location.vehicule.numero_chassis }})</p>
+    <p><strong>Locataire:</strong> {{ location.locataire }}</p>
+    <p><strong>Type:</strong> {{ location.type_location }}</p>
+    <p><strong>Début:</strong> {{ location.date_debut }}</p>
+    <p><strong>Fin:</strong> {{ location.date_fin }}</p>
+    <p><strong>Statut:</strong> {{ location.get_statut_display }}</p>
+  </div>
+  <div class="card fiche-block">
+    <h3>Finances</h3>
+    <p><strong>Loyer mensuel:</strong> {% if location.loyer_mensuel %}{{ location.loyer_mensuel|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Km inclus / mois:</strong> {{ location.km_inclus_mois|default:"—" }}</p>
+    <p><strong>Prix km supplémentaire:</strong> {% if location.prix_km_supplementaire %}{{ location.prix_km_supplementaire }} FCFA/km{% else %}—{% endif %}</p>
+  </div>
+  <div class="card fiche-block">
+    <h3>Échéances</h3>
+    <p><strong>Expiration visite technique (CT):</strong> {{ location.date_expiration_ct|default:"—" }}</p>
+    <p><strong>Expiration assurance:</strong> {{ location.date_expiration_assurance|default:"—" }}</p>
+    <p><strong>Kilométrage prochaine vidange:</strong> {% if location.km_prochaine_vidange %}{{ location.km_prochaine_vidange|intcomma }} km{% else %}—{% endif %}</p>
+  </div>
+  {% if location.remarques %}
+  <div class="card fiche-block">
+    <h3>Remarques</h3>
+    <p>{{ location.remarques }}</p>
+  </div>
+  {% endif %}
+</div>
+<p>
+  <a href="{% url 'flotte:location_list' %}" class="btn btn-ghost">Retour à la liste</a>
+  {% if is_manager_or_admin %}<a href="{% url 'flotte:location_update' location.pk %}" class="btn btn-primary">Modifier</a>{% endif %}
+</p>
+{% endblock %}

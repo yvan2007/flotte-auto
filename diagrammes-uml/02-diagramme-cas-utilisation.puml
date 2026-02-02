@@ -1,0 +1,247 @@
+@startuml Diagramme de Cas d'Utilisation - FLOTTE
+!theme plain
+skinparam shadowing false
+
+' Couleurs beige du thème FLOTTE
+skinparam actorBackgroundColor #faf8f5
+skinparam actorBorderColor #8b7659
+skinparam actorFontColor #3d3329
+skinparam usecaseBackgroundColor #f2ede6
+skinparam usecaseBorderColor #a8957a
+skinparam usecaseFontColor #534636
+skinparam rectangleBackgroundColor #e8dfd4
+skinparam rectangleBorderColor #c4b39e
+skinparam rectangleFontColor #534636
+skinparam packageBackgroundColor #d9ccbe
+skinparam packageBorderColor #a8957a
+skinparam packageFontColor #534636
+skinparam noteBackgroundColor #f2ede6
+skinparam noteBorderColor #c4b39e
+skinparam noteFontColor #3d3329
+
+' ============================================
+' DIAGRAMME DE CAS D'UTILISATION - SYSTÈME FLOTTE
+' ============================================
+
+left to right direction
+
+actor "Administrateur" as Admin
+actor "Utilisateur" as User
+
+' ============================================
+' GESTION DES VÉHICULES
+' ============================================
+package "Gestion Véhicules" {
+    usecase "Ajouter un véhicule" as UC01
+    usecase "Consulter le parc" as UC02
+    usecase "Consulter fiche véhicule" as UC03
+    usecase "Modifier véhicule" as UC04
+    usecase "Rechercher véhicule" as UC05
+    usecase "Filtrer véhicules" as UC06
+    usecase "Trier véhicules" as UC07
+}
+
+' ============================================
+' GESTION DES IMPORTS
+' ============================================
+package "Gestion Imports" {
+    usecase "Suivre démarches import" as UC08
+    usecase "Enregistrer étape douane" as UC09
+    usecase "Enregistrer homologation" as UC10
+    usecase "Enregistrer immatriculation" as UC11
+    usecase "Enregistrer carte grise" as UC12
+    usecase "Consulter état démarches" as UC13
+}
+
+' ============================================
+' GESTION DES DOCUMENTS
+' ============================================
+package "Gestion Documents" {
+    usecase "Ajouter document" as UC14
+    usecase "Consulter documents véhicule" as UC15
+    usecase "Vérifier échéances documents" as UC16
+    usecase "Archiver document" as UC17
+}
+
+' ============================================
+' GESTION DES RÉPARATIONS
+' ============================================
+package "Gestion Réparations" {
+    usecase "Enregistrer réparation" as UC18
+    usecase "Consulter historique réparations" as UC19
+    usecase "Consulter réparations véhicule" as UC20
+}
+
+' ============================================
+' GESTION DES VENTES
+' ============================================
+package "Gestion Ventes" {
+    usecase "Enregistrer vente" as UC21
+    usecase "Consulter ventes" as UC22
+    usecase "Calculer marge vente" as UC23
+    usecase "Générer facture vente" as UC24
+    usecase "Générer PV livraison" as UC25
+}
+
+' ============================================
+' GESTION FINANCIÈRE
+' ============================================
+package "Gestion Financière" {
+    usecase "Consulter chiffre d'affaires" as UC26
+    usecase "Consulter marge" as UC27
+    usecase "Générer rapport financier" as UC28
+    usecase "Consulter évolution CA" as UC29
+}
+
+' ============================================
+' TABLEAU DE BORD
+' ============================================
+package "Tableau de Bord" {
+    usecase "Consulter tableau de bord" as UC30
+    usecase "Consulter KPIs" as UC31
+    usecase "Consulter activité récente" as UC32
+    usecase "Consulter démarches en attente" as UC33
+    usecase "Consulter alertes" as UC34
+}
+
+' ============================================
+' GESTION UTILISATEURS
+' ============================================
+package "Authentification" {
+    usecase "Se connecter" as UC35
+    usecase "Se déconnecter" as UC36
+}
+
+' ============================================
+' RELATIONS ACTEURS - CAS D'UTILISATION
+' ============================================
+
+Admin --> UC01
+Admin --> UC02
+Admin --> UC03
+Admin --> UC04
+Admin --> UC05
+Admin --> UC06
+Admin --> UC07
+Admin --> UC08
+Admin --> UC09
+Admin --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+Admin --> UC17
+Admin --> UC18
+Admin --> UC19
+Admin --> UC20
+Admin --> UC21
+Admin --> UC22
+Admin --> UC23
+Admin --> UC24
+Admin --> UC25
+Admin --> UC26
+Admin --> UC27
+Admin --> UC28
+Admin --> UC29
+Admin --> UC30
+Admin --> UC31
+Admin --> UC32
+Admin --> UC33
+Admin --> UC34
+Admin --> UC35
+Admin --> UC36
+
+User --> UC02
+User --> UC03
+User --> UC05
+User --> UC13
+User --> UC15
+User --> UC19
+User --> UC22
+User --> UC26
+User --> UC30
+User --> UC31
+User --> UC35
+User --> UC36
+
+' ============================================
+' RELATIONS INCLUDE
+' ============================================
+
+UC01 ..> UC35 : include
+UC04 ..> UC35 : include
+UC08 ..> UC35 : include
+UC09 ..> UC08 : include
+UC10 ..> UC08 : include
+UC11 ..> UC08 : include
+UC12 ..> UC08 : include
+UC14 ..> UC35 : include
+UC18 ..> UC35 : include
+UC21 ..> UC35 : include
+UC21 ..> UC23 : include
+UC24 ..> UC21 : include
+UC25 ..> UC21 : include
+UC28 ..> UC26 : include
+UC28 ..> UC27 : include
+UC30 ..> UC31 : include
+UC30 ..> UC32 : include
+UC30 ..> UC33 : include
+UC30 ..> UC34 : include
+
+' ============================================
+' RELATIONS EXTEND
+' ============================================
+
+UC03 ..> UC02 : extend
+UC20 ..> UC03 : extend
+UC15 ..> UC03 : extend
+UC13 ..> UC03 : extend
+UC16 ..> UC15 : extend
+UC34 ..> UC16 : extend
+UC23 ..> UC21 : extend
+UC29 ..> UC26 : extend
+
+' ============================================
+' RELATIONS GÉNÉRALISATION
+' ============================================
+
+UC08 <|-- UC09
+UC08 <|-- UC10
+UC08 <|-- UC11
+UC08 <|-- UC12
+
+UC21 <|-- UC24
+UC21 <|-- UC25
+
+UC30 <|-- UC31
+UC30 <|-- UC32
+UC30 <|-- UC33
+UC30 <|-- UC34
+
+note right of UC01
+  Permet d'ajouter un nouveau
+  véhicule au parc avec toutes
+  les informations d'identification
+end note
+
+note right of UC08
+  Suivi complet du processus
+  d'import depuis l'entrée
+  jusqu'à la carte grise
+end note
+
+note right of UC21
+  Enregistre une vente avec
+  calcul automatique de la marge
+  et génération des documents
+end note
+
+note right of UC30
+  Vue d'ensemble de l'activité
+  avec KPIs, alertes et
+  démarches en attente
+end note
+
+@enduml

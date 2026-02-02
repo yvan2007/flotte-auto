@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Chiffre d'affaires{% endblock %}
+{% block page_title %}Chiffre d'affaires{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Chiffre d'affaires</span></nav>
+{% endblock %}
+{% block content %}
+<section class="ca-hero">
+  <div class="ca-hero-inner">
+    <div class="ca-hero-icon" aria-hidden="true">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div class="ca-hero-text">
+      <h2 class="ca-hero-title">Chiffre d'affaires</h2>
+      <p class="ca-hero-desc">Synthèse des ventes et montants enregistrés.</p>
+    </div>
+  </div>
+</section>
+
+<div class="kpi-grid kpi-grid-ca">
+  <div class="kpi-card kpi-card-primary">
+    <span class="kpi-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </span>
+    <span class="kpi-label">CA total (FCFA)</span>
+    <span class="kpi-value">{{ total_ca|floatformat:0 }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </span>
+    <span class="kpi-label">Nombre de ventes</span>
+    <span class="kpi-value">{{ nb_ventes }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+    </span>
+    <span class="kpi-label">Moyenne par vente (FCFA)</span>
+    <span class="kpi-value">{{ moyenne_vente|floatformat:0 }}</span>
+  </div>
+</div>
+
+<div class="card card-ca-summary">
+  <div class="card-ca-summary-header">
+    <span class="card-ca-summary-icon" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+    </span>
+    <div>
+      <h2 class="card-title">Gestion financière</h2>
+      <p class="card-desc">Factures, dépenses par véhicule (entretien, réparation, carburant, assurance) et montant total des ventes.</p>
+    </div>
+  </div>
+  {% if is_manager_or_admin %}
+  <div class="card-ca-actions">
+    <a href="{% url 'flotte:ventes_list' %}" class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Voir les ventes
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

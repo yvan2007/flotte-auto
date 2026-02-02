@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Location{% endblock %}
+{% block page_title %}Location / LLD / LOA{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Location</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Contrats de location (LLD, LOA, courte durée). Suivi des véhicules loués, locataires, échéances (CT, assurance, km vidange).</p>
+</div>
+<div class="toolbar">
+  <a href="{% url 'flotte:location_create' %}" class="btn btn-primary">Nouvelle location</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Locataire</th>
+        <th>Type</th>
+        <th>Début</th>
+        <th>Fin</th>
+        <th>Loyer (FCFA)</th>
+        <th>Exp. CT</th>
+        <th>Exp. assurance</th>
+        <th>Km vidange</th>
+        <th>Statut</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for loc in locations %}
+      <tr>
+        <td><strong><a href="{% url 'flotte:vehicule_detail' loc.vehicule.pk %}">{{ loc.vehicule.libelle_court }}</a></strong></td>
+        <td>{{ loc.locataire }}</td>
+        <td>{{ loc.type_location }}</td>
+        <td>{{ loc.date_debut }}</td>
+        <td>{{ loc.date_fin }}</td>
+        <td>{% if loc.loyer_mensuel %}{{ loc.loyer_mensuel|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>{{ loc.date_expiration_ct|default:"—" }}</td>
+        <td>{{ loc.date_expiration_assurance|default:"—" }}</td>
+        <td>{% if loc.km_prochaine_vidange %}{{ loc.km_prochaine_vidange|intcomma }}{% else %}—{% endif %}</td>
+        <td>
+          {% if loc.statut == 'en_cours' %}<span class="badge badge-ok">En cours</span>
+          {% elif loc.statut == 'a_venir' %}<span class="badge badge-warn">À venir</span>
+          {% else %}<span class="badge badge-muted">Terminé</span>{% endif %}
+        </td>
+        <td><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche</a> <a href="{% url 'flotte:location_update' loc.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="11">Aucune location. <a href="{% url 'flotte:location_create' %}">Créer une location</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if page_obj.has_other_pages %}
+<nav style="margin-top: 1rem;">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-ghost btn-sm">Précédent</a>{% endif %}
+  <span style="margin: 0 1rem;">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-ghost btn-sm">Suivant</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

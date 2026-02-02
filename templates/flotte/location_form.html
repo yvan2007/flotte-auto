@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:location_list' %}">Location</a><span>›</span><span class="current">{{ title }}</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="post" class="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-group">
+      <label>{{ form.vehicule.label }}</label>
+      {{ form.vehicule }}
+      {{ form.vehicule.errors }}
+    </div>
+    <div class="form-group">
+      <label>{{ form.locataire.label }}</label>
+      {{ form.locataire }}
+      {{ form.locataire.errors }}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.type_location.label }}</label>
+        {{ form.type_location }}
+        {{ form.type_location.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.loyer_mensuel.label }}</label>
+        {{ form.loyer_mensuel }}
+        {{ form.loyer_mensuel.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.date_debut.label }}</label>
+        {{ form.date_debut }}
+        {{ form.date_debut.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.date_fin.label }}</label>
+        {{ form.date_fin }}
+        {{ form.date_fin.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.km_inclus_mois.label }}</label>
+        {{ form.km_inclus_mois }}
+        {{ form.km_inclus_mois.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.prix_km_supplementaire.label }}</label>
+        {{ form.prix_km_supplementaire }}
+        {{ form.prix_km_supplementaire.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.date_expiration_ct.label }}</label>
+        {{ form.date_expiration_ct }}
+        {{ form.date_expiration_ct.errors }}
+      </div>
+      <div class="form-group">
+        <label>{{ form.date_expiration_assurance.label }}</label>
+        {{ form.date_expiration_assurance }}
+        {{ form.date_expiration_assurance.errors }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>{{ form.km_prochaine_vidange.label }}</label>
+      {{ form.km_prochaine_vidange }}
+      {{ form.km_prochaine_vidange.errors }}
+    </div>
+    <div class="form-group">
+      <label>{{ form.remarques.label }}</label>
+      {{ form.remarques }}
+      {{ form.remarques.errors }}
+    </div>
+    <div class="form-group">
+      <label>{{ form.statut.label }}</label>
+      {{ form.statut }}
+      {{ form.statut.errors }}
+    </div>
+    <div class="form-actions">
+      <a href="{% url 'flotte:location_list' %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

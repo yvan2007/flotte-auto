@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><span class="current">Tableau de bord</span></nav>
+{% endblock %}
+{% block content %}
+<p class="card-desc" style="margin-bottom: 1.25rem;">Vue d'ensemble du parc, des véhicules en import et des alertes (CT, assurance).</p>
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <span class="kpi-label">Véhicules dans le parc</span>
+    <span class="kpi-value">{{ parc }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">En cours d'import</span>
+    <span class="kpi-value">{{ import }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Vendus</span>
+    <span class="kpi-value">{{ vendus }}</span>
+  </div>
+  <div class="kpi-card">
+    <span class="kpi-label">Total véhicules</span>
+    <span class="kpi-value">{{ total }}</span>
+  </div>
+</div>
+<div class="dashboard-grid">
+  <div class="card">
+    <h2 class="card-title">Répartition par marque</h2>
+    <p class="card-desc">Nombre de véhicules par marque dans la flotte.</p>
+    <div class="parc-marque-grid">
+      {% for item in by_marque %}
+      <span class="parc-marque-item"><strong>{{ item.marque__nom|default:"—" }}</strong> <span>{{ item.n }} véhicule{{ item.n|pluralize }}</span></span>
+      {% empty %}
+      <div class="empty-state"><p>Aucun véhicule enregistré.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Véhicules en cours d'import</h2>
+    <p class="card-desc">Derniers véhicules en phase d'import (douane, homologation, immat.).</p>
+    {% if vehicules_import %}
+    <ul class="activity-list">
+      {% for v in vehicules_import %}
+      <li>
+        <span class="li-content"><a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a> — {{ v.numero_chassis }} <span class="text-muted">(entrée {{ v.date_entree_parc|default:"—" }})</span></span>
+        <span class="li-actions"><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-outline btn-sm">Fiche</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    <p style="margin-top: 0.75rem;"><a href="{% url 'flotte:import_list' %}" class="btn btn-primary btn-sm">Voir tout l'import</a></p>
+    {% else %}
+    <div class="empty-state"><p>Aucun véhicule en cours d'import.</p><p><a href="{% url 'flotte:parc' %}">Voir le parc</a></p></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Alertes — CT (visite technique)</h2>
+    <p class="card-desc">Contrôles techniques dont l'échéance est dans les 30 prochains jours.</p>
+    {% if alertes_ct %}
+    <ul class="activity-list">
+      {% for loc in alertes_ct %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">CT</span> <a href="{% url 'flotte:vehicule_detail' loc.vehicule.pk %}">{{ loc.vehicule.libelle_court }}</a> — Expiration le {{ loc.date_expiration_ct }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche location</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state"><p>Aucune échéance CT dans les 30 prochains jours.</p></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Alertes — Assurance</h2>
+    <p class="card-desc">Assurances dont l'échéance est dans les 30 prochains jours.</p>
+    {% if alertes_assurance %}
+    <ul class="activity-list">
+      {% for loc in alertes_assurance %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">Assurance</span> <a href="{% url 'flotte:vehicule_detail' loc.vehicule.pk %}">{{ loc.vehicule.libelle_court }}</a> — Expiration le {{ loc.date_expiration_assurance }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche location</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state"><p>Aucune échéance assurance dans les 30 prochains jours.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

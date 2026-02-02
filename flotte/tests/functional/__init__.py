@@ -1,0 +1,1 @@
+# Tests fonctionnels FLOTTE (Selenium)

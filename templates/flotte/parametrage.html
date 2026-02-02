@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Paramétrage — Accueil{% endblock %}
+{% block page_title %}Paramétrage de la solution{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><span class="current">Paramétrage</span></nav>
+{% endblock %}
+{% block content %}
+<p class="card-desc" style="margin-bottom: 1.5rem;">Gérer les marques, modèles, types techniques, utilisateurs et droits d'accès. Le numéro de châssis est l'identifiant principal des véhicules (surtout en import sans immatriculation).</p>
+
+<div class="parametrage-grid">
+  <section class="card parametrage-section">
+    <h2 class="card-title">1 — Informations des véhicules</h2>
+    <p class="card-desc">Numéro de châssis (unique), enregistrement véhicule acheté (pays, statut), documents (disponibles ou à faire), réparations à effectuer.</p>
+    <ul class="parametrage-links">
+      <li><a href="{% url 'flotte:parc' %}" class="btn btn-ghost">Parc / Flotte</a></li>
+      <li><a href="{% url 'flotte:import_list' %}" class="btn btn-ghost">Import & démarches</a></li>
+      <li><a href="{% url 'flotte:documents_list' %}" class="btn btn-ghost">Documents véhicules</a></li>
+      <li><a href="{% url 'flotte:reparations_list' %}" class="btn btn-ghost">Réparations</a></li>
+    </ul>
+  </section>
+
+  <section class="card parametrage-section">
+    <h2 class="card-title">2 — Caractéristiques techniques</h2>
+    <p class="card-desc">Type de transmission (manuelle, automatique…), type de carburant (essence, diesel, électrique…), couleur intérieure, km vidange, échéances (assurance, CT, carte grise).</p>
+    <ul class="parametrage-links">
+      <li><a href="{% url 'flotte:parametrage_transmission' %}" class="btn btn-ghost">Types transmission</a></li>
+      <li><a href="{% url 'flotte:parametrage_carburant' %}" class="btn btn-ghost">Types carburant</a></li>
+      <li><a href="{% url 'flotte:parametrage_type_vehicule' %}" class="btn btn-ghost">Types véhicule</a></li>
+      <li><a href="{% url 'flotte:location_list' %}" class="btn btn-ghost">Locations (CT, assurance, vidange)</a></li>
+    </ul>
+  </section>
+
+  <section class="card parametrage-section">
+    <h2 class="card-title">3 — Marques et modèles</h2>
+    <p class="card-desc">Créer, modifier, archiver une marque ou un modèle. Règles : une même marque ne peut pas exister deux fois ; pour le modèle, version et année sont obligatoires ; un même modèle ne peut exister qu'une fois par marque.</p>
+    <ul class="parametrage-links">
+      <li><a href="{% url 'flotte:parametrage_marques' %}" class="btn btn-primary">Marques</a></li>
+      <li><a href="{% url 'flotte:parametrage_modeles' %}" class="btn btn-primary">Modèles</a></li>
+    </ul>
+  </section>
+
+  <section class="card parametrage-section">
+    <h2 class="card-title">4 — Utilisateurs et paramètres</h2>
+    <p class="card-desc">Connecter le manager ou l'utilisateur. Créer, modifier, archiver les utilisateurs et leurs rôles. Gérer les droits et accès selon les rôles (Admin, Gestionnaire, Utilisateur).</p>
+    <ul class="parametrage-links">
+      <li><a href="{% url 'flotte:parametrage_utilisateurs' %}" class="btn btn-primary">Utilisateurs</a></li>
+    </ul>
+  </section>
+
+  <section class="card parametrage-section">
+    <h2 class="card-title">5 — Gestion financière et dépenses</h2>
+    <p class="card-desc">Factures liées aux véhicules. Centraliser les dépenses par véhicule : entretien, réparation, carburant, assurance. Chiffre d'affaires et rapports.</p>
+    <ul class="parametrage-links">
+      <li><a href="{% url 'flotte:ca' %}" class="btn btn-primary">Chiffre d'affaires</a></li>
+      <li><a href="{% url 'flotte:ventes_list' %}" class="btn btn-ghost">Ventes</a></li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

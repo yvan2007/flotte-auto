@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Maintenance préventive{% endblock %}
+{% block page_title %}Maintenance préventive{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Maintenance préventive</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Maintenance préventive</h2>
+  <p class="card-desc">Planning des entretiens : vidange, courroie, pneus, filtres, plaquettes, batterie. Alertes selon kilométrage et dates.</p>
+</div>
+{% if is_manager_or_admin %}
+<div class="toolbar">
+  <a href="{% url 'flotte:maintenance_create' %}" class="btn btn-primary">Nouvelle maintenance</a>
+</div>
+{% endif %}
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Type</th>
+        <th>Date prévue</th>
+        <th>Km prévu</th>
+        <th>Date effectuée</th>
+        <th>Coût (FCFA)</th>
+        <th>Statut</th>
+        {% if is_manager_or_admin %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in maintenances %}
+      <tr>
+        <td><strong><a href="{% url 'flotte:vehicule_detail' m.vehicule.pk %}">{{ m.vehicule.libelle_court }}</a></strong></td>
+        <td>{{ m.get_type_maintenance_display }}</td>
+        <td>{{ m.date_prevue|default:"—" }}</td>
+        <td>{% if m.kilometrage_prevu %}{{ m.kilometrage_prevu|intcomma }}{% else %}—{% endif %}</td>
+        <td>{{ m.date_effectuee|default:"—" }}</td>
+        <td>{% if m.cout %}{{ m.cout|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>
+          {% if m.statut == 'effectue' %}<span class="badge badge-ok">Effectué</span>
+          {% elif m.statut == 'en_cours' %}<span class="badge badge-warn">En cours</span>
+          {% else %}<span class="badge badge-muted">À faire</span>{% endif %}
+        </td>
+        {% if is_manager_or_admin %}<td><a href="{% url 'flotte:maintenance_update' m.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>{% endif %}
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">Aucune maintenance enregistrée.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

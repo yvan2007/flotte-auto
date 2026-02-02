@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Réparations{% endblock %}
+{% block page_title %}Réparations{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Historique des réparations</h2>
+  <p class="card-desc">Réparations effectuées ou à faire sur chaque véhicule.</p>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Date</th>
+        <th>Km</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Coût (FCFA)</th>
+        <th>Prestataire</th>
+        <th>À faire</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reparations %}
+      <tr>
+        <td><strong><a href="{% url 'flotte:vehicule_detail' r.vehicule.pk %}">{{ r.vehicule.libelle_court }}</a></strong></td>
+        <td>{{ r.date_reparation|default:"—" }}</td>
+        <td>{{ r.kilometrage|default:"—"|intcomma }}</td>
+        <td>{{ r.type_rep|default:"—" }}</td>
+        <td>{{ r.description|truncatewords:15 }}</td>
+        <td>{% if r.cout %}{{ r.cout|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>{{ r.prestataire|default:"—" }}</td>
+        <td>{% if r.a_faire %}<span class="badge badge-warn">Oui</span>{% else %}—{% endif %}</td>
+        <td><a href="{% url 'flotte:vehicule_detail' r.vehicule.pk %}" class="btn btn-ghost btn-sm">Fiche</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="9">Aucune réparation enregistrée.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
