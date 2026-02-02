@@ -1,4 +1,5 @@
-"""Signals FLOTTE — création du profil utilisateur à l'inscription."""
+"""Signals FLOTTE — création du profil utilisateur à l'inscription.
+Associe un ProfilUtilisateur (rôle) à chaque nouvel utilisateur."""
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
