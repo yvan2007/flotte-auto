@@ -16,7 +16,10 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, FormView,
 )
 from django.urls import reverse_lazy, reverse
-from django.db.models import Count, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
+from django.db.models.functions import TruncDate, TruncMonth, TruncYear
+from django.utils import timezone
+from decimal import Decimal
 from django.utils.decorators import method_decorator
 
 from .models import (
@@ -666,19 +669,77 @@ def ventes_list(request):
     return render(request, 'flotte/ventes_list.html', context)
 
 
+def _ca_evolution_queryset(granularite, annee, mois=None):
+    """Retourne les valeurs annotées (date/mois/année, total) pour l'évolution du CA."""
+    qs = Vente.objects.exclude(prix_vente__isnull=True).exclude(prix_vente=0)
+    if annee:
+        qs = qs.filter(date_vente__year=annee)
+    if mois is not None:
+        qs = qs.filter(date_vente__month=mois)
+    if granularite == 'jour':
+        qs = qs.annotate(periode=TruncDate('date_vente')).values('periode').annotate(
+            total=Sum('prix_vente'), nb=Count('id')
+        ).order_by('periode')
+    elif granularite == 'mois':
+        qs = qs.annotate(periode=TruncMonth('date_vente')).values('periode').annotate(
+            total=Sum('prix_vente'), nb=Count('id')
+        ).order_by('periode')
+    else:  # annee
+        qs = qs.annotate(periode=TruncYear('date_vente')).values('periode').annotate(
+            total=Sum('prix_vente'), nb=Count('id')
+        ).order_by('periode')
+    return qs
+
+
+@manager_or_admin_required
+def ca_api_evolution(request):
+    """API JSON : évolution du CA par jour / mois / année pour les graphiques."""
+    granularite = request.GET.get('granularite', 'mois')
+    if granularite not in ('jour', 'mois', 'annee'):
+        granularite = 'mois'
+    try:
+        annee = int(request.GET.get('annee', timezone.now().year))
+    except (TypeError, ValueError):
+        annee = timezone.now().year
+    mois = request.GET.get('mois')
+    if mois is not None:
+        try:
+            mois = int(mois)
+        except (TypeError, ValueError):
+            mois = None
+    rows = list(_ca_evolution_queryset(granularite, annee, mois))
+    if granularite == 'jour':
+        labels = [r['periode'].strftime('%d/%m') if r['periode'] else '' for r in rows]
+    elif granularite == 'mois':
+        mois_noms = ('', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc')
+        labels = [
+            f"{mois_noms[r['periode'].month]} {r['periode'].year}" if r['periode'] else ''
+            for r in rows
+        ]
+    else:
+        labels = [str(r['periode'].year) if r['periode'] else '' for r in rows]
+    data = [float(r['total'] or 0) for r in rows]
+    nb_ventes = [r['nb'] for r in rows]
+    return JsonResponse({'labels': labels, 'data': data, 'nb_ventes': nb_ventes})
+
+
 @manager_or_admin_required
 def ca_view(request):
-    """Chiffre d'affaires : KPIs et synthèse des ventes."""
-    from django.db.models import Avg
+    """Chiffre d'affaires : KPIs, synthèse des ventes et données pour graphiques."""
+    now = timezone.now()
     agg = Vente.objects.aggregate(
         total_ca=Sum('prix_vente'),
         nb_ventes=Count('id'),
         moyenne_vente=Avg('prix_vente'),
     )
+    annees = list(range(now.year - 2, now.year + 3))
     context = {
-        'total_ca': agg['total_ca'] or 0,
+        'total_ca': agg['total_ca'] or Decimal('0'),
         'nb_ventes': agg['nb_ventes'] or 0,
-        'moyenne_vente': agg['moyenne_vente'] or 0,
+        'moyenne_vente': agg['moyenne_vente'] or Decimal('0'),
+        'annee_courante': now.year,
+        'mois_courant': now.month,
+        'annees': annees,
         **get_sidebar_context(request),
     }
     return render(request, 'flotte/ca.html', context)

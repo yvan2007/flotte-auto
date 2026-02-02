@@ -84,6 +84,8 @@ body { margin: 0; font-family: var(--font-sans); color: var(--text); background:
 .search { padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--beige-50); font-size: 0.9rem; width: 220px; }
 .search:focus { outline: none; border-color: var(--beige-500); }
 .user-badge { padding: 0.35rem 0.6rem; background: var(--beige-300); border-radius: var(--radius); font-size: 0.85rem; color: var(--beige-900); }
+.ca-mask-toggle-global { display: inline-flex; align-items: center; gap: 0.4rem; }
+.ca-mask-toggle-global.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
 .content { flex: 1; padding: 1.5rem; overflow-y: auto; }
 
@@ -212,6 +214,10 @@ body { margin: 0; font-family: var(--font-sans); color: var(--text); background:
 
 .text-muted { color: var(--text-muted); font-size: 0.9em; }
 .text-right { text-align: right; }
+
+/* Masque des montants (confidentialité) — le remplacement par "—" est fait en JS */
+.montant-fcfa { font-variant-numeric: tabular-nums; }
+body.montants-masques .montant-fcfa[data-montant] { letter-spacing: 0.06em; }
 
 @media (max-width: 768px) {
   .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }

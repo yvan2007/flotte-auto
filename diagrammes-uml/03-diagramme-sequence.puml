@@ -159,7 +159,6 @@ participant "Interface" as UI3
 participant "Contrôleur" as Controller3
 participant "Service Vente" as VenteService
 participant "Service Véhicule" as VehiculeService3
-participant "Service CA" as CAService
 participant "Base de Données" as DB3
 
 Admin3 -> UI3 : Consulte fiche véhicule
@@ -207,13 +206,12 @@ activate DB3
 DB3 --> VehiculeService3 : Statut mis à jour
 deactivate DB3
 deactivate VehiculeService3
-VenteService -> CAService : mettreAJourCA(montant, marge)
-activate CAService
-CAService -> DB3 : UPDATE ChiffreAffaires\nSET montantCA += montant
-activate DB3
-DB3 --> CAService : CA mis à jour
-deactivate DB3
-deactivate CAService
+note over VenteService, DB3
+  Le CA est calculé à la volée
+  à partir de la table Vente
+  (SUM(prix_vente) par période).
+  Aucune table ChiffreAffaires.
+end note
 VenteService --> Controller3 : Vente enregistrée
 deactivate VenteService
 Controller3 --> UI3 : Succès
@@ -236,7 +234,6 @@ participant "Service Dashboard" as DashboardService
 participant "Service Véhicule" as VehiculeService4
 participant "Service Import" as ImportService4
 participant "Service Vente" as VenteService4
-participant "Service Alerte" as AlerteService
 participant "Base de Données" as DB4
 
 User -> UI4 : Accède au tableau de bord
@@ -265,19 +262,11 @@ par Chargement parallèle des données
     
     DashboardService -> VenteService4 : obtenirVentesMois()
     activate VenteService4
-    VenteService4 -> DB4 : SELECT COUNT(*), SUM(prixVente)\nFROM Vente WHERE MONTH(dateVente) = MONTH(NOW())
+    VenteService4 -> DB4 : SELECT COUNT(*), SUM(prix_vente)\nFROM Vente WHERE date_vente ce mois
     activate DB4
-    DB4 --> VenteService4 : Ventes du mois
+    DB4 --> VenteService4 : Ventes du mois (CA = SUM)
     deactivate DB4
     deactivate VenteService4
-    
-    DashboardService -> CAService : obtenirCAMois()
-    activate CAService
-    CAService -> DB4 : SELECT montantCA FROM ChiffreAffaires\nWHERE periode = MONTH(NOW())
-    activate DB4
-    DB4 --> CAService : CA du mois
-    deactivate DB4
-    deactivate CAService
     
     DashboardService --> Controller4 : KPIs
     deactivate DashboardService
@@ -300,14 +289,11 @@ par Chargement parallèle des données
     ImportService4 --> Controller4 : Démarches
     deactivate ImportService4
     
-    Controller4 -> AlerteService : obtenirAlertes()
-    activate AlerteService
-    AlerteService -> DB4 : SELECT * FROM Alerte\nWHERE dateEcheance <= DATE_ADD(NOW(), INTERVAL 30 DAY)
-    activate DB4
-    DB4 --> AlerteService : Alertes
-    deactivate DB4
-    AlerteService --> Controller4 : Alertes
-    deactivate AlerteService
+    note over Controller4, DB4
+      Alertes : dérivées des échéances
+      (documents, CT, assurance, démarches)
+      pas de table Alerte dédiée
+    end note
 end
 
 Controller4 --> UI4 : Données complètes dashboard

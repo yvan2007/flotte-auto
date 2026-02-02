@@ -40,6 +40,7 @@ urlpatterns = [
     path('documents/', views.documents_list, name='documents_list'),
     path('ventes/', views.ventes_list, name='ventes_list'),
     path('ca/', views.ca_view, name='ca'),
+    path('ca/api/evolution/', views.ca_api_evolution, name='ca_api_evolution'),
     path('ca/rapport/<int:pk>/', views.rapport_download, name='rapport_download'),
     path('ca/rapport/<int:pk>/modifier/', views.RapportJournalierUpdateView.as_view(), name='rapport_update'),
     path('maintenance/', views.maintenance_list, name='maintenance_list'),

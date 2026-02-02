@@ -27,7 +27,7 @@
         <td><strong><a href="{% url 'flotte:vehicule_detail' v.vehicule.pk %}">{{ v.vehicule.libelle_court }}</a></strong></td>
         <td>{{ v.date_vente }}</td>
         <td>{{ v.acquereur|default:"—" }}</td>
-        <td>{% if v.prix_vente %}{{ v.prix_vente|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td class="num">{% if v.prix_vente %}<span class="montant-fcfa" data-montant="{{ v.prix_vente|floatformat:0 }}">{{ v.prix_vente|floatformat:0 }}</span>{% else %}—{% endif %}</td>
         <td>{{ v.km_vente|default:"—"|intcomma }}</td>
         <td>{{ v.garantie_duree|default:"—" }}</td>
         <td>{{ v.etat_livraison|default:"—" }}</td>

@@ -1,5 +1,4 @@
 @startuml Diagramme d'Activité - FLOTTE
-start
 skinparam shadowing false
 
 ' Couleurs beige du thème FLOTTE

@@ -5,6 +5,24 @@
 {% block breadcrumb %}
 <nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Chiffre d'affaires</span></nav>
 {% endblock %}
+
+{% block extra_css %}
+<style>
+  .ca-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+  .ca-filters label { font-size: 0.85rem; font-weight: 600; color: var(--beige-800); margin-right: 0.25rem; }
+  .ca-filters .select { min-width: 120px; }
+  .ca-chart-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); min-height: 320px; }
+  .ca-chart-wrap h3 { margin: 0 0 1rem; font-size: 1.05rem; font-weight: 600; color: var(--beige-800); }
+  .ca-chart-container { position: relative; height: 280px; }
+  .ca-mask-toggle { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; font-size: 0.85rem; color: var(--text-muted); background: var(--beige-100); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: background var(--transition), color var(--transition); }
+  .ca-mask-toggle:hover { background: var(--beige-200); color: var(--text); }
+  .ca-mask-toggle.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .ca-mask-toggle svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .montant-fcfa { font-variant-numeric: tabular-nums; }
+  body.montants-masques .montant-fcfa { letter-spacing: 0.1em; }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="ca-hero">
   <div class="ca-hero-inner">
@@ -13,7 +31,11 @@
     </div>
     <div class="ca-hero-text">
       <h2 class="ca-hero-title">Chiffre d'affaires</h2>
-      <p class="ca-hero-desc">Synthèse des ventes et montants enregistrés.</p>
+      <p class="ca-hero-desc">Synthèse des ventes, évolution par période et indicateurs clés.</p>
+    </div>
+    <div class="ca-mask-toggle" id="ca-mask-toggle" role="button" tabindex="0" aria-pressed="false" title="Masquer / Afficher les montants">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      <span id="ca-mask-label">Masquer les montants</span>
     </div>
   </div>
 </section>
@@ -24,7 +46,7 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     </span>
     <span class="kpi-label">CA total (FCFA)</span>
-    <span class="kpi-value">{{ total_ca|floatformat:0 }}</span>
+    <span class="kpi-value montant-fcfa" data-montant="{{ total_ca|floatformat:0 }}">{{ total_ca|floatformat:0 }}</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-icon" aria-hidden="true">
@@ -38,7 +60,47 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
     </span>
     <span class="kpi-label">Moyenne par vente (FCFA)</span>
-    <span class="kpi-value">{{ moyenne_vente|floatformat:0 }}</span>
+    <span class="kpi-value montant-fcfa" data-montant="{{ moyenne_vente|floatformat:0 }}">{{ moyenne_vente|floatformat:0 }}</span>
+  </div>
+</div>
+
+<div class="ca-filters">
+  <label for="ca-granularite">Période :</label>
+  <select id="ca-granularite" class="select" aria-label="Granularité (jour, mois, année)">
+    <option value="jour">Par jour</option>
+    <option value="mois" selected>Par mois</option>
+    <option value="annee">Par année</option>
+  </select>
+  <label for="ca-annee">Année :</label>
+  <select id="ca-annee" class="select" aria-label="Année">
+    {% for y in annees %}
+    <option value="{{ y }}" {% if y == annee_courante %}selected{% endif %}>{{ y }}</option>
+    {% endfor %}
+  </select>
+  <span id="ca-mois-wrap" style="display: none;">
+    <label for="ca-mois">Mois :</label>
+    <select id="ca-mois" class="select" aria-label="Mois">
+      <option value="1" {% if mois_courant == 1 %}selected{% endif %}>Janvier</option>
+      <option value="2" {% if mois_courant == 2 %}selected{% endif %}>Février</option>
+      <option value="3" {% if mois_courant == 3 %}selected{% endif %}>Mars</option>
+      <option value="4" {% if mois_courant == 4 %}selected{% endif %}>Avril</option>
+      <option value="5" {% if mois_courant == 5 %}selected{% endif %}>Mai</option>
+      <option value="6" {% if mois_courant == 6 %}selected{% endif %}>Juin</option>
+      <option value="7" {% if mois_courant == 7 %}selected{% endif %}>Juillet</option>
+      <option value="8" {% if mois_courant == 8 %}selected{% endif %}>Août</option>
+      <option value="9" {% if mois_courant == 9 %}selected{% endif %}>Septembre</option>
+      <option value="10" {% if mois_courant == 10 %}selected{% endif %}>Octobre</option>
+      <option value="11" {% if mois_courant == 11 %}selected{% endif %}>Novembre</option>
+      <option value="12" {% if mois_courant == 12 %}selected{% endif %}>Décembre</option>
+    </select>
+  </span>
+  <button type="button" class="btn btn-primary btn-sm" id="ca-apply">Actualiser</button>
+</div>
+
+<div class="ca-chart-wrap">
+  <h3>Évolution du chiffre d'affaires (FCFA)</h3>
+  <div class="ca-chart-container">
+    <canvas id="ca-chart" aria-label="Graphique évolution du CA"></canvas>
   </div>
 </div>
 
@@ -61,4 +123,127 @@
   </div>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-4LidfOM+nnk/TRBd/6TY8y/5lY3Fc4bJ5k7k5E2xEEMlBvEhzF5eFcw+1k4R68xG" crossorigin="anonymous"></script>
+<script>
+(function() {
+  var STORAGE_KEY = 'flotte_mask_amounts';
+  var apiUrl = '{% url "flotte:ca_api_evolution" %}';
+
+  function getMask() { try { return localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) { return false; } }
+  function setMask(on) { try { localStorage.setItem(STORAGE_KEY, on ? '1' : '0'); } catch (e) {} }
+
+  function applyMaskToPage() {
+    var on = getMask();
+    document.body.classList.toggle('montants-masques', on);
+    var label = document.getElementById('ca-mask-label');
+    var btn = document.getElementById('ca-mask-toggle');
+    if (label) label.textContent = on ? 'Afficher les montants' : 'Masquer les montants';
+    if (btn) { btn.classList.toggle('active', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    var headerLabel = document.getElementById('header-mask-label');
+    var headerBtn = document.getElementById('header-mask-toggle');
+    if (headerLabel) headerLabel.textContent = on ? 'Afficher les montants' : 'Masquer les montants';
+    if (headerBtn) { headerBtn.classList.toggle('active', on); headerBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    document.querySelectorAll('.montant-fcfa[data-montant]').forEach(function(el) {
+      el.textContent = on ? '\u2014' : (el.getAttribute('data-montant') || el.textContent);
+    });
+  }
+
+  var maskToggle = document.getElementById('ca-mask-toggle');
+  if (maskToggle) {
+    maskToggle.addEventListener('click', function() { setMask(!getMask()); applyMaskToPage(); });
+    maskToggle.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); maskToggle.click(); } });
+  }
+  applyMaskToPage();
+
+  var granularite = document.getElementById('ca-granularite');
+  var annee = document.getElementById('ca-annee');
+  var moisWrap = document.getElementById('ca-mois-wrap');
+  var moisSelect = document.getElementById('ca-mois');
+  function toggleMois() { moisWrap.style.display = granularite && granularite.value === 'jour' ? 'inline-flex' : 'none'; }
+  if (granularite) { granularite.addEventListener('change', toggleMois); toggleMois(); }
+
+  var anneeSelect = document.getElementById('ca-annee');
+  if (!anneeSelect || !anneeSelect.options.length) {
+    var y = new Date().getFullYear();
+    for (var i = y - 4; i <= y + 1; i++) {
+      var opt = document.createElement('option');
+      opt.value = i; opt.textContent = i;
+      if (i === y) opt.selected = true;
+      anneeSelect.appendChild(opt);
+    }
+  }
+
+  var chart = null;
+  function buildChart(labels, data) {
+    var ctx = document.getElementById('ca-chart');
+    if (!ctx) return;
+    if (chart) chart.destroy();
+    chart = new Chart(ctx.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'CA (FCFA)',
+          data: data,
+          backgroundColor: 'rgba(125, 107, 82, 0.35)',
+          borderColor: 'rgb(139, 118, 89)',
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(item) {
+                var v = item.raw;
+                if (v >= 1e9) return (v / 1e9).toFixed(1) + ' Md FCFA';
+                if (v >= 1e6) return (v / 1e6).toFixed(1) + ' M FCFA';
+                if (v >= 1e3) return (v / 1e3).toFixed(0) + ' k FCFA';
+                return v + ' FCFA';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(v) {
+                if (v >= 1e9) return (v / 1e9) + ' Md';
+                if (v >= 1e6) return (v / 1e6) + ' M';
+                if (v >= 1e3) return (v / 1e3) + ' k';
+                return v;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function loadEvolution() {
+    var g = (granularite && granularite.value) || 'mois';
+    var a = (annee && annee.value) || new Date().getFullYear();
+    var m = (granularite && granularite.value === 'jour' && moisSelect) ? moisSelect.value : '';
+    var url = apiUrl + '?granularite=' + encodeURIComponent(g) + '&annee=' + encodeURIComponent(a);
+    if (m) url += '&mois=' + encodeURIComponent(m);
+    fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function(r) { return r.json(); })
+      .then(function(json) {
+        buildChart(json.labels || [], json.data || []);
+      })
+      .catch(function() { buildChart([], []); });
+  }
+
+  document.getElementById('ca-apply').addEventListener('click', loadEvolution);
+  loadEvolution();
+})();
+</script>
 {% endblock %}
