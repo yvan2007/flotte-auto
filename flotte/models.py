@@ -1,6 +1,7 @@
 """
 Modèles FLOTTE — Marques, modèles, types, véhicules (châssis = identifiant),
 locations (CT, assurance, km vidange), import, dépenses, documents, réparations.
+Tous les montants sont en FCFA.
 """
 from django.db import models
 from django.conf import settings
