@@ -141,6 +141,14 @@ class Vehicule(models.Model):
         'Kilométrage prochaine vidange', null=True, blank=True,
         help_text='Km auquel effectuer la prochaine vidange (si hors location)'
     )
+    date_expiration_ct = models.DateField(
+        'Date expiration CT (véhicule au parc)', null=True, blank=True,
+        help_text='Pour véhicules non loués : prochaine échéance contrôle technique'
+    )
+    date_expiration_assurance = models.DateField(
+        'Date expiration assurance (véhicule au parc)', null=True, blank=True,
+        help_text='Pour véhicules non loués : échéance assurance'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -177,6 +185,10 @@ class ImportDemarche(models.Model):
     etape = models.CharField('Étape', max_length=80)
     date_etape = models.DateField('Date', null=True, blank=True)
     statut_etape = models.CharField('Statut étape', max_length=40, blank=True)
+    fichier = models.FileField(
+        'Pièce jointe (document)', upload_to='import_demarches/%Y/%m/', max_length=255,
+        null=True, blank=True, help_text='Document scanné (PV, attestation, etc.)'
+    )
     remarque = models.TextField('Remarque', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -187,6 +199,79 @@ class ImportDemarche(models.Model):
 
     def __str__(self):
         return f'{self.vehicule.numero_chassis} — {self.etape}'
+
+
+class ChargeImport(models.Model):
+    """Charges d'importation par véhicule : fret, dédouanement, transitaire, coût total (FCFA)."""
+    vehicule = models.ForeignKey(
+        Vehicule, on_delete=models.CASCADE, related_name='charges_import'
+    )
+    fret = models.DecimalField(
+        'Fret (transport international, FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True
+    )
+    frais_dedouanement = models.DecimalField(
+        'Frais de dédouanement (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True
+    )
+    frais_transitaire = models.DecimalField(
+        'Frais de service du transitaire (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True
+    )
+    cout_total = models.DecimalField(
+        'Coût total d\'importation (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True,
+        help_text='Calcul automatique (fret + dédouanement + transitaire) ou saisie manuelle'
+    )
+    remarque = models.TextField('Remarque', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['vehicule', '-id']
+        verbose_name = 'Charge d\'importation'
+        verbose_name_plural = 'Charges d\'importation'
+
+    def __str__(self):
+        return f'{self.vehicule.numero_chassis} — Import'
+
+    def save(self, *args, **kwargs):
+        from decimal import Decimal
+        # Recalcul systématique : coût total = fret + dédouanement + transitaire (additions)
+        if any(x is not None for x in (self.fret, self.frais_dedouanement, self.frais_transitaire)):
+            total = (self.fret or Decimal(0)) + (self.frais_dedouanement or Decimal(0)) + (self.frais_transitaire or Decimal(0))
+            self.cout_total = total
+        super().save(*args, **kwargs)
+
+
+class PartieImportee(models.Model):
+    """Pièce ou partie de véhicule importée — coûts, quantités, association véhicule."""
+    vehicule = models.ForeignKey(
+        Vehicule, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='parties_importees',
+        help_text='Véhicule concerné (optionnel, pour stock général laisser vide)'
+    )
+    designation = models.CharField('Désignation', max_length=200)
+    quantite = models.PositiveIntegerField('Quantité', default=1)
+    cout_unitaire = models.DecimalField(
+        'Coût unitaire (FCFA)', max_digits=14, decimal_places=0, null=True, blank=True
+    )
+    remarque = models.TextField('Remarque', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['vehicule', '-id']
+        verbose_name = 'Partie importée'
+        verbose_name_plural = 'Parties importées'
+
+    def __str__(self):
+        return f'{self.designation} — x{self.quantite}'
+
+    @property
+    def cout_total(self):
+        if self.cout_unitaire is not None:
+            return self.cout_unitaire * self.quantite
+        return None
 
 
 class Depense(models.Model):
@@ -220,16 +305,39 @@ class Depense(models.Model):
         return f'{self.vehicule.numero_chassis} — {self.libelle}'
 
 
+class TypeDocument(models.Model):
+    """Type de document normalisé (carte grise, assurance, CT, vignette, etc.)."""
+    libelle = models.CharField('Libellé', max_length=80, unique=True)
+    ordre = models.PositiveSmallIntegerField('Ordre d\'affichage', default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['ordre', 'libelle']
+        verbose_name = 'Type de document'
+        verbose_name_plural = 'Types de document'
+
+    def __str__(self):
+        return self.libelle
+
+
 class DocumentVehicule(models.Model):
     """Document attaché à un véhicule (disponible ou à faire)."""
     vehicule = models.ForeignKey(
         Vehicule, on_delete=models.CASCADE, related_name='documents'
     )
-    type_document = models.CharField('Type', max_length=80)
+    type_document_fk = models.ForeignKey(
+        TypeDocument, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='documents_vehicule', verbose_name='Type (liste)'
+    )
+    type_document = models.CharField('Type (libre si autre)', max_length=80, blank=True)
     numero = models.CharField('Numéro', max_length=60, blank=True)
     date_emission = models.DateField('Date émission', null=True, blank=True)
     date_echeance = models.DateField('Date échéance', null=True, blank=True)
     disponible = models.BooleanField('Disponible', default=False)
+    fichier = models.FileField(
+        'Fichier (document)', upload_to='documents_vehicule/%Y/%m/', max_length=255,
+        null=True, blank=True, help_text='Document scanné (PDF, image)'
+    )
     remarque = models.TextField('Remarque', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -239,7 +347,14 @@ class DocumentVehicule(models.Model):
         verbose_name_plural = 'Documents véhicule'
 
     def __str__(self):
-        return f'{self.vehicule.numero_chassis} — {self.type_document}'
+        return f'{self.vehicule.numero_chassis} — {self.libelle_type}'
+
+    @property
+    def libelle_type(self):
+        """Type affiché : liste ou champ libre."""
+        if self.type_document_fk_id:
+            return self.type_document_fk.libelle
+        return self.type_document or '—'
 
 
 class Reparation(models.Model):
@@ -277,6 +392,10 @@ class Location(models.Model):
     vehicule = models.ForeignKey(
         Vehicule, on_delete=models.CASCADE, related_name='locations'
     )
+    conducteur = models.ForeignKey(
+        'Conducteur', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='locations', verbose_name='Conducteur assigné'
+    )
     locataire = models.CharField('Locataire', max_length=200)
     type_location = models.CharField(
         'Type', max_length=60
@@ -299,6 +418,16 @@ class Location(models.Model):
     km_prochaine_vidange = models.PositiveIntegerField(
         'Kilométrage prochaine vidange', null=True, blank=True
     )
+    cout_location = models.DecimalField(
+        'Coût de location (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True,
+        help_text='Coût global ou complément au loyer'
+    )
+    frais_annexes = models.DecimalField(
+        'Frais annexes (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True,
+        help_text='Assurance, entretien, carburant, etc.'
+    )
     remarques = models.TextField('Remarques', blank=True)
     statut = models.CharField(
         'Statut', max_length=20, choices=STATUT_CHOICES, default='en_cours'
@@ -314,6 +443,39 @@ class Location(models.Model):
     def __str__(self):
         return f'{self.vehicule} — {self.locataire}'
 
+    @property
+    def cout_total_location(self):
+        """Loyer + frais annexes + somme des pénalités (contraventions)."""
+        from decimal import Decimal
+        total = self.loyer_mensuel or Decimal(0)
+        total += self.frais_annexes or Decimal(0)
+        total += sum((c.montant or Decimal(0)) for c in self.contraventions.all())
+        return total
+
+
+class Contravention(models.Model):
+    """Contravention / amende liée à une location — impact sur le coût total."""
+    location = models.ForeignKey(
+        Location, on_delete=models.CASCADE, related_name='contraventions'
+    )
+    date_contravention = models.DateField('Date', null=True, blank=True)
+    reference = models.CharField('Référence / N° PV', max_length=80, blank=True)
+    montant = models.DecimalField(
+        'Montant / pénalité (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True
+    )
+    lieu = models.CharField('Lieu', max_length=120, blank=True)
+    remarque = models.TextField('Remarque', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['location', '-date_contravention', '-id']
+        verbose_name = 'Contravention'
+        verbose_name_plural = 'Contraventions'
+
+    def __str__(self):
+        return f'{self.location} — {self.reference or self.date_contravention}'
+
 
 class Vente(models.Model):
     """Vente / cession d'un véhicule."""
@@ -322,6 +484,15 @@ class Vente(models.Model):
     )
     date_vente = models.DateField('Date vente')
     acquereur = models.CharField('Acquéreur', max_length=200, blank=True)
+    acquereur_compte = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ventes_comme_acquereur',
+        verbose_name='Compte client (acquéreur)',
+        help_text='Si l\'acquéreur a un compte FLOTTE (rôle Utilisateur), associez-le pour qu\'il voie cette vente dans son espace.',
+    )
     prix_vente = models.DecimalField(
         'Prix vente (FCFA)', max_digits=14, decimal_places=0, null=True, blank=True
     )
@@ -353,6 +524,10 @@ class Facture(models.Model):
     type_facture = models.CharField(
         'Type', max_length=60, blank=True,
         help_text='Ex: achat, réparation, assurance'
+    )
+    fichier = models.FileField(
+        'Fichier (PDF)', upload_to='factures/%Y/%m/', max_length=255,
+        null=True, blank=True, help_text='Facture scannée (PDF)'
     )
     remarque = models.TextField('Remarque', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -493,6 +668,23 @@ class ReleveCarburant(models.Model):
     def __str__(self):
         return f'{self.vehicule.libelle_court} — {self.date_releve}'
 
+    def save(self, *args, **kwargs):
+        from decimal import Decimal, ROUND_HALF_UP
+        # Calcul automatique des montants liés : montant_fcfa = litres × prix_litre (ou compléter le champ manquant)
+        litres = self.litres
+        montant = self.montant_fcfa
+        prix = self.prix_litre
+        if litres is not None and prix is not None and prix != 0:
+            if montant is None or montant == 0:
+                self.montant_fcfa = (litres * prix).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+        elif litres is not None and litres != 0 and montant is not None:
+            if prix is None or prix == 0:
+                self.prix_litre = (montant / litres).quantize(Decimal(1), rounding=ROUND_HALF_UP)
+        elif prix is not None and prix != 0 and montant is not None:
+            if litres is None or litres == 0:
+                self.litres = (montant / prix).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        super().save(*args, **kwargs)
+
 
 class Conducteur(models.Model):
     """Conducteur (chauffeur) — peut être lié ou non à un utilisateur du système."""
@@ -525,3 +717,29 @@ class Conducteur(models.Model):
         if self.prenom:
             return f'{self.nom} {self.prenom}'
         return self.nom
+
+
+class AuditLog(models.Model):
+    """Traçabilité des créations/modifications/suppressions sur les entités principales."""
+    ACTION_CHOICES = [
+        ('create', 'Création'),
+        ('update', 'Modification'),
+        ('delete', 'Suppression'),
+    ]
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        related_name='+'
+    )
+    action = models.CharField('Action', max_length=10, choices=ACTION_CHOICES)
+    model_name = models.CharField('Modèle', max_length=80)
+    object_id = models.CharField('ID objet', max_length=50, blank=True)
+    object_repr = models.CharField('Représentation', max_length=200, blank=True)
+    timestamp = models.DateTimeField('Date', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = 'Journal d\'audit'
+        verbose_name_plural = 'Journaux d\'audit'
+
+    def __str__(self):
+        return f'{self.timestamp} — {self.get_action_display()} — {self.model_name} {self.object_id}'
