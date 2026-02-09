@@ -1,0 +1,12 @@
+Bonjour {{ prenom }},
+
+Votre compte FLOTTE a été créé. Vous pouvez dès à présent vous connecter pour accéder à l'application de gestion d'import et de parc véhicules.
+
+Identifiant de connexion : {{ username }}
+Vous pouvez vous connecter avec cet identifiant ou avec votre adresse email ({{ user.email }}).
+
+Accéder à l'application : {{ login_url }}
+
+En cas d'oubli de mot de passe, utilisez le lien « Mot de passe oublié » sur la page de connexion.
+
+— L'équipe FLOTTE

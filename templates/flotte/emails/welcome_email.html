@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenue sur FLOTTE</title>
+</head>
+<body style="margin:0; padding:0; background-color:#ffffff; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#ffffff;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; margin: 0 auto; background:#ffffff;">
+          <tr>
+            <td style="background: #7d6b52; padding: 28px 32px; text-align: center;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5Z'/%3E%3Cpath d='M2 17l10 5 10-5'/%3E%3C/svg%3E" width="48" height="48" alt="FLOTTE" style="display:block; margin:0 auto; border:0;" />
+                    <h1 style="margin: 12px 0 0; font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.02em;">FLOTTE</h1>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: rgba(255,255,255,0.9);">Gestion import & parc véhicules</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background: #ffffff; padding: 32px; border: 1px solid #e8e0d8; border-top: none;">
+              <h2 style="margin: 0 0 20px; font-size: 18px; font-weight: 600; color: #352d24;">Bienvenue, {{ prenom }} !</h2>
+              <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.55; color: #534636;">Votre compte FLOTTE a été créé. Vous pouvez dès à présent vous connecter pour accéder à l'application de gestion d'import et de parc véhicules.</p>
+              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: #6f5d45;">
+                <strong>Identifiant :</strong> {{ username }}<br>
+                Vous pouvez vous connecter avec cet identifiant ou avec votre adresse email.
+              </p>
+              <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="background-color: #7d6b52; border-radius: 6px; padding: 0;">
+                    <a href="{{ login_url }}" target="_blank" style="display: block; padding: 14px 28px; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none;">Accéder à l'application</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 24px 0 0; font-size: 13px; line-height: 1.5; color: #6f5d45;">En cas d'oubli de mot de passe, utilisez le lien « Mot de passe oublié » sur la page de connexion.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 16px; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #8b7a62;">— L'équipe FLOTTE</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
