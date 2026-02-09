@@ -2,8 +2,9 @@
 Vues FLOTTE — Dashboard, parc (châssis), location (CT, assurance, vidange),
 import, paramétrage (marques, modèles, types, utilisateurs).
 """
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import (
     LoginView, LogoutView,
@@ -16,17 +17,21 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, FormView,
 )
 from django.urls import reverse_lazy, reverse
+from django.views.decorators.http import require_GET
 from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncYear
 from django.utils import timezone
 from decimal import Decimal
 from django.utils.decorators import method_decorator
+from django.db import DatabaseError, IntegrityError
 
 from .models import (
     Marque, Modele, TypeCarburant, TypeTransmission, TypeVehicule,
     Vehicule, Location, ImportDemarche, Depense, DocumentVehicule,
     Reparation, Vente, ProfilUtilisateur, Facture,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
+    ChargeImport, PartieImportee, Contravention, TypeDocument,
+    AuditLog,
 )
 from .forms import (
     LoginForm, UserCreateForm, UserUpdateForm, MarqueForm, ModeleForm,
@@ -34,6 +39,7 @@ from .forms import (
     VehiculeForm, LocationForm, DepenseForm, DocumentVehiculeForm,
     ReparationForm, FactureForm, ImportDemarcheForm, VenteForm,
     RapportJournalierForm, MaintenanceForm, ReleveCarburantForm, ConducteurForm,
+    ChargeImportForm, PartieImporteeForm, ContraventionForm, TypeDocumentForm,
 )
 from .mixins import (
     AdminRequiredMixin, ManagerRequiredMixin,
@@ -43,6 +49,7 @@ from .mixins import (
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def get_sidebar_context(request):
@@ -63,6 +70,17 @@ class FlotteLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
+        from django.utils.http import url_has_allowed_host_and_scheme
+        next_url = self.request.POST.get('next') or self.request.GET.get('next')
+        if next_url:
+            # Chemin relatif (ex. /api/) : autoriser si pas d'URL externe
+            if next_url.startswith('/') and '//' not in next_url:
+                return next_url
+            # URL absolue : vérifier hôte autorisé
+            if url_has_allowed_host_and_scheme(
+                next_url, allowed_hosts={self.request.get_host()}, require_https=self.request.is_secure()
+            ):
+                return next_url
         return reverse_lazy('flotte:dashboard')
 
 
@@ -83,6 +101,7 @@ class FlottePasswordResetView(PasswordResetView):
     """Demande de réinitialisation du mot de passe (email)."""
     template_name = 'flotte/password_reset_form.html'
     email_template_name = 'flotte/emails/password_reset_email.html'
+    html_email_template_name = 'flotte/emails/password_reset_email_html.html'
     subject_template_name = 'flotte/emails/password_reset_subject.txt'
     success_url = reverse_lazy('flotte:password_reset_done')
     from_email = None  # utilise DEFAULT_FROM_EMAIL
@@ -155,6 +174,41 @@ def dashboard(request):
             statut='en_cours',
         ).select_related('vehicule').order_by('date_expiration_assurance')[:10]
     )
+    # Alertes permis (conducteurs dont le permis expire dans les 30 jours)
+    alertes_permis = list(
+        Conducteur.objects.filter(
+            actif=True,
+            permis_date_expiration__isnull=False,
+            permis_date_expiration__gte=now,
+            permis_date_expiration__lte=fin_alerte,
+        ).order_by('permis_date_expiration')[:10]
+    )
+    # Alertes documents véhicule (échéance dans les 30 jours)
+    alertes_documents = list(
+        DocumentVehicule.objects.filter(
+            date_echeance__isnull=False,
+            date_echeance__gte=now,
+            date_echeance__lte=fin_alerte,
+        ).select_related('vehicule').order_by('date_echeance')[:10]
+    )
+    # CT et assurance au niveau véhicule (au parc sans location en cours, 30 jours)
+    vehicules_parc_sans_location = Vehicule.objects.filter(statut='parc').exclude(
+        locations__statut='en_cours'
+    ).distinct()
+    alertes_ct_vehicule = list(
+        vehicules_parc_sans_location.filter(
+            date_expiration_ct__isnull=False,
+            date_expiration_ct__gte=now,
+            date_expiration_ct__lte=fin_alerte,
+        ).select_related('marque', 'modele').order_by('date_expiration_ct')[:10]
+    )
+    alertes_assurance_vehicule = list(
+        vehicules_parc_sans_location.filter(
+            date_expiration_assurance__isnull=False,
+            date_expiration_assurance__gte=now,
+            date_expiration_assurance__lte=fin_alerte,
+        ).select_related('marque', 'modele').order_by('date_expiration_assurance')[:10]
+    )
     vehicules_import = list(
         Vehicule.objects.filter(statut='import').select_related('marque', 'modele').order_by('-date_entree_parc')[:5]
     )
@@ -166,10 +220,395 @@ def dashboard(request):
         'by_marque': by_marque,
         'alertes_ct': alertes_ct,
         'alertes_assurance': alertes_assurance,
+        'alertes_permis': alertes_permis,
+        'alertes_documents': alertes_documents,
+        'alertes_ct_vehicule': alertes_ct_vehicule,
+        'alertes_assurance_vehicule': alertes_assurance_vehicule,
         'vehicules_import': vehicules_import,
         **get_sidebar_context(request),
     }
     return render(request, 'flotte/dashboard.html', context)
+
+
+# ——— Échéances (conformité flotte) ———
+@login_required
+def echeances(request):
+    """Page consolidée des échéances : CT, assurance, documents, permis conducteurs, maintenance à faire."""
+    from datetime import timedelta
+    now = timezone.now().date()
+    horizon = now + timedelta(days=90)
+    # CT (locations en cours)
+    echeances_ct = list(
+        Location.objects.filter(
+            date_expiration_ct__isnull=False,
+            date_expiration_ct__gte=now,
+            date_expiration_ct__lte=horizon,
+            statut='en_cours',
+        ).select_related('vehicule').order_by('date_expiration_ct')
+    )
+    # Assurance (locations en cours)
+    echeances_assurance = list(
+        Location.objects.filter(
+            date_expiration_assurance__isnull=False,
+            date_expiration_assurance__gte=now,
+            date_expiration_assurance__lte=horizon,
+            statut='en_cours',
+        ).select_related('vehicule').order_by('date_expiration_assurance')
+    )
+    # CT et assurance au niveau véhicule (au parc sans location en cours)
+    vehicules_parc_sans_location = Vehicule.objects.filter(statut='parc').exclude(
+        locations__statut='en_cours'
+    ).distinct()
+    echeances_ct_vehicule = list(
+        vehicules_parc_sans_location.filter(
+            date_expiration_ct__isnull=False,
+            date_expiration_ct__gte=now,
+            date_expiration_ct__lte=horizon,
+        ).select_related('marque', 'modele').order_by('date_expiration_ct')
+    )
+    echeances_assurance_vehicule = list(
+        vehicules_parc_sans_location.filter(
+            date_expiration_assurance__isnull=False,
+            date_expiration_assurance__gte=now,
+            date_expiration_assurance__lte=horizon,
+        ).select_related('marque', 'modele').order_by('date_expiration_assurance')
+    )
+    # Documents véhicule (date échéance)
+    echeances_documents = list(
+        DocumentVehicule.objects.filter(
+            date_echeance__isnull=False,
+            date_echeance__gte=now,
+            date_echeance__lte=horizon,
+        ).select_related('vehicule').order_by('date_echeance')
+    )
+    # Permis conducteurs
+    echeances_permis = list(
+        Conducteur.objects.filter(
+            actif=True,
+            permis_date_expiration__isnull=False,
+            permis_date_expiration__gte=now,
+            permis_date_expiration__lte=horizon,
+        ).order_by('permis_date_expiration')
+    )
+    # Maintenance à faire (date prévue dans l'horizon ou sans date)
+    echeances_maintenance = list(
+        Maintenance.objects.filter(statut='a_faire').filter(
+            Q(date_prevue__isnull=True) | Q(date_prevue__lte=horizon)
+        ).select_related('vehicule').order_by('date_prevue')[:50]
+    )
+    # Vidange — km atteint ou dépassé (véhicule ou location)
+    from django.db.models import F
+    alertes_vidange_vehicules = list(
+        Vehicule.objects.filter(
+            statut__in=['parc', 'import'],
+            km_prochaine_vidange__isnull=False,
+        ).filter(kilometrage_actuel__gte=F('km_prochaine_vidange')).select_related('marque', 'modele')
+    )
+    locations_km = list(
+        Location.objects.filter(
+            statut='en_cours',
+            km_prochaine_vidange__isnull=False,
+        ).select_related('vehicule')
+    )
+    alertes_vidange_locations = [
+        loc for loc in locations_km
+        if (loc.vehicule.kilometrage_actuel or 0) >= (loc.km_prochaine_vidange or 0)
+    ]
+    context = {
+        'echeances_ct': echeances_ct,
+        'echeances_assurance': echeances_assurance,
+        'echeances_ct_vehicule': echeances_ct_vehicule,
+        'echeances_assurance_vehicule': echeances_assurance_vehicule,
+        'echeances_documents': echeances_documents,
+        'echeances_permis': echeances_permis,
+        'echeances_maintenance': echeances_maintenance,
+        'alertes_vidange_vehicules': alertes_vidange_vehicules,
+        'alertes_vidange_locations': alertes_vidange_locations,
+        'date_debut': now,
+        'date_fin': horizon,
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/echeances.html', context)
+
+
+# ——— TCO (coût total de possession) ———
+@login_required
+@manager_or_admin_required
+def tco_view(request):
+    """Rapport TCO par véhicule : acquisition + dépenses + carburant + maintenance − vente."""
+    qs = Vehicule.objects.select_related('marque', 'modele').prefetch_related(
+        'charges_import', 'depenses', 'maintenances', 'releves_carburant', 'ventes'
+    ).order_by('marque__nom', 'modele__nom')
+    rows = []
+    for v in qs:
+        acquisition = v.prix_achat or Decimal(0)
+        acquisition += sum((c.cout_total or Decimal(0)) for c in v.charges_import.all())
+        depenses = sum((d.montant or Decimal(0)) for d in v.depenses.all())
+        maintenance = sum((m.cout or Decimal(0)) for m in v.maintenances.all())
+        carburant = sum((r.montant_fcfa or Decimal(0)) for r in v.releves_carburant.all())
+        ventes = list(v.ventes.all()[:1])
+        vente_prix = ventes[0].prix_vente if ventes else None
+        vente_prix = vente_prix or Decimal(0)
+        tco = acquisition + depenses + maintenance + carburant - vente_prix
+        rows.append({
+            'vehicule': v,
+            'acquisition': acquisition,
+            'depenses': depenses,
+            'maintenance': maintenance,
+            'carburant': carburant,
+            'vente_prix': vente_prix,
+            'tco': tco,
+        })
+    context = {
+        'rows': rows,
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/tco.html', context)
+
+
+# ——— Export réglementaire (CSV) ———
+@login_required
+@manager_or_admin_required
+def export_reglementaire(request):
+    """Export CSV : véhicules avec immat, CT, assurance, locataire (pour contrôle)."""
+    import csv
+    from io import StringIO
+    qs = Vehicule.objects.select_related('marque', 'modele').prefetch_related(
+        'locations'
+    ).filter(statut__in=['parc', 'import']).order_by('numero_chassis')
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter=';')
+    writer.writerow([
+        'Châssis', 'Immat', 'Marque', 'Modèle', 'Km', 'CT (véhicule)', 'Assurance (véhicule)',
+        'Location en cours', 'Locataire', 'CT (location)', 'Assurance (location)',
+    ])
+    for v in qs:
+        loc_en_cours = v.locations.filter(statut='en_cours').first()
+        writer.writerow([
+            v.numero_chassis,
+            v.numero_immatriculation or '',
+            v.marque.nom if v.marque else '',
+            v.modele.nom if v.modele else '',
+            v.kilometrage_actuel or '',
+            str(v.date_expiration_ct) if getattr(v, 'date_expiration_ct', None) else '',
+            str(v.date_expiration_assurance) if getattr(v, 'date_expiration_assurance', None) else '',
+            'Oui' if loc_en_cours else 'Non',
+            loc_en_cours.locataire if loc_en_cours else '',
+            str(loc_en_cours.date_expiration_ct) if loc_en_cours and loc_en_cours.date_expiration_ct else '',
+            str(loc_en_cours.date_expiration_assurance) if loc_en_cours and loc_en_cours.date_expiration_assurance else '',
+        ])
+    content = '\ufeff' + buffer.getvalue()  # BOM UTF-8 pour Excel
+    response = HttpResponse(content, content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="flotte_export_reglementaire.csv"'
+    return response
+
+
+@login_required
+@manager_or_admin_required
+def export_charges_import(request):
+    """Export CSV : charges d'importation (fret, dédouanement, transitaire, coût total) par véhicule."""
+    import csv
+    from io import StringIO
+    qs = ChargeImport.objects.select_related('vehicule').order_by('vehicule__numero_chassis', '-id')
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter=';')
+    writer.writerow([
+        'Châssis', 'Fret (FCFA)', 'Dédouanement (FCFA)', 'Transitaire (FCFA)',
+        'Coût total (FCFA)', 'Remarque',
+    ])
+    for c in qs:
+        writer.writerow([
+            c.vehicule.numero_chassis if c.vehicule else '',
+            c.fret or '',
+            c.frais_dedouanement or '',
+            c.frais_transitaire or '',
+            c.cout_total or '',
+            (c.remarque or '')[:200],
+        ])
+    content = '\ufeff' + buffer.getvalue()
+    response = HttpResponse(content, content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="flotte_charges_import.csv"'
+    return response
+
+
+@login_required
+@manager_or_admin_required
+def export_locations(request):
+    """Export CSV : locations avec coût total (loyer + frais annexes + contraventions)."""
+    import csv
+    from io import StringIO
+    qs = Location.objects.select_related('vehicule__marque', 'vehicule__modele').prefetch_related(
+        'contraventions'
+    ).order_by('-date_debut')
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter=';')
+    writer.writerow([
+        'Véhicule', 'Châssis', 'Locataire', 'Type', 'Date début', 'Date fin',
+        'Loyer (FCFA)', 'Frais annexes (FCFA)', 'Coût total (FCFA)', 'Statut',
+    ])
+    for loc in qs:
+        total = loc.cout_total_location
+        writer.writerow([
+            loc.vehicule.libelle_court if loc.vehicule else '',
+            loc.vehicule.numero_chassis if loc.vehicule else '',
+            loc.locataire or '',
+            loc.type_location or '',
+            str(loc.date_debut) if loc.date_debut else '',
+            str(loc.date_fin) if loc.date_fin else '',
+            loc.loyer_mensuel or '',
+            loc.frais_annexes or '',
+            total if total is not None else '',
+            loc.get_statut_display() if loc.statut else loc.statut or '',
+        ])
+    content = '\ufeff' + buffer.getvalue()
+    response = HttpResponse(content, content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="flotte_locations.csv"'
+    return response
+
+
+# ——— Recherche globale ———
+@login_required
+def recherche(request):
+    """Recherche globale : véhicules, locations, ventes, conducteurs, factures (selon ce qu'on tape)."""
+    q = (request.GET.get('q') or '').strip()
+    vehicules = []
+    locations = []
+    ventes = []
+    conducteurs = []
+    factures = []
+    if q:
+        # Véhicules : châssis, immat, marque, modèle, pays
+        vehicules = Vehicule.objects.filter(
+            Q(numero_chassis__icontains=q) |
+            Q(numero_immatriculation__icontains=q) |
+            Q(marque__nom__icontains=q) |
+            Q(modele__nom__icontains=q) |
+            Q(origine_pays__icontains=q)
+        ).select_related('marque', 'modele').order_by('-date_entree_parc')[:25]
+        # Locations : locataire, type, véhicule
+        if is_manager_or_admin(request):
+            locations = Location.objects.filter(
+                Q(locataire__icontains=q) |
+                Q(type_location__icontains=q) |
+                Q(vehicule__numero_chassis__icontains=q) |
+                Q(vehicule__marque__nom__icontains=q) |
+                Q(vehicule__modele__nom__icontains=q)
+            ).select_related('vehicule__marque', 'vehicule__modele').order_by('-date_debut')[:25]
+        # Ventes : acquéreur, véhicule (manager voit tout ; user voit ses ventes)
+        ventes_qs = Vente.objects.select_related('vehicule__marque', 'vehicule__modele').order_by('-date_vente')
+        if not is_manager_or_admin(request):
+            ventes_qs = ventes_qs.filter(acquereur_compte=request.user)
+        ventes = ventes_qs.filter(
+            Q(acquereur__icontains=q) |
+            Q(vehicule__numero_chassis__icontains=q) |
+            Q(vehicule__marque__nom__icontains=q) |
+            Q(vehicule__modele__nom__icontains=q)
+        )[:25]
+        # Conducteurs : nom, prénom, email, téléphone
+        conducteurs = Conducteur.objects.filter(
+            Q(nom__icontains=q) |
+            Q(prenom__icontains=q) |
+            Q(email__icontains=q) |
+            Q(telephone__icontains=q)
+        ).order_by('nom', 'prenom')[:25]
+        # Factures : numéro, fournisseur, véhicule (manager/admin)
+        if is_manager_or_admin(request):
+            factures = Facture.objects.filter(
+                Q(numero__icontains=q) |
+                Q(fournisseur__icontains=q) |
+                Q(vehicule__numero_chassis__icontains=q) |
+                Q(vehicule__marque__nom__icontains=q) |
+                Q(vehicule__modele__nom__icontains=q)
+            ).select_related('vehicule__marque', 'vehicule__modele').order_by('-date_facture')[:25]
+
+    context = {
+        'q': q,
+        'vehicules': vehicules,
+        'locations': locations,
+        'ventes': ventes,
+        'conducteurs': conducteurs,
+        'factures': factures,
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/recherche.html', context)
+
+
+@login_required
+@require_GET
+def recherche_api(request):
+    """API JSON pour la recherche en direct : renvoie véhicules, locations, ventes, conducteurs, factures (labels + URLs)."""
+    q = (request.GET.get('q') or '').strip()
+    out = {'vehicules': [], 'locations': [], 'ventes': [], 'conducteurs': [], 'factures': []}
+    if not q:
+        return JsonResponse(out)
+
+    # Véhicules
+    for v in Vehicule.objects.filter(
+        Q(numero_chassis__icontains=q) |
+        Q(numero_immatriculation__icontains=q) |
+        Q(marque__nom__icontains=q) |
+        Q(modele__nom__icontains=q) |
+        Q(origine_pays__icontains=q)
+    ).select_related('marque', 'modele').order_by('-date_entree_parc')[:15]:
+        out['vehicules'].append({
+            'id': v.pk,
+            'label': '{} — {}'.format(v.libelle_court, v.numero_chassis) + (' · ' + v.numero_immatriculation if v.numero_immatriculation else ''),
+            'url': reverse('flotte:vehicule_detail', args=[v.pk]),
+        })
+
+    if is_manager_or_admin(request):
+        for loc in Location.objects.filter(
+            Q(locataire__icontains=q) |
+            Q(type_location__icontains=q) |
+            Q(vehicule__numero_chassis__icontains=q) |
+            Q(vehicule__marque__nom__icontains=q) |
+            Q(vehicule__modele__nom__icontains=q)
+        ).select_related('vehicule__marque', 'vehicule__modele').order_by('-date_debut')[:15]:
+            out['locations'].append({
+                'id': loc.pk,
+                'label': '{} — {} · {}'.format(loc.locataire, loc.vehicule.libelle_court if loc.vehicule else loc.vehicule_id, loc.type_location),
+                'url': reverse('flotte:location_detail', args=[loc.pk]),
+            })
+
+    ventes_qs = Vente.objects.select_related('vehicule__marque', 'vehicule__modele').order_by('-date_vente')
+    if not is_manager_or_admin(request):
+        ventes_qs = ventes_qs.filter(acquereur_compte=request.user)
+    for v in ventes_qs.filter(
+        Q(acquereur__icontains=q) |
+        Q(vehicule__numero_chassis__icontains=q) |
+        Q(vehicule__marque__nom__icontains=q) |
+        Q(vehicule__modele__nom__icontains=q)
+    )[:15]:
+        out['ventes'].append({
+            'id': v.pk,
+            'label': '{} — {} · {}'.format(v.vehicule.libelle_court if v.vehicule else '', v.acquereur or '—', v.date_vente),
+            'url': reverse('flotte:vehicule_detail', args=[v.vehicule_id]),
+        })
+
+    for c in Conducteur.objects.filter(
+        Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(email__icontains=q) | Q(telephone__icontains=q)
+    ).order_by('nom', 'prenom')[:15]:
+        out['conducteurs'].append({
+            'id': c.pk,
+            'label': '{} {}'.format(c.nom, c.prenom) + (' · ' + (c.email or c.telephone or '') if (c.email or c.telephone) else ''),
+            'url': reverse('flotte:conducteur_update', args=[c.pk]),
+        })
+
+    if is_manager_or_admin(request):
+        for f in Facture.objects.filter(
+            Q(numero__icontains=q) |
+            Q(fournisseur__icontains=q) |
+            Q(vehicule__numero_chassis__icontains=q) |
+            Q(vehicule__marque__nom__icontains=q) |
+            Q(vehicule__modele__nom__icontains=q)
+        ).select_related('vehicule__marque', 'vehicule__modele').order_by('-date_facture')[:15]:
+            out['factures'].append({
+                'id': f.pk,
+                'label': '{} — {} · {}'.format(f.vehicule.libelle_court if f.vehicule else '', f.numero, f.fournisseur or ''),
+                'url': reverse('flotte:vehicule_detail', args=[f.vehicule_id]),
+            })
+
+    return JsonResponse(out)
 
 
 # ——— Parc / Véhicules ———
@@ -220,13 +659,15 @@ def vehicule_detail(request, pk):
         Vehicule.objects.select_related(
             'marque', 'modele', 'type_vehicule', 'type_carburant', 'type_transmission'
         ).prefetch_related(
-            'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes', 'factures'
+            'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes', 'factures',
+            'charges_import', 'parties_importees',
         ),
         pk=pk
     )
     total_depenses = vehicule.depenses.aggregate(s=Sum('montant'))['s'] or 0
     total_reparations = vehicule.reparations.aggregate(s=Sum('cout'))['s'] or 0
-    cout_total = (vehicule.prix_achat or 0) + total_depenses + total_reparations
+    total_charges_import = vehicule.charges_import.aggregate(s=Sum('cout_total'))['s'] or 0
+    cout_total = (vehicule.prix_achat or 0) + total_depenses + total_reparations + total_charges_import
     derniere_vente = vehicule.ventes.order_by('-date_vente').first()
     marge = None
     if derniere_vente and derniere_vente.prix_vente:
@@ -235,6 +676,7 @@ def vehicule_detail(request, pk):
         'vehicule': vehicule,
         'total_depenses': total_depenses,
         'total_reparations': total_reparations,
+        'total_charges_import': total_charges_import,
         'cout_total': cout_total,
         'derniere_vente': derniere_vente,
         'marge': marge,
@@ -321,8 +763,11 @@ class LocationCreateView(ManagerRequiredMixin, CreateView):
 
 @manager_or_admin_required
 def location_detail(request, pk):
-    """Fiche location."""
-    loc = get_object_or_404(Location.objects.select_related('vehicule'), pk=pk)
+    """Fiche location (avec contraventions et coût total)."""
+    loc = get_object_or_404(
+        Location.objects.select_related('vehicule').prefetch_related('contraventions'),
+        pk=pk
+    )
     context = {'location': loc, **get_sidebar_context(request)}
     return render(request, 'flotte/location_detail.html', context)
 
@@ -506,8 +951,17 @@ class FactureCreateView(ManagerRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['vehicule'] = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
+        vehicule = get_object_or_404(
+            Vehicule.objects.prefetch_related('charges_import', 'depenses', 'reparations'),
+            pk=self.kwargs['vehicule_pk']
+        )
+        from django.db.models import Sum
+        total_charges = vehicule.charges_import.aggregate(s=Sum('cout_total'))['s'] or 0
+        total_dep = vehicule.depenses.aggregate(s=Sum('montant'))['s'] or 0
+        total_rep = vehicule.reparations.aggregate(s=Sum('cout'))['s'] or 0
+        context['vehicule'] = vehicule
         context['title'] = 'Ajouter une facture'
+        context['cout_total_vehicule'] = (vehicule.prix_achat or 0) + total_charges + total_dep + total_rep
         context.update(get_sidebar_context(self.request))
         return context
 
@@ -580,6 +1034,177 @@ class ImportDemarcheUpdateView(ManagerRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
+# ——— Charges d'importation (par véhicule) ———
+@method_decorator(login_required, name='dispatch')
+class ChargeImportCreateView(ManagerRequiredMixin, CreateView):
+    model = ChargeImport
+    form_class = ChargeImportForm
+    template_name = 'flotte/charge_import_form.html'
+    context_object_name = 'charge_import'
+
+    def form_valid(self, form):
+        form.instance.vehicule_id = self.kwargs['vehicule_pk']
+        messages.success(self.request, 'Charges d\'importation enregistrées.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.kwargs['vehicule_pk']])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicule'] = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
+        context['title'] = 'Ajouter charges d\'importation'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class ChargeImportUpdateView(ManagerRequiredMixin, UpdateView):
+    model = ChargeImport
+    form_class = ChargeImportForm
+    template_name = 'flotte/charge_import_form.html'
+    context_object_name = 'charge_import'
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicule'] = self.object.vehicule
+        context['title'] = 'Modifier charges d\'importation'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Charges d\'importation mises à jour.')
+        return super().form_valid(form)
+
+
+# ——— Pièces importées ———
+@method_decorator(login_required, name='dispatch')
+class PartieImporteeListView(ManagerRequiredMixin, ListView):
+    model = PartieImportee
+    template_name = 'flotte/parties_importees_list.html'
+    context_object_name = 'parties'
+    paginate_by = 30
+
+    def get_queryset(self):
+        qs = PartieImportee.objects.select_related('vehicule').order_by('-id')
+        vehicule_id = self.request.GET.get('vehicule')
+        if vehicule_id:
+            qs = qs.filter(vehicule_id=vehicule_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicules'] = Vehicule.objects.all().order_by('marque__nom', 'modele__nom')[:200]
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PartieImporteeCreateView(ManagerRequiredMixin, CreateView):
+    model = PartieImportee
+    form_class = PartieImporteeForm
+    template_name = 'flotte/partie_importee_form.html'
+    context_object_name = 'partie'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['vehicule_filtre'] = self.kwargs.get('vehicule_pk')
+        return kwargs
+
+    def form_valid(self, form):
+        if self.kwargs.get('vehicule_pk'):
+            form.instance.vehicule_id = self.kwargs['vehicule_pk']
+        messages.success(self.request, 'Partie importée enregistrée.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        if self.kwargs.get('vehicule_pk'):
+            return reverse('flotte:vehicule_detail', args=[self.kwargs['vehicule_pk']])
+        return reverse('flotte:parties_importees_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.kwargs.get('vehicule_pk'):
+            context['vehicule'] = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
+        context['title'] = 'Ajouter une pièce / partie importée'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PartieImporteeUpdateView(ManagerRequiredMixin, UpdateView):
+    model = PartieImportee
+    form_class = PartieImporteeForm
+    template_name = 'flotte/partie_importee_form.html'
+    context_object_name = 'partie'
+
+    def get_success_url(self):
+        if self.object.vehicule_id:
+            return reverse('flotte:vehicule_detail', args=[self.object.vehicule_id])
+        return reverse('flotte:parties_importees_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.vehicule_id:
+            context['vehicule'] = self.object.vehicule
+        context['title'] = 'Modifier la pièce / partie importée'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Partie importée mise à jour.')
+        return super().form_valid(form)
+
+
+# ——— Contraventions (par location) ———
+@method_decorator(login_required, name='dispatch')
+class ContraventionCreateView(ManagerRequiredMixin, CreateView):
+    model = Contravention
+    form_class = ContraventionForm
+    template_name = 'flotte/contravention_form.html'
+    context_object_name = 'contravention'
+
+    def form_valid(self, form):
+        form.instance.location_id = self.kwargs['location_pk']
+        messages.success(self.request, 'Contravention enregistrée.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('flotte:location_detail', args=[self.kwargs['location_pk']])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location'] = get_object_or_404(Location, pk=self.kwargs['location_pk'])
+        context['title'] = 'Ajouter une contravention'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class ContraventionUpdateView(ManagerRequiredMixin, UpdateView):
+    model = Contravention
+    form_class = ContraventionForm
+    template_name = 'flotte/contravention_form.html'
+    context_object_name = 'contravention'
+
+    def get_success_url(self):
+        return reverse('flotte:location_detail', args=[self.object.location_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['location'] = self.object.location
+        context['title'] = 'Modifier la contravention'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Contravention mise à jour.')
+        return super().form_valid(form)
+
+
 # ——— Ventes (CRUD depuis l'app) ———
 @method_decorator(login_required, name='dispatch')
 class VenteCreateView(ManagerRequiredMixin, CreateView):
@@ -590,13 +1215,20 @@ class VenteCreateView(ManagerRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.vehicule_id = self.kwargs['vehicule_pk']
-        messages.success(self.request, 'Vente enregistrée.')
-        result = super().form_valid(form)
-        # Marquer le véhicule comme vendu
-        vehicule = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
-        vehicule.statut = 'vendu'
-        vehicule.save(update_fields=['statut'])
-        return result
+        try:
+            result = super().form_valid(form)
+            vehicule = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
+            vehicule.statut = 'vendu'
+            vehicule.save(update_fields=['statut'])
+            messages.success(self.request, 'Vente enregistrée.')
+            return result
+        except (DatabaseError, IntegrityError) as e:
+            logger.exception('VenteCreateView: erreur enregistrement vente: %s', e)
+            messages.error(
+                self.request,
+                'L\'enregistrement de la vente a échoué. Veuillez vérifier les données ou réessayer.',
+            )
+            return self.form_invalid(form)
 
     def get_success_url(self):
         return reverse('flotte:vehicule_detail', args=[self.kwargs['vehicule_pk']])
@@ -627,8 +1259,17 @@ class VenteUpdateView(ManagerRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, 'Vente mise à jour.')
-        return super().form_valid(form)
+        try:
+            result = super().form_valid(form)
+            messages.success(self.request, 'Vente mise à jour.')
+            return result
+        except (DatabaseError, IntegrityError) as e:
+            logger.exception('VenteUpdateView: erreur mise à jour vente: %s', e)
+            messages.error(
+                self.request,
+                'La mise à jour de la vente a échoué. Veuillez vérifier les données ou réessayer.',
+            )
+            return self.form_invalid(form)
 
 
 # ——— Import (réservé manager / admin) ———
@@ -662,11 +1303,24 @@ def documents_list(request):
     return render(request, 'flotte/documents_list.html', context)
 
 
-@manager_or_admin_required
+@login_required
 def ventes_list(request):
-    """Liste des ventes."""
-    ventes = Vente.objects.select_related('vehicule').order_by('-date_vente')[:100]
-    context = {'ventes': ventes, **get_sidebar_context(request)}
+    """Liste des ventes. Manager/Admin : toutes. Utilisateur (client) : uniquement ses ventes (acquereur_compte)."""
+    from .mixins import is_manager_or_admin
+    context_base = get_sidebar_context(request)
+    try:
+        qs = Vente.objects.select_related('vehicule', 'acquereur_compte').order_by('-date_vente')
+        if not is_manager_or_admin(request):
+            qs = qs.filter(acquereur_compte=request.user)
+        ventes = list(qs[:100])
+    except (DatabaseError, Exception) as e:
+        logger.exception('ventes_list: erreur lors du chargement des ventes: %s', e)
+        ventes = []
+        messages.error(
+            request,
+            'Impossible de charger la liste des ventes. Veuillez réessayer plus tard.',
+        )
+    context = {'ventes': ventes, **context_base}
     return render(request, 'flotte/ventes_list.html', context)
 
 
@@ -693,9 +1347,10 @@ def _ca_evolution_queryset(granularite, annee, mois=None):
     return qs
 
 
-@manager_or_admin_required
+@login_required
 def ca_api_evolution(request):
-    """API JSON : évolution du CA par jour / mois / année pour les graphiques."""
+    """API JSON : évolution du CA par jour / mois / année pour les graphiques.
+    Accessible à tout utilisateur connecté (cohérent avec la page CA)."""
     granularite = request.GET.get('granularite', 'mois')
     if granularite not in ('jour', 'mois', 'annee'):
         granularite = 'mois'
@@ -735,11 +1390,21 @@ def ca_view(request):
         moyenne_vente=Avg('prix_vente'),
     )
     annees = list(range(now.year - 2, now.year + 3))
+    # Année par défaut : dernière année ayant au moins une vente, sinon année courante
+    derniere_annee_avec_vente = (
+        Vente.objects.exclude(date_vente__isnull=True)
+        .values_list('date_vente__year', flat=True)
+        .order_by('-date_vente__year')
+        .first()
+    )
+    annee_defaut = derniere_annee_avec_vente if derniere_annee_avec_vente else now.year
+    if annee_defaut not in annees:
+        annees = sorted(set(annees) | {annee_defaut})
     context = {
         'total_ca': agg['total_ca'] or Decimal('0'),
         'nb_ventes': agg['nb_ventes'] or 0,
         'moyenne_vente': agg['moyenne_vente'] or Decimal('0'),
-        'annee_courante': now.year,
+        'annee_courante': annee_defaut,
         'mois_courant': now.month,
         'annees': annees,
         **get_sidebar_context(request),
@@ -925,6 +1590,57 @@ def parametrage_index(request):
         raise PermissionDenied
     context = {**get_sidebar_context(request)}
     return render(request, 'flotte/parametrage.html', context)
+
+
+@login_required
+def audit_list(request):
+    """Consultation et export du journal d'audit (réservé admin). Filtres : date, utilisateur, modèle."""
+    if not is_admin(request):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied
+    qs = AuditLog.objects.select_related('user').order_by('-timestamp')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    user_id = request.GET.get('user')
+    model_name = request.GET.get('model', '').strip()
+    if date_from:
+        qs = qs.filter(timestamp__date__gte=date_from)
+    if date_to:
+        qs = qs.filter(timestamp__date__lte=date_to)
+    if user_id:
+        qs = qs.filter(user_id=user_id)
+    if model_name:
+        qs = qs.filter(model_name__icontains=model_name)
+    qs = qs[:500]
+    if request.GET.get('export') == 'csv':
+        import csv
+        from django.utils import timezone
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="audit_flotte_{}.csv"'.format(
+            timezone.now().strftime('%Y%m%d_%H%M')
+        )
+        response.write('\ufeff')
+        writer = csv.writer(response, delimiter=';')
+        writer.writerow(['Date', 'Utilisateur', 'Action', 'Modèle', 'ID objet', 'Représentation'])
+        for log in qs:
+            writer.writerow([
+                log.timestamp.strftime('%Y-%m-%d %H:%M:%S') if log.timestamp else '',
+                log.user.username if log.user else '',
+                log.get_action_display() if log.action else log.action,
+                log.model_name or '',
+                log.object_id or '',
+                (log.object_repr or '')[:200],
+            ])
+        return response
+    context = {
+        'audit_logs': qs,
+        'date_from': date_from,
+        'date_to': date_to,
+        'user_id': user_id,
+        'model_name': model_name,
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/audit_list.html', context)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -1154,6 +1870,50 @@ class TypeVehiculeUpdateView(AdminRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Modifier le type de véhicule'
         context['back_url'] = reverse_lazy('flotte:parametrage_type_vehicule')
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+# ——— Paramétrage Types de document ———
+@method_decorator(login_required, name='dispatch')
+class ParametrageTypeDocumentListView(AdminRequiredMixin, ListView):
+    model = TypeDocument
+    template_name = 'flotte/parametrage_type_document.html'
+    context_object_name = 'types'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class TypeDocumentCreateView(AdminRequiredMixin, CreateView):
+    model = TypeDocument
+    form_class = TypeDocumentForm
+    template_name = 'flotte/parametrage_form.html'
+    success_url = reverse_lazy('flotte:parametrage_type_document')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Ajouter un type de document'
+        context['back_url'] = reverse_lazy('flotte:parametrage_type_document')
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class TypeDocumentUpdateView(AdminRequiredMixin, UpdateView):
+    model = TypeDocument
+    form_class = TypeDocumentForm
+    template_name = 'flotte/parametrage_form.html'
+    context_object_name = 'object'
+    success_url = reverse_lazy('flotte:parametrage_type_document')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Modifier le type de document'
+        context['back_url'] = reverse_lazy('flotte:parametrage_type_document')
         context.update(get_sidebar_context(self.request))
         return context
 
