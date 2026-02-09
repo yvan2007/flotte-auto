@@ -10,10 +10,11 @@ flotte/tests/
 ├── config.py            # Credentials et URL (variables d'environnement)
 ├── README.md            # Ce fichier
 ├── unit/                # Tests unitaires (modèles)
-│   ├── test_models.py
+│   ├── test_models.py   # Marque, Modele, Vehicule, Depense, Vente, Maintenance, etc.
 │   └── ...
-├── integration/         # Tests d'intégration (vues, permissions)
-│   ├── test_views_permissions.py
+├── integration/         # Tests d'intégration (vues, permissions, API)
+│   ├── test_views_permissions.py  # Accès par rôle, login next, CA annee_defaut
+│   ├── test_api.py                 # API index, ca_api_evolution, marques, CA synthèse, DRF root
 │   └── ...
 └── functional/          # Tests fonctionnels Selenium (parcours utilisateur Chrome)
     ├── test_selenium_journey.py
@@ -86,6 +87,8 @@ Configurables par **variables d'environnement** (voir `flotte/tests/config.py`) 
 
 ## Parcours couverts (Selenium)
 
-- **User (consultation)** : dashboard, parc, réparations, documents, maintenance, carburant, conducteurs ; refus (403) sur import, ventes, CA, location, paramétrage.
-- **Manager (gestion)** : tout le parcours opérationnel (y compris import, ventes, CA, location) ; refus sur paramétrage.
-- **Admin** : accès à tout, y compris paramétrage (marques, modèles, etc.).
+Les tests utilisent des **attentes explicites** (WebDriverWait) pour limiter les échecs intermittents. Chaque rôle est couvert de façon complète.
+
+- **User (consultation)** : accès à dashboard, recherche, échéances, parc, réparations, documents, ventes, maintenance, carburant, conducteurs. Refus (403) sur : import, parties importées, CA, TCO, location, paramétrage.
+- **Manager (gestion)** : tout le parcours opérationnel (recherche, échéances, parc, import, parties importées, ventes, CA, TCO, location, maintenance, carburant, conducteurs). Refus sur paramétrage (index + marques).
+- **Admin** : accès à tout, y compris paramétrage (index, marques, modèles, utilisateurs).

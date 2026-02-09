@@ -13,6 +13,7 @@ from flotte.models import (
     Maintenance,
     ReleveCarburant,
     Conducteur,
+    Vente,
 )
 
 
@@ -130,3 +131,37 @@ class RapportJournalierMaintenanceConducteurTests(TestCase):
             montant_fcfa=Decimal('45000'),
         )
         self.assertEqual(r.vehicule.numero_chassis, 'CHASSIS004')
+
+
+class VenteModelTests(TestCase):
+    """Tests sur le modèle Vente (CA, graphiques évolution)."""
+
+    def setUp(self):
+        self.marque = Marque.objects.create(nom='VenteTest')
+        self.modele = Modele.objects.create(
+            marque=self.marque, nom='M1', version='V1', annee_min=2020
+        )
+        self.vehicule = Vehicule.objects.create(
+            numero_chassis='CH_VENTE_001',
+            marque=self.marque,
+            modele=self.modele,
+            statut='vendu',
+        )
+
+    def test_creation_vente_ok(self):
+        v = Vente.objects.create(
+            vehicule=self.vehicule,
+            date_vente=date(2025, 1, 15),
+            prix_vente=Decimal('2500000'),
+        )
+        self.assertEqual(v.vehicule.numero_chassis, 'CH_VENTE_001')
+        self.assertEqual(v.date_vente.year, 2025)
+        self.assertEqual(v.prix_vente, Decimal('2500000'))
+
+    def test_vente_sans_prix_autorise(self):
+        """Vente avec prix_vente null (pour évolution CA, exclue du CA)."""
+        v = Vente.objects.create(
+            vehicule=self.vehicule,
+            date_vente=date(2025, 2, 1),
+        )
+        self.assertIsNone(v.prix_vente)

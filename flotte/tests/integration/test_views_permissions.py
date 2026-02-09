@@ -1,11 +1,14 @@
 """
 Tests d'intégration FLOTTE — accès aux vues selon le rôle (user, manager, admin).
 """
+from datetime import date
+from decimal import Decimal
+
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from flotte.models import ProfilUtilisateur
+from flotte.models import ProfilUtilisateur, Marque, Modele, Vehicule, Vente
 
 User = get_user_model()
 
@@ -80,10 +83,11 @@ class PermissionsViewsTests(TestCase):
         response = self.client.get(reverse('flotte:ca'))
         self.assertEqual(response.status_code, 200)
 
-    def test_user_denied_ventes_list(self):
+    def test_user_can_access_ventes_list(self):
+        """Liste ventes : accessible à tout utilisateur connecté (filtrée par acquereur pour rôle user)."""
         self.client.login(username='user1', password='testpass123')
         response = self.client.get(reverse('flotte:ventes_list'))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_admin_can_access_parametrage(self):
         self.client.login(username='admin1', password='testpass123')
@@ -109,3 +113,38 @@ class PermissionsViewsTests(TestCase):
         self.client.login(username='user1', password='testpass123')
         response = self.client.get(reverse('flotte:conducteurs_list'))
         self.assertEqual(response.status_code, 200)
+
+    def test_login_redirect_with_next_api(self):
+        """Après connexion avec ?next=/api/, redirection vers /api/."""
+        login_url = reverse('flotte:login')
+        next_url = '/api/'
+        response = self.client.post(
+            login_url,
+            {'username': 'manager1', 'password': 'testpass123', 'next': next_url},
+            follow=False,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, next_url)
+
+    def test_ca_view_annee_courante_when_ventes_exist(self):
+        """Page CA : annee_courante = dernière année ayant une vente."""
+        marque = Marque.objects.create(nom='CA Test')
+        modele = Modele.objects.create(
+            marque=marque, nom='M1', version='V1', annee_min=2020
+        )
+        vehicule = Vehicule.objects.create(
+            numero_chassis='CH_CA_TEST',
+            marque=marque,
+            modele=modele,
+            statut='vendu',
+        )
+        Vente.objects.create(
+            vehicule=vehicule,
+            date_vente=date(2023, 5, 10),
+            prix_vente=Decimal('500000'),
+        )
+        self.client.login(username='manager1', password='testpass123')
+        response = self.client.get(reverse('flotte:ca'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['annee_courante'], 2023)
+        self.assertIn(2023, response.context['annees'])
