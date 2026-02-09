@@ -8,6 +8,7 @@ from .models import (
     Location, Vente, ProfilUtilisateur, Facture,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
     ChargeImport, PartieImportee, Contravention, TypeDocument, AuditLog,
+    PhotoVehicule, PenaliteFacture,
 )
 
 User = get_user_model()
@@ -67,6 +68,13 @@ class FactureInline(admin.TabularInline):
     extra = 0
 
 
+class PhotoVehiculeInline(admin.TabularInline):
+    model = PhotoVehicule
+    extra = 0
+    fields = ('photo', 'angle', 'description', 'est_principale', 'ordre')
+    readonly_fields = ('photo',)
+
+
 @admin.register(Vehicule)
 class VehiculeAdmin(admin.ModelAdmin):
     list_display = (
@@ -75,8 +83,16 @@ class VehiculeAdmin(admin.ModelAdmin):
     )
     list_filter = ('statut', 'marque', 'type_carburant')
     search_fields = ('numero_chassis', 'numero_immatriculation', 'marque__nom', 'modele__nom')
-    inlines = [ImportDemarcheInline, DepenseInline, DocumentVehiculeInline, ReparationInline, FactureInline]
+    inlines = [ImportDemarcheInline, DepenseInline, DocumentVehiculeInline, ReparationInline, FactureInline, PhotoVehiculeInline]
     date_hierarchy = 'date_entree_parc'
+
+
+@admin.register(PhotoVehicule)
+class PhotoVehiculeAdmin(admin.ModelAdmin):
+    list_display = ('vehicule', 'angle', 'description', 'est_principale', 'ordre', 'created_at')
+    list_filter = ('angle', 'est_principale', 'vehicule')
+    search_fields = ('vehicule__numero_chassis', 'description')
+    date_hierarchy = 'created_at'
 
 
 class ContraventionInline(admin.TabularInline):
@@ -115,11 +131,26 @@ class ContraventionAdmin(admin.ModelAdmin):
     search_fields = ('reference', 'location__locataire', 'location__vehicule__numero_chassis')
 
 
+class PenaliteFactureInline(admin.TabularInline):
+    model = PenaliteFacture
+    extra = 0
+    fields = ('date_penalite', 'libelle', 'montant', 'remarque')
+
+
 @admin.register(Facture)
 class FactureAdmin(admin.ModelAdmin):
     list_display = ('numero', 'vehicule', 'fournisseur', 'date_facture', 'montant', 'type_facture')
     list_filter = ('type_facture',)
     search_fields = ('numero', 'fournisseur', 'vehicule__numero_chassis')
+    inlines = [PenaliteFactureInline]
+
+
+@admin.register(PenaliteFacture)
+class PenaliteFactureAdmin(admin.ModelAdmin):
+    list_display = ('facture', 'libelle', 'date_penalite', 'montant', 'created_at')
+    list_filter = ('facture__vehicule',)
+    search_fields = ('libelle', 'facture__numero')
+    date_hierarchy = 'date_penalite'
 
 
 @admin.register(Vente)

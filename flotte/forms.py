@@ -13,6 +13,7 @@ from .models import (
     Reparation, ProfilUtilisateur, Facture, Vente,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
     ChargeImport, PartieImportee, Contravention, TypeDocument,
+    PhotoVehicule, PenaliteFacture,
 )
 
 User = get_user_model()
@@ -622,6 +623,19 @@ class FactureForm(forms.ModelForm):
             pass
 
 
+class PenaliteFactureForm(forms.ModelForm):
+    """Pénalité liée à une facture (retard, amende, etc.)."""
+    class Meta:
+        model = PenaliteFacture
+        fields = ('date_penalite', 'libelle', 'montant', 'remarque')
+        widgets = {
+            'date_penalite': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'libelle': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Ex: Retard de paiement, Amende'}),
+            'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
+        }
+
+
 class RapportJournalierForm(forms.ModelForm):
     """Upload rapport journalier ou document CA (PDF)."""
     class Meta:
@@ -770,4 +784,28 @@ class ContraventionForm(forms.ModelForm):
             'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'lieu': forms.TextInput(attrs={'class': 'form-input'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
+        }
+
+
+class PhotoVehiculeForm(forms.ModelForm):
+    """Formulaire pour ajouter/modifier une photo de véhicule."""
+    class Meta:
+        model = PhotoVehicule
+        fields = ('photo', 'angle', 'description', 'est_principale', 'ordre')
+        widgets = {
+            'photo': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': 'image/*',
+            }),
+            'angle': forms.Select(attrs={'class': 'form-input'}),
+            'description': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Description optionnelle (ex: "Vue avant avec phares allumés")'
+            }),
+            'est_principale': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'ordre': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'min': 0,
+                'placeholder': '0'
+            }),
         }

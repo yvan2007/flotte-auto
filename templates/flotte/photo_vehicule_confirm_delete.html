@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Supprimer la photo{% endblock %}
+{% block page_title %}Supprimer la photo{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc</a><span>›</span><a href="{% url 'flotte:vehicule_detail' vehicule.pk %}">{{ vehicule.libelle_court }}</a><span>›</span><span class="current">Supprimer la photo</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Supprimer la photo</h2>
+  <p><strong>Véhicule:</strong> {{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</p>
+  
+  <div class="delete-confirmation">
+    <p>Êtes-vous sûr de vouloir supprimer cette photo ?</p>
+    {% if photo.photo %}
+    <div class="photo-preview-delete">
+      <img src="{{ photo.photo.url }}" alt="{{ photo.get_angle_display }}" style="max-width: 300px; border-radius: 8px; margin: 1rem 0;">
+      <p><strong>Angle:</strong> {{ photo.get_angle_display }}</p>
+      {% if photo.description %}
+      <p><strong>Description:</strong> {{ photo.description }}</p>
+      {% endif %}
+    </div>
+    {% endif %}
+    <p class="warning-text">Cette action est irréversible.</p>
+  </div>
+
+  <form method="post" class="form">
+    {% csrf_token %}
+    <div class="form-actions">
+      <a href="{% url 'flotte:vehicule_detail' vehicule.pk %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-danger">Supprimer définitivement</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

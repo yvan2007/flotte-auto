@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc</a><span>›</span><a href="{% url 'flotte:vehicule_detail' vehicule.pk %}">{{ vehicule.libelle_court }}</a><span>›</span><span class="current">{{ title }}</span></nav>
+{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/photo-form.css' %}">
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="form-header">
+    <h2>{{ title }}</h2>
+    <p class="form-subtitle">Véhicule: <strong>{{ vehicule.libelle_court }}</strong> ({{ vehicule.numero_chassis }})</p>
+  </div>
+  <form method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    
+    <div class="form-group">
+      <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }} <span class="required">*</span></label>
+      {{ form.photo }}
+      {{ form.photo.errors }}
+      <small class="form-hint">Formats acceptés: JPG, PNG. Taille recommandée: 1920x1080px ou supérieure.</small>
+      {% if form.instance.photo %}
+      <div class="current-photo-preview">
+        <p>Photo actuelle:</p>
+        <img src="{{ form.instance.photo.url }}" alt="Photo actuelle" class="preview-image">
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.angle.id_for_label }}">{{ form.angle.label }} <span class="required">*</span></label>
+        {{ form.angle }}
+        {{ form.angle.errors }}
+        <small class="form-hint">Sélectionnez l'angle de prise de vue</small>
+      </div>
+      <div class="form-group">
+        <label for="{{ form.ordre.id_for_label }}">{{ form.ordre.label }}</label>
+        {{ form.ordre }}
+        {{ form.ordre.errors }}
+        <small class="form-hint">Ordre d'affichage (0 = premier)</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+      {{ form.description }}
+      {{ form.description.errors }}
+      <small class="form-hint">Description optionnelle de la photo</small>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-label">
+        {{ form.est_principale }}
+        <span>{{ form.est_principale.label }}</span>
+      </label>
+      {{ form.est_principale.errors }}
+      <small class="form-hint">La photo principale sera affichée en premier. Si vous cochez cette case, les autres photos principales seront automatiquement désactivées.</small>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'flotte:vehicule_detail' vehicule.pk %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+// Aperçu de l'image avant upload
+document.addEventListener('DOMContentLoaded', function() {
+  var photoInput = document.getElementById('id_photo');
+  if (photoInput) {
+    photoInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var previewContainer = document.querySelector('.current-photo-preview');
+          if (!previewContainer) {
+            previewContainer = document.createElement('div');
+            previewContainer.className = 'current-photo-preview';
+            previewContainer.innerHTML = '<p>Nouvelle photo:</p><img src="" alt="Aperçu" class="preview-image">';
+            photoInput.parentElement.appendChild(previewContainer);
+          }
+          var previewImg = previewContainer.querySelector('.preview-image');
+          previewImg.src = e.target.result;
+          previewContainer.querySelector('p').textContent = 'Nouvelle photo:';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

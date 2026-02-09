@@ -18,7 +18,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_GET
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, Prefetch, Q, Sum
 from django.db.models.functions import TruncDate, TruncMonth, TruncYear
 from django.utils import timezone
 from decimal import Decimal
@@ -31,7 +31,7 @@ from .models import (
     Reparation, Vente, ProfilUtilisateur, Facture,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
     ChargeImport, PartieImportee, Contravention, TypeDocument,
-    AuditLog,
+    AuditLog, PhotoVehicule, PenaliteFacture,
 )
 from .forms import (
     LoginForm, UserCreateForm, UserUpdateForm, MarqueForm, ModeleForm,
@@ -40,6 +40,7 @@ from .forms import (
     ReparationForm, FactureForm, ImportDemarcheForm, VenteForm,
     RapportJournalierForm, MaintenanceForm, ReleveCarburantForm, ConducteurForm,
     ChargeImportForm, PartieImporteeForm, ContraventionForm, TypeDocumentForm,
+    PhotoVehiculeForm, PenaliteFactureForm,
 )
 from .mixins import (
     AdminRequiredMixin, ManagerRequiredMixin,
@@ -659,8 +660,9 @@ def vehicule_detail(request, pk):
         Vehicule.objects.select_related(
             'marque', 'modele', 'type_vehicule', 'type_carburant', 'type_transmission'
         ).prefetch_related(
-            'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes', 'factures',
-            'charges_import', 'parties_importees',
+            'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes',
+            'charges_import', 'parties_importees', 'photos',
+            Prefetch('factures', queryset=Facture.objects.prefetch_related('penalites').order_by('-date_facture', '-id')),
         ),
         pk=pk
     )
@@ -672,6 +674,7 @@ def vehicule_detail(request, pk):
     marge = None
     if derniere_vente and derniere_vente.prix_vente:
         marge = derniere_vente.prix_vente - cout_total
+    photos = vehicule.photos.all()
     context = {
         'vehicule': vehicule,
         'total_depenses': total_depenses,
@@ -680,6 +683,7 @@ def vehicule_detail(request, pk):
         'cout_total': cout_total,
         'derniere_vente': derniere_vente,
         'marge': marge,
+        'photos': photos,
         **get_sidebar_context(request),
     }
     return render(request, 'flotte/vehicule_detail.html', context)
@@ -841,6 +845,84 @@ class DocumentVehiculeUpdateView(ManagerRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
+# ——— Photos véhicule (CRUD) ———
+@method_decorator(login_required, name='dispatch')
+class PhotoVehiculeCreateView(ManagerRequiredMixin, CreateView):
+    """Ajouter une photo à un véhicule."""
+    model = PhotoVehicule
+    form_class = PhotoVehiculeForm
+    template_name = 'flotte/photo_vehicule_form.html'
+    context_object_name = 'photo'
+
+    def get_initial(self):
+        return {'vehicule': get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])}
+
+    def form_valid(self, form):
+        form.instance.vehicule_id = self.kwargs['vehicule_pk']
+        # Si c'est la photo principale, désactiver les autres
+        if form.instance.est_principale:
+            PhotoVehicule.objects.filter(vehicule_id=self.kwargs['vehicule_pk']).exclude(pk=form.instance.pk).update(est_principale=False)
+        messages.success(self.request, 'Photo ajoutée avec succès.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.kwargs['vehicule_pk']])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicule'] = get_object_or_404(Vehicule, pk=self.kwargs['vehicule_pk'])
+        context['title'] = 'Ajouter une photo'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PhotoVehiculeUpdateView(ManagerRequiredMixin, UpdateView):
+    """Modifier une photo de véhicule."""
+    model = PhotoVehicule
+    form_class = PhotoVehiculeForm
+    template_name = 'flotte/photo_vehicule_form.html'
+    context_object_name = 'photo'
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicule'] = self.object.vehicule
+        context['title'] = 'Modifier la photo'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def form_valid(self, form):
+        # Si c'est la photo principale, désactiver les autres
+        if form.instance.est_principale:
+            PhotoVehicule.objects.filter(vehicule_id=form.instance.vehicule_id).exclude(pk=form.instance.pk).update(est_principale=False)
+        messages.success(self.request, 'Photo mise à jour.')
+        return super().form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class PhotoVehiculeDeleteView(ManagerRequiredMixin, DeleteView):
+    """Supprimer une photo de véhicule."""
+    model = PhotoVehicule
+    template_name = 'flotte/photo_vehicule_confirm_delete.html'
+    context_object_name = 'photo'
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicule'] = self.object.vehicule
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Photo supprimée.')
+        return super().delete(request, *args, **kwargs)
+
+
 # ——— Réparations (CRUD depuis l'app) ———
 @method_decorator(login_required, name='dispatch')
 class ReparationCreateView(ManagerRequiredMixin, CreateView):
@@ -934,12 +1016,27 @@ class DepenseUpdateView(ManagerRequiredMixin, UpdateView):
 
 
 # ——— Factures (CRUD depuis l'app) ———
+def get_next_numero_facture():
+    """Génère le prochain numéro de facture au format FAC-AAAA-NNNNN (ex. FAC-2026-00001)."""
+    year = timezone.now().year
+    prefix = f'FAC-{year}-'
+    # Nombre de factures existantes avec ce préfixe (numéro auto ou manuel commençant par FAC-AAAA-)
+    count = Facture.objects.filter(numero__startswith=prefix).count()
+    next_n = count + 1
+    return f'{prefix}{next_n:05d}'
+
+
 @method_decorator(login_required, name='dispatch')
 class FactureCreateView(ManagerRequiredMixin, CreateView):
     model = Facture
     form_class = FactureForm
     template_name = 'flotte/facture_form.html'
     context_object_name = 'facture'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['numero'] = get_next_numero_facture()
+        return initial
 
     def form_valid(self, form):
         form.instance.vehicule_id = self.kwargs['vehicule_pk']
@@ -962,6 +1059,7 @@ class FactureCreateView(ManagerRequiredMixin, CreateView):
         context['vehicule'] = vehicule
         context['title'] = 'Ajouter une facture'
         context['cout_total_vehicule'] = (vehicule.prix_achat or 0) + total_charges + total_dep + total_rep
+        context['numero_suggere'] = get_next_numero_facture()
         context.update(get_sidebar_context(self.request))
         return context
 
@@ -986,6 +1084,79 @@ class FactureUpdateView(ManagerRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Facture mise à jour.')
         return super().form_valid(form)
+
+
+# ——— Pénalités facture (CRUD) ———
+@method_decorator(login_required, name='dispatch')
+class PenaliteFactureCreateView(ManagerRequiredMixin, CreateView):
+    """Ajouter une pénalité à une facture."""
+    model = PenaliteFacture
+    form_class = PenaliteFactureForm
+    template_name = 'flotte/penalite_facture_form.html'
+    context_object_name = 'penalite'
+
+    def form_valid(self, form):
+        form.instance.facture_id = self.kwargs['facture_pk']
+        messages.success(self.request, 'Pénalité enregistrée.')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.facture.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        facture = get_object_or_404(Facture, pk=self.kwargs['facture_pk'])
+        context['facture'] = facture
+        context['vehicule'] = facture.vehicule
+        context['title'] = 'Ajouter une pénalité'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PenaliteFactureUpdateView(ManagerRequiredMixin, UpdateView):
+    """Modifier une pénalité de facture."""
+    model = PenaliteFacture
+    form_class = PenaliteFactureForm
+    template_name = 'flotte/penalite_facture_form.html'
+    context_object_name = 'penalite'
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.facture.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['facture'] = self.object.facture
+        context['vehicule'] = self.object.facture.vehicule
+        context['title'] = 'Modifier la pénalité'
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Pénalité mise à jour.')
+        return super().form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class PenaliteFactureDeleteView(ManagerRequiredMixin, DeleteView):
+    """Supprimer une pénalité de facture."""
+    model = PenaliteFacture
+    template_name = 'flotte/penalite_facture_confirm_delete.html'
+    context_object_name = 'penalite'
+
+    def get_success_url(self):
+        return reverse('flotte:vehicule_detail', args=[self.object.facture.vehicule_id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['facture'] = self.object.facture
+        context['vehicule'] = self.object.facture.vehicule
+        context.update(get_sidebar_context(self.request))
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Pénalité supprimée.')
+        return super().delete(request, *args, **kwargs)
 
 
 # ——— Démarches import (CRUD depuis l'app) ———
@@ -1376,15 +1547,17 @@ def ca_api_evolution(request):
     else:
         labels = [str(r['periode'].year) if r['periode'] else '' for r in rows]
     data = [float(r['total'] or 0) for r in rows]
-    nb_ventes = [r['nb'] for r in rows]
+    nb_ventes = [int(r['nb']) for r in rows]
     return JsonResponse({'labels': labels, 'data': data, 'nb_ventes': nb_ventes})
 
 
 @manager_or_admin_required
 def ca_view(request):
-    """Chiffre d'affaires : KPIs, synthèse des ventes et données pour graphiques."""
+    """Chiffre d'affaires : KPIs sur toutes les ventes avec prix (cohérent avec graphiques)."""
     now = timezone.now()
-    agg = Vente.objects.aggregate(
+    # Même base que les graphiques : ventes avec prix renseigné et > 0
+    qs_ventes_ca = Vente.objects.exclude(prix_vente__isnull=True).exclude(prix_vente=0)
+    agg = qs_ventes_ca.aggregate(
         total_ca=Sum('prix_vente'),
         nb_ventes=Count('id'),
         moyenne_vente=Avg('prix_vente'),

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Supprimer la pénalité{% endblock %}
+{% block page_title %}Supprimer la pénalité{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc</a><span>›</span><a href="{% url 'flotte:vehicule_detail' vehicule.pk %}">{{ vehicule.libelle_court }}</a><span>›</span><span class="current">Supprimer la pénalité</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Supprimer la pénalité</h2>
+  <p><strong>Véhicule:</strong> {{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</p>
+  <p><strong>Facture:</strong> {{ facture.numero }}{% if facture.fournisseur %} — {{ facture.fournisseur }}{% endif %}</p>
+  <div class="delete-confirmation" style="margin:1rem 0; padding:1rem; background:#fff5f5; border-left:4px solid #dc2626;">
+    <p><strong>Pénalité:</strong> {{ penalite.libelle }}{% if penalite.montant %} — {{ penalite.montant|floatformat:0 }} FCFA{% endif %}</p>
+    <p>Êtes-vous sûr de vouloir supprimer cette pénalité ?</p>
+    <p style="color:#dc2626; font-weight:600;">Cette action est irréversible.</p>
+  </div>
+  <form method="post" class="form">
+    {% csrf_token %}
+    <div class="form-actions">
+      <a href="{% url 'flotte:vehicule_detail' vehicule.pk %}" class="btn btn-ghost">Annuler</a>
+      <button type="submit" class="btn btn-danger">Supprimer définitivement</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

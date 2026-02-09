@@ -177,6 +177,53 @@ class Vehicule(models.Model):
         return self.numero_chassis
 
 
+class PhotoVehicule(models.Model):
+    """Photo d'un véhicule sous différents angles."""
+    ANGLE_CHOICES = [
+        ('avant', 'Vue avant'),
+        ('arriere', 'Vue arrière'),
+        ('gauche', 'Vue côté gauche'),
+        ('droit', 'Vue côté droit'),
+        ('interieur_avant', 'Intérieur avant'),
+        ('interieur_arriere', 'Intérieur arrière'),
+        ('moteur', 'Moteur'),
+        ('autre', 'Autre'),
+    ]
+    vehicule = models.ForeignKey(
+        Vehicule, on_delete=models.CASCADE, related_name='photos'
+    )
+    photo = models.ImageField(
+        'Photo', upload_to='vehicules_photos/%Y/%m/', max_length=255,
+        help_text='Photo du véhicule (JPG, PNG)'
+    )
+    angle = models.CharField(
+        'Angle / Vue', max_length=20, choices=ANGLE_CHOICES, default='autre',
+        help_text='Angle de prise de vue'
+    )
+    description = models.CharField(
+        'Description', max_length=200, blank=True,
+        help_text='Description optionnelle de la photo'
+    )
+    est_principale = models.BooleanField(
+        'Photo principale', default=False,
+        help_text='Photo principale affichée en premier'
+    )
+    ordre = models.PositiveSmallIntegerField(
+        'Ordre d\'affichage', default=0,
+        help_text='Ordre d\'affichage (plus petit = affiché en premier)'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['vehicule', 'ordre', 'est_principale', '-created_at']
+        verbose_name = 'Photo véhicule'
+        verbose_name_plural = 'Photos véhicule'
+
+    def __str__(self):
+        return f'{self.vehicule.numero_chassis} — {self.get_angle_display()}'
+
+
 class ImportDemarche(models.Model):
     """Étape d'import / démarche par véhicule."""
     vehicule = models.ForeignKey(
@@ -539,6 +586,36 @@ class Facture(models.Model):
 
     def __str__(self):
         return f'{self.vehicule.numero_chassis} — {self.numero}'
+
+    @property
+    def total_avec_penalites(self):
+        """Montant facture + somme des pénalités liées."""
+        from decimal import Decimal
+        base = self.montant or Decimal(0)
+        penalites = sum((p.montant or Decimal(0)) for p in self.penalites.all())
+        return base + penalites
+
+
+class PenaliteFacture(models.Model):
+    """Pénalité (retard, amende, etc.) liée à une facture."""
+    facture = models.ForeignKey(
+        Facture, on_delete=models.CASCADE, related_name='penalites'
+    )
+    date_penalite = models.DateField('Date', null=True, blank=True)
+    libelle = models.CharField('Libellé', max_length=200, help_text='Ex: Retard de paiement, Amende')
+    montant = models.DecimalField(
+        'Montant (FCFA)', max_digits=14, decimal_places=0, null=True, blank=True
+    )
+    remarque = models.TextField('Remarque', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['facture', '-date_penalite', '-id']
+        verbose_name = 'Pénalité facture'
+        verbose_name_plural = 'Pénalités facture'
+
+    def __str__(self):
+        return f'{self.facture.numero} — {self.libelle}'
 
 
 class ProfilUtilisateur(models.Model):

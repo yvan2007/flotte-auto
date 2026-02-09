@@ -1,12 +1,79 @@
 {% extends "base.html" %}
 {% load humanize %}
+{% load static %}
 {% block title %}Fiche véhicule{% endblock %}
 {% block page_title %}Fiche véhicule — {{ vehicule.numero_chassis }}{% endblock %}
 {% block breadcrumb %}
 <nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><a href="{% url 'flotte:parc' %}">Parc / Flotte</a><span>›</span><span class="current">{{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</span></nav>
 {% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/vehicule-gallery.css' %}">
+{% endblock %}
 {% block content %}
 <div class="fiche-grid">
+  {% if photos %}
+  <div class="card fiche-block vehicule-gallery-section">
+    <div class="gallery-header">
+      <h3>Photos du véhicule</h3>
+      {% if is_manager_or_admin %}
+      <a href="{% url 'flotte:photo_vehicule_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une photo</a>
+      {% endif %}
+    </div>
+    <div class="photo-gallery">
+      {% for photo in photos %}
+      <div class="photo-item {% if photo.est_principale %}photo-principale{% endif %}" data-photo-id="{{ photo.pk }}">
+        <div class="photo-wrapper">
+          <img src="{{ photo.photo.url }}" alt="{{ photo.get_angle_display }}{% if photo.description %} — {{ photo.description }}{% endif %}" class="photo-thumbnail" loading="lazy">
+          {% if photo.est_principale %}
+          <span class="badge badge-primary photo-badge">Principale</span>
+          {% endif %}
+          <div class="photo-overlay">
+            <div class="photo-info">
+              <span class="photo-angle">{{ photo.get_angle_display }}</span>
+              {% if photo.description %}
+              <span class="photo-description">{{ photo.description }}</span>
+              {% endif %}
+            </div>
+            <div class="photo-actions">
+              <button class="btn-icon btn-view" onclick="openLightbox('{{ photo.photo.url }}', '{{ photo.get_angle_display }}{% if photo.description %} — {{ photo.description }}{% endif %}')" title="Voir en grand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+              {% if is_manager_or_admin %}
+              <a href="{% url 'flotte:photo_vehicule_update' photo.pk %}" class="btn-icon btn-edit" title="Modifier">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </a>
+              <a href="{% url 'flotte:photo_vehicule_delete' photo.pk %}" class="btn-icon btn-delete" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card fiche-block vehicule-gallery-section">
+    <div class="gallery-header">
+      <h3>Photos du véhicule</h3>
+      {% if is_manager_or_admin %}
+      <a href="{% url 'flotte:photo_vehicule_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une photo</a>
+      {% endif %}
+    </div>
+    <p class="no-photos">Aucune photo disponible. {% if is_manager_or_admin %}Ajoutez des photos pour documenter le véhicule sous tous les angles.{% endif %}</p>
+  </div>
+  {% endif %}
+
   <div class="card fiche-block">
     <h3>Identification</h3>
     <p><strong>Châssis:</strong> {{ vehicule.numero_chassis }}</p>
@@ -149,7 +216,24 @@
     {% if vehicule.factures.all %}
     <ul class="activity-list">
       {% for f in vehicule.factures.all %}
-      <li>{{ f.numero }}{% if f.fournisseur %} — {{ f.fournisseur }}{% endif %}{% if f.date_facture %} ({{ f.date_facture }}){% endif %} : {% if f.montant %}{{ f.montant|floatformat:0 }} FCFA{% endif %}{% if f.type_facture %} — {{ f.type_facture }}{% endif %}{% if f.fichier %} <a href="{{ f.fichier.url }}" class="link-doc" target="_blank" rel="noopener">PDF</a>{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:facture_update' f.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      <li>
+        <strong>{{ f.numero }}</strong>{% if f.fournisseur %} — {{ f.fournisseur }}{% endif %}{% if f.date_facture %} ({{ f.date_facture }}){% endif %} : {% if f.montant %}{{ f.montant|floatformat:0 }} FCFA{% endif %}{% if f.type_facture %} — {{ f.type_facture }}{% endif %}{% if f.fichier %} <a href="{{ f.fichier.url }}" class="link-doc" target="_blank" rel="noopener">PDF</a>{% endif %}
+        {% if f.penalites.all %}
+        <ul style="margin:0.5rem 0 0 1.5rem; list-style:disc;">
+          {% for p in f.penalites.all %}
+          <li>Pénalité : {{ p.libelle }}{% if p.date_penalite %} ({{ p.date_penalite }}){% endif %}{% if p.montant %} — {{ p.montant|floatformat:0 }} FCFA{% endif %}
+          {% if is_manager_or_admin %}<a href="{% url 'flotte:penalite_facture_update' p.pk %}" class="btn btn-ghost btn-sm">Modifier</a> <a href="{% url 'flotte:penalite_facture_delete' p.pk %}" class="btn btn-ghost btn-sm" onclick="return confirm('Supprimer cette pénalité ?');">Supprimer</a>{% endif %}</li>
+          {% endfor %}
+        </ul>
+        <p style="margin:0.25rem 0 0 1.5rem;"><strong>Total avec pénalités : {{ f.total_avec_penalites|floatformat:0 }} FCFA</strong></p>
+        {% endif %}
+        {% if is_manager_or_admin %}
+        <p style="margin-top:0.5rem;">
+          <a href="{% url 'flotte:facture_update' f.pk %}" class="btn btn-ghost btn-sm">Modifier la facture</a>
+          <a href="{% url 'flotte:penalite_facture_create' f.pk %}" class="btn btn-ghost btn-sm">Ajouter une pénalité</a>
+        </p>
+        {% endif %}
+      </li>
       {% endfor %}
     </ul>
     {% else %}
@@ -184,4 +268,41 @@
   </div>
   {% endif %}
 </div>
+
+<!-- Lightbox pour afficher les photos en grand -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-content" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Fermer">&times;</button>
+    <img id="lightbox-image" src="" alt="">
+    <div id="lightbox-caption"></div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function openLightbox(imageSrc, caption) {
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImage = document.getElementById('lightbox-image');
+  var lightboxCaption = document.getElementById('lightbox-caption');
+  lightboxImage.src = imageSrc;
+  lightboxCaption.textContent = caption || '';
+  lightbox.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(event) {
+  if (!event || event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
+    var lightbox = document.getElementById('lightbox');
+    lightbox.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// Fermer avec la touche Échap
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLightbox({target: {id: 'lightbox'}});
+  }
+});
+</script>
 {% endblock %}
