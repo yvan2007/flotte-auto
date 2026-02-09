@@ -5,7 +5,7 @@
 <nav class="breadcrumb" aria-label="Fil d'Ariane"><span class="current">Tableau de bord</span></nav>
 {% endblock %}
 {% block content %}
-<p class="card-desc" style="margin-bottom: 1.25rem;">Vue d'ensemble du parc, des véhicules en import et des alertes (CT, assurance). KPIs et activité récente.</p>
+<p class="card-desc" style="margin-bottom: 1.25rem;">Vue d'ensemble du parc, des véhicules en import et des alertes (CT, assurance, permis, documents). <a href="{% url 'flotte:echeances' %}">Voir toutes les échéances</a> (90 jours).</p>
 <div class="kpi-grid">
   <div class="kpi-card">
     <span class="kpi-label">Véhicules dans le parc</span>
@@ -85,5 +85,60 @@
     <div class="empty-state"><p>Aucune échéance assurance dans les 30 prochains jours.</p></div>
     {% endif %}
   </div>
+  <div class="card">
+    <h2 class="card-title">Alertes — CT et assurance (véhicules au parc)</h2>
+    <p class="card-desc">Véhicules au parc dont le CT ou l'assurance expire dans les 30 prochains jours.</p>
+    {% if alertes_ct_vehicule or alertes_assurance_vehicule %}
+    <ul class="activity-list">
+      {% for v in alertes_ct_vehicule %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">CT</span> <a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a> — Expiration le {{ v.date_expiration_ct }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></span>
+      </li>
+      {% endfor %}
+      {% for v in alertes_assurance_vehicule %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">Assurance</span> <a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a> — Expiration le {{ v.date_expiration_assurance }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state"><p>Aucune alerte CT/assurance véhicule au parc.</p></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Alertes — Permis conducteurs</h2>
+    <p class="card-desc">Conducteurs actifs dont le permis expire dans les 30 prochains jours.</p>
+    {% if alertes_permis %}
+    <ul class="activity-list">
+      {% for c in alertes_permis %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">Permis</span> {{ c.nom }} {{ c.prenom }} — Expiration le {{ c.permis_date_expiration }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:conducteur_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state"><p>Aucun permis en échéance dans les 30 prochains jours.</p></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Alertes — Documents véhicule</h2>
+    <p class="card-desc">Documents dont la date d'échéance est dans les 30 prochains jours.</p>
+    {% if alertes_documents %}
+    <ul class="activity-list">
+      {% for doc in alertes_documents %}
+      <li>
+        <span class="li-content"><span class="badge badge-warn">Document</span> <a href="{% url 'flotte:vehicule_detail' doc.vehicule.pk %}">{{ doc.vehicule.libelle_court }}</a> — {{ doc.libelle_type }} échéance le {{ doc.date_echeance }}</span>
+        <span class="li-actions"><a href="{% url 'flotte:vehicule_detail' doc.vehicule.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state"><p>Aucun document en échéance dans les 30 prochains jours.</p></div>
+    {% endif %}
+  </div>
 </div>
+<p style="margin-top: 1rem;"><a href="{% url 'flotte:echeances' %}" class="btn btn-primary btn-sm">Voir toutes les échéances (90 jours)</a></p>
 {% endblock %}

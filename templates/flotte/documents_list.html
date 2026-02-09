@@ -18,7 +18,7 @@
     </div>
     <ul class="doc-list">
       {% for doc in v.documents.all %}
-      <li>{% if doc.disponible %}✓{% else %}—{% endif %} {{ doc.type_document }}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %}</li>
+      <li>{% if doc.disponible %}✓{% else %}—{% endif %} {{ doc.libelle_type }}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %}</li>
       {% empty %}
       <li>Aucun document enregistré</li>
       {% endfor %}

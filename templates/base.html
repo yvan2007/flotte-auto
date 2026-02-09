@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <script>
+  (function(){var k='flotte_theme';var t=localStorage.getItem(k);if(t&&['clair','noir','beige','bleu','ardoise'].indexOf(t)!==-1){document.documentElement.setAttribute('data-theme',t);}else{document.documentElement.setAttribute('data-theme','beige');}})();
+  </script>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -25,6 +28,14 @@
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
           Tableau de bord
         </a>
+        <a href="{% url 'flotte:recherche' %}" class="nav-link {% if request.resolver_match.url_name == 'recherche' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+          Recherche
+        </a>
+        <a href="{% url 'flotte:echeances' %}" class="nav-link {% if request.resolver_match.url_name == 'echeances' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          Échéances
+        </a>
         <a href="{% url 'flotte:parc' %}" class="nav-link {% if request.resolver_match.url_name == 'parc' or request.resolver_match.url_name == 'vehicule_detail' or request.resolver_match.url_name == 'vehicule_create' or request.resolver_match.url_name == 'vehicule_update' %}active{% endif %}">
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5H5v5z"/><path d="M5 9h14V6H5v3z"/><path d="M3 4h18v16H3z"/></svg></span>
           Parc / Flotte
@@ -33,6 +44,10 @@
         <a href="{% url 'flotte:import_list' %}" class="nav-link {% if request.resolver_match.url_name == 'import_list' %}active{% endif %}">
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h6v13H6"/><path d="M16 8v5l4-2.5-4-2.5z"/></svg></span>
           Import & démarches
+        </a>
+        <a href="{% url 'flotte:parties_importees_list' %}" class="nav-link {% if request.resolver_match.url_name == 'parties_importees_list' or request.resolver_match.url_name == 'partie_importee_create_standalone' or request.resolver_match.url_name == 'partie_importee_update' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+          Parties importées
         </a>
         {% endif %}
         <a href="{% url 'flotte:reparations_list' %}" class="nav-link {% if request.resolver_match.url_name == 'reparations_list' %}active{% endif %}">
@@ -43,14 +58,18 @@
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span>
           Documents
         </a>
-        {% if is_manager_or_admin %}
         <a href="{% url 'flotte:ventes_list' %}" class="nav-link {% if request.resolver_match.url_name == 'ventes_list' %}active{% endif %}">
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
-          Ventes
+          {% if is_manager_or_admin %}Ventes{% else %}Mes ventes{% endif %}
         </a>
+        {% if is_manager_or_admin %}
         <a href="{% url 'flotte:ca' %}" class="nav-link {% if request.resolver_match.url_name == 'ca' %}active{% endif %}">
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
           Chiffre d'affaires
+        </a>
+        <a href="{% url 'flotte:tco' %}" class="nav-link {% if request.resolver_match.url_name == 'tco' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          TCO
         </a>
         {% endif %}
         <a href="{% url 'flotte:maintenance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'maintenance_list' %}active{% endif %}">
@@ -87,13 +106,25 @@
     <main class="main">
       <header class="header">
         <h1 class="page-title">{% block page_title %}Tableau de bord{% endblock %}</h1>
+        <div class="header-search-wrap">
+          <form action="{% url 'flotte:recherche' %}" method="get" class="header-search" role="search">
+            <label for="header-search-input" class="sr-only">Recherche globale</label>
+            <input type="search" id="header-search-input" name="q" class="search" placeholder="Rechercher (châssis, marque, locataire…)" value="{{ request.GET.q }}" aria-label="Recherche globale" autocomplete="off">
+            <button type="submit" class="btn btn-ghost btn-sm">Rechercher</button>
+          </form>
+          <div id="header-search-dropdown" class="header-search-dropdown" aria-hidden="true" style="display: none;" data-api-url="{% url 'flotte:recherche_api' %}"></div>
+        </div>
         <div class="header-actions">
-          {% if is_manager_or_admin %}
-          <button type="button" class="btn btn-ghost btn-sm ca-mask-toggle-global" id="header-mask-toggle" title="Masquer / Afficher les montants" aria-pressed="false">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            <span id="header-mask-label">Masquer les montants</span>
-          </button>
-          {% endif %}
+          <div class="theme-switcher" role="group" aria-label="Choisir le thème de l'interface">
+            <label for="flotte-theme-select">Thème</label>
+            <select id="flotte-theme-select" name="theme" aria-label="Thème d'affichage">
+              <option value="clair">Blanc</option>
+              <option value="noir">Noir</option>
+              <option value="beige">Beige</option>
+              <option value="bleu">Bleu</option>
+              <option value="ardoise">Ardoise</option>
+            </select>
+          </div>
           <span class="user-badge">{{ user.get_full_name|default:user.username }}</span>
           <form method="post" action="{% url 'flotte:logout' %}" class="logout-form-inline">
             {% csrf_token %}
@@ -104,9 +135,23 @@
       <div class="content">
         <div class="content-wrap">
           {% if messages %}
-          <div class="messages" role="status" aria-live="polite">
+          <div class="messages messages-toast" role="status" aria-live="polite">
             {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-with-icon" data-dismiss>
+              <span class="alert-icon" aria-hidden="true">
+                {% if message.tags == 'success' %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                {% elif message.tags == 'warning' %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                {% else %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                {% endif %}
+              </span>
+              <span class="alert-text">{{ message }}</span>
+              <button type="button" class="alert-close" aria-label="Fermer" title="Fermer">&times;</button>
+            </div>
             {% endfor %}
           </div>
           {% endif %}
@@ -118,6 +163,19 @@
   </div>
   <script>
   (function() {
+    var themeKey = 'flotte_theme';
+    var themeSelect = document.getElementById('flotte-theme-select');
+    if (themeSelect) {
+      var current = document.documentElement.getAttribute('data-theme') || 'beige';
+      themeSelect.value = current;
+      themeSelect.addEventListener('change', function() {
+        var val = themeSelect.value;
+        if (['clair','noir','beige','bleu','ardoise'].indexOf(val) !== -1) {
+          document.documentElement.setAttribute('data-theme', val);
+          try { localStorage.setItem(themeKey, val); } catch (e) {}
+        }
+      });
+    }
     var key = 'flotte_mask_amounts';
     function getMask() { try { return localStorage.getItem(key) === '1'; } catch (e) { return false; } }
     function setMask(on) { try { localStorage.setItem(key, on ? '1' : '0'); } catch (e) {} }
@@ -128,10 +186,6 @@
         var val = el.getAttribute('data-montant');
         el.textContent = on ? '\u2014' : (val || el.textContent);
       });
-      var headerLabel = document.getElementById('header-mask-label');
-      var headerBtn = document.getElementById('header-mask-toggle');
-      if (headerLabel) headerLabel.textContent = on ? 'Afficher les montants' : 'Masquer les montants';
-      if (headerBtn) { headerBtn.classList.toggle('active', on); headerBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
       var caLabel = document.getElementById('ca-mask-label');
       var caBtn = document.getElementById('ca-mask-toggle');
       if (caLabel) caLabel.textContent = on ? 'Afficher les montants' : 'Masquer les montants';
@@ -142,9 +196,56 @@
     } else {
       applyMask();
     }
-    document.getElementById('header-mask-toggle') && document.getElementById('header-mask-toggle').addEventListener('click', function() {
-      setMask(!getMask());
-      applyMask();
+  })();
+  </script>
+  {% if messages %}
+  <script>
+  (function() {
+    document.querySelectorAll('.alert[data-dismiss]').forEach(function(alert) {
+      var closeBtn = alert.querySelector('.alert-close');
+      if (closeBtn) closeBtn.addEventListener('click', function() { alert.classList.add('alert-dismissed'); });
+      setTimeout(function() { alert.classList.add('alert-dismissed'); }, 6000);
+    });
+  })();
+  </script>
+  {% endif %}
+  <script>
+  (function() {
+    var input = document.getElementById('header-search-input');
+    var dropdown = document.getElementById('header-search-dropdown');
+    if (!input || !dropdown) return;
+    var apiUrl = dropdown.getAttribute('data-api-url') || '/recherche/api/';
+    var debounceTimer = null;
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+    function showResults(data) {
+      var parts = [];
+      if (data.vehicules.length) { parts.push('<span class="dropdown-section">Véhicules</span>'); data.vehicules.forEach(function(r) { parts.push('<a href="' + esc(r.url) + '">' + esc(r.label) + '</a>'); }); }
+      if (data.locations.length) { parts.push('<span class="dropdown-section">Locations</span>'); data.locations.forEach(function(r) { parts.push('<a href="' + esc(r.url) + '">' + esc(r.label) + '</a>'); }); }
+      if (data.ventes.length) { parts.push('<span class="dropdown-section">Ventes</span>'); data.ventes.forEach(function(r) { parts.push('<a href="' + esc(r.url) + '">' + esc(r.label) + '</a>'); }); }
+      if (data.conducteurs.length) { parts.push('<span class="dropdown-section">Conducteurs</span>'); data.conducteurs.forEach(function(r) { parts.push('<a href="' + esc(r.url) + '">' + esc(r.label) + '</a>'); }); }
+      if (data.factures.length) { parts.push('<span class="dropdown-section">Factures</span>'); data.factures.forEach(function(r) { parts.push('<a href="' + esc(r.url) + '">' + esc(r.label) + '</a>'); }); }
+      dropdown.innerHTML = parts.join('');
+      dropdown.style.display = parts.length ? 'block' : 'none';
+      dropdown.setAttribute('aria-hidden', parts.length ? 'false' : 'true');
+    }
+    function run() {
+      var q = (input.value || '').trim();
+      if (!q) { dropdown.innerHTML = ''; dropdown.style.display = 'none'; dropdown.setAttribute('aria-hidden', 'true'); return; }
+      fetch(apiUrl + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+        .then(function(r) { return r.json(); })
+        .then(showResults)
+        .catch(function() { dropdown.innerHTML = ''; dropdown.style.display = 'none'; });
+    }
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(run, 280);
+    });
+    input.addEventListener('focus', function() { if ((input.value || '').trim()) run(); });
+    document.addEventListener('click', function(e) {
+      if (dropdown.style.display === 'block' && !dropdown.contains(e.target) && e.target !== input) {
+        dropdown.style.display = 'none';
+        dropdown.setAttribute('aria-hidden', 'true');
+      }
     });
   })();
   </script>

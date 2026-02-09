@@ -35,11 +35,40 @@
     {% if vehicule.import_demarches.all %}
     <ul class="activity-list">
       {% for d in vehicule.import_demarches.all %}
-      <li><span class="badge badge-ok">{{ d.etape }}</span> {{ d.date_etape|default:"" }} {{ d.statut_etape|default:"" }}{% if d.remarque %} — {{ d.remarque|truncatewords:10 }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:import_demarche_update' d.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      <li><span class="badge badge-ok">{{ d.etape }}</span> {{ d.date_etape|default:"" }} {{ d.statut_etape|default:"" }}{% if d.remarque %} — {{ d.remarque|truncatewords:10 }}{% endif %}{% if d.fichier %} <a href="{{ d.fichier.url }}" class="link-doc" target="_blank" rel="noopener">Document</a>{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:import_demarche_update' d.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
       {% endfor %}
     </ul>
     {% else %}
     <p>Aucune démarche enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Charges d'importation</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:charge_import_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter des charges</a></p>{% endif %}
+    {% if vehicule.charges_import.all %}
+    <ul class="activity-list">
+      {% for c in vehicule.charges_import.all %}
+      <li>Fret {% if c.fret %}{{ c.fret|floatformat:0 }} FCFA{% else %}—{% endif %} · Dédouanement {% if c.frais_dedouanement %}{{ c.frais_dedouanement|floatformat:0 }}{% else %}—{% endif %} · Transitaire {% if c.frais_transitaire %}{{ c.frais_transitaire|floatformat:0 }}{% else %}—{% endif %} → <strong>Total {% if c.cout_total %}{{ c.cout_total|floatformat:0 }} FCFA{% else %}—{% endif %}</strong> {% if is_manager_or_admin %}<a href="{% url 'flotte:charge_import_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    <p class="total-line">Total charges d'import : <strong>{{ total_charges_import|floatformat:0 }} FCFA</strong></p>
+    {% else %}
+    <p>Aucune charge d'importation enregistrée.</p>
+    {% endif %}
+  </div>
+
+  <div class="card fiche-block">
+    <h3>Pièces / parties importées</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:partie_importee_create' vehicule.pk %}" class="btn btn-primary btn-sm">Ajouter une pièce</a></p>{% endif %}
+    {% if vehicule.parties_importees.all %}
+    <ul class="activity-list">
+      {% for p in vehicule.parties_importees.all %}
+      <li>{{ p.designation }} — Qté {{ p.quantite }}{% if p.cout_unitaire %} × {{ p.cout_unitaire|floatformat:0 }} FCFA{% endif %}{% if p.cout_total %} = {{ p.cout_total|floatformat:0 }} FCFA{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:partie_importee_update' p.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune pièce importée liée à ce véhicule.</p>
     {% endif %}
   </div>
 
@@ -64,7 +93,7 @@
     {% if vehicule.documents.all %}
     <ul class="activity-list">
       {% for doc in vehicule.documents.all %}
-      <li>{% if doc.disponible %}<span class="badge badge-ok">Disponible</span>{% else %}<span class="badge badge-warn">À faire</span>{% endif %} {{ doc.type_document }}{% if doc.numero %} ({{ doc.numero }}){% endif %}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:document_update' doc.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      <li>{% if doc.disponible %}<span class="badge badge-ok">Disponible</span>{% else %}<span class="badge badge-warn">À faire</span>{% endif %} {{ doc.libelle_type }}{% if doc.numero %} ({{ doc.numero }}){% endif %}{% if doc.date_echeance %} — Échéance {{ doc.date_echeance }}{% endif %}{% if doc.fichier %} <a href="{{ doc.fichier.url }}" class="link-doc" target="_blank" rel="noopener">Fichier</a>{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:document_update' doc.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
       {% endfor %}
     </ul>
     {% else %}
@@ -120,7 +149,7 @@
     {% if vehicule.factures.all %}
     <ul class="activity-list">
       {% for f in vehicule.factures.all %}
-      <li>{{ f.numero }}{% if f.fournisseur %} — {{ f.fournisseur }}{% endif %}{% if f.date_facture %} ({{ f.date_facture }}){% endif %} : {% if f.montant %}{{ f.montant|floatformat:0 }} FCFA{% endif %}{% if f.type_facture %} — {{ f.type_facture }}{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:facture_update' f.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      <li>{{ f.numero }}{% if f.fournisseur %} — {{ f.fournisseur }}{% endif %}{% if f.date_facture %} ({{ f.date_facture }}){% endif %} : {% if f.montant %}{{ f.montant|floatformat:0 }} FCFA{% endif %}{% if f.type_facture %} — {{ f.type_facture }}{% endif %}{% if f.fichier %} <a href="{{ f.fichier.url }}" class="link-doc" target="_blank" rel="noopener">PDF</a>{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:facture_update' f.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
       {% endfor %}
     </ul>
     {% else %}
@@ -131,9 +160,10 @@
   <div class="card fiche-block">
     <h3>Coûts & marge</h3>
     <p><strong>Prix d'achat:</strong> {% if vehicule.prix_achat %}{{ vehicule.prix_achat|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Total charges import:</strong> {{ total_charges_import|floatformat:0 }} FCFA</p>
     <p><strong>Total dépenses:</strong> {{ total_depenses|floatformat:0 }} FCFA</p>
     <p><strong>Total réparations:</strong> {{ total_reparations|floatformat:0 }} FCFA</p>
-    <p><strong>Coût total:</strong> {{ cout_total|floatformat:0 }} FCFA</p>
+    <p class="total-line"><strong>Coût total (réf. facturation):</strong> {{ cout_total|floatformat:0 }} FCFA</p>
     {% if derniere_vente %}
     <p><strong>Dernière vente:</strong> {{ derniere_vente.prix_vente|floatformat:0 }} FCFA ({{ derniere_vente.date_vente }}) — {{ derniere_vente.acquereur|default:"" }}</p>
     {% if marge is not None %}

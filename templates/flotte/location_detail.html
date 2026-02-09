@@ -10,6 +10,7 @@
   <div class="card fiche-block">
     <h3>Contrat</h3>
     <p><strong>Véhicule:</strong> <a href="{% url 'flotte:vehicule_detail' location.vehicule.pk %}">{{ location.vehicule.libelle_court }}</a> (châssis {{ location.vehicule.numero_chassis }})</p>
+    <p><strong>Conducteur assigné:</strong> {% if location.conducteur %}{{ location.conducteur.nom }} {{ location.conducteur.prenom }} <a href="{% url 'flotte:conducteur_update' location.conducteur.pk %}" class="btn btn-ghost btn-sm">Fiche conducteur</a>{% else %}—{% endif %}</p>
     <p><strong>Locataire:</strong> {{ location.locataire }}</p>
     <p><strong>Type:</strong> {{ location.type_location }}</p>
     <p><strong>Début:</strong> {{ location.date_debut }}</p>
@@ -19,8 +20,24 @@
   <div class="card fiche-block">
     <h3>Finances</h3>
     <p><strong>Loyer mensuel:</strong> {% if location.loyer_mensuel %}{{ location.loyer_mensuel|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Coût de location:</strong> {% if location.cout_location %}{{ location.cout_location|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
+    <p><strong>Frais annexes (assurance, entretien, carburant…):</strong> {% if location.frais_annexes %}{{ location.frais_annexes|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
     <p><strong>Km inclus / mois:</strong> {{ location.km_inclus_mois|default:"—" }}</p>
     <p><strong>Prix km supplémentaire:</strong> {% if location.prix_km_supplementaire %}{{ location.prix_km_supplementaire }} FCFA/km{% else %}—{% endif %}</p>
+    <p class="total-line"><strong>Coût total (loyer + frais + contraventions):</strong> {{ location.cout_total_location|floatformat:0 }} FCFA</p>
+  </div>
+  <div class="card fiche-block">
+    <h3>Contraventions / amendes</h3>
+    {% if is_manager_or_admin %}<p><a href="{% url 'flotte:contravention_create' location.pk %}" class="btn btn-primary btn-sm">Ajouter une contravention</a></p>{% endif %}
+    {% if location.contraventions.all %}
+    <ul class="activity-list">
+      {% for c in location.contraventions.all %}
+      <li>{{ c.date_contravention|default:"" }} {% if c.reference %}{{ c.reference }}{% endif %} {% if c.lieu %}{{ c.lieu }}{% endif %} — {% if c.montant %}{{ c.montant|floatformat:0 }} FCFA{% else %}—{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:contravention_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune contravention enregistrée.</p>
+    {% endif %}
   </div>
   <div class="card fiche-block">
     <h3>Échéances</h3>

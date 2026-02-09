@@ -7,7 +7,7 @@
 {% block content %}
 <div class="card">
   <p><strong>Véhicule:</strong> {{ vehicule.libelle_court }} ({{ vehicule.numero_chassis }})</p>
-  <form method="post" class="form">
+  <form method="post" class="form" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.non_field_errors }}
     {% for field in form %}
