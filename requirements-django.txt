@@ -1,9 +1,29 @@
 # Application FLOTTE
 Django>=5.0,<6
 
+# API REST
+djangorestframework>=3.14,<4
+# CORS pour appels API depuis un autre domaine
+django-cors-headers>=4.0,<5
+
+# Connexion Google (OAuth2) + comptes sociaux
+django-allauth>=65.0,<66
+PyJWT>=2.8,<3
+cryptography>=42.0,<45
+requests>=2.28,<3
+
+# Variables d'environnement depuis .env (optionnel)
+python-dotenv>=1.0,<2
+
+# Liste des pays (ISO 3166-1) pour sélection pays d'origine
+django-countries>=7.5,<10
+
 # Tests fonctionnels (Selenium + Chrome)
 selenium>=4.0,<6
 webdriver-manager>=4.0,<5
 
 # Couverture de code (coverage)
 coverage[toml]>=7.0,<9
+
+# Génération de rapports DOCX
+python-docx>=1.0,<2
