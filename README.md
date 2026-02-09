@@ -57,9 +57,27 @@ python manage.py createsuperuser
   python manage.py runserver
   ```
 
-Puis ouvrir **http://127.0.0.1:8000/** et se connecter avec le superuser.
+Puis ouvrir **http://127.0.0.1:8000/** et se connecter avec le superuser (ou avec **Se connecter avec Google** si configuré).
 
 Fonctionnalités : châssis = identifiant véhicule, Paramétrage (marques, modèles, types carburant/transmission/véhicule, utilisateurs), Location (CT, assurance, km vidange), Parc, Import, Réparations, Documents, Ventes, CA. Thème beige conservé.
+
+### Connexion Google (optionnel)
+
+Pour activer le bouton **« Se connecter avec Google »** sur la page de connexion :
+
+1. **Google Cloud Console** : [APIs & Services → Identifiants](https://console.cloud.google.com/apis/credentials) → Créer des identifiants → **ID client OAuth 2.0** (type **Application Web**).
+2. **URI de redirection autorisés** : ajouter  
+   - En local : `http://127.0.0.1:8000/accounts/google/login/callback/`  
+   - En production : `https://votre-domaine.com/accounts/google/login/callback/`
+3. **Variables d’environnement** (ne jamais les mettre dans le code) :
+   - `GOOGLE_OAUTH_CLIENT_ID` = ID client
+   - `GOOGLE_OAUTH_CLIENT_SECRET` = Secret client
+
+Sans ces variables, le bouton Google reste affiché mais la connexion Google échouera tant qu’elles ne sont pas définies.
+
+### Emails (bienvenue, mot de passe oublié)
+
+À chaque **création de compte** (Paramétrage → Utilisateurs → Ajouter, ou connexion Google), un **email de bienvenue** est envoyé automatiquement (si l’utilisateur a une adresse email) : message structuré avec lien « Accéder à l’application ». Les templates HTML se trouvent dans `templates/flotte/emails/` (bienvenue, réinitialisation mot de passe). Pour ajouter d’autres emails (rappels CT, expiration documents, etc.), réutiliser le module `flotte.emails` et la fonction `send_mail_html()`. En dev sans SMTP, les emails s’affichent dans la console. Pour un envoi réel, ajouter dans `.env` : `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` (Gmail : mot de passe d'application). Tester avec : `python manage.py send_test_email votre@email.com`. Le domaine des liens : `EMAIL_DOMAIN` ou site Django (Admin → Sites).
 
 ---
 
