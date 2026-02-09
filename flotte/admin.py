@@ -7,6 +7,7 @@ from .models import (
     Vehicule, ImportDemarche, Depense, DocumentVehicule, Reparation,
     Location, Vente, ProfilUtilisateur, Facture,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
+    ChargeImport, PartieImportee, Contravention, TypeDocument, AuditLog,
 )
 
 User = get_user_model()
@@ -78,13 +79,40 @@ class VehiculeAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_entree_parc'
 
 
+class ContraventionInline(admin.TabularInline):
+    model = Contravention
+    extra = 0
+
+
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = (
-        'vehicule', 'locataire', 'type_location', 'date_debut', 'date_fin',
-        'loyer_mensuel', 'date_expiration_ct', 'date_expiration_assurance', 'statut'
+        'vehicule', 'conducteur', 'locataire', 'type_location', 'date_debut', 'date_fin',
+        'loyer_mensuel', 'cout_location', 'frais_annexes', 'date_expiration_ct', 'date_expiration_assurance', 'statut'
     )
     list_filter = ('statut', 'type_location')
+    inlines = [ContraventionInline]
+
+
+@admin.register(ChargeImport)
+class ChargeImportAdmin(admin.ModelAdmin):
+    list_display = ('vehicule', 'fret', 'frais_dedouanement', 'frais_transitaire', 'cout_total', 'created_at')
+    list_filter = ('vehicule',)
+    search_fields = ('vehicule__numero_chassis',)
+
+
+@admin.register(PartieImportee)
+class PartieImporteeAdmin(admin.ModelAdmin):
+    list_display = ('designation', 'vehicule', 'quantite', 'cout_unitaire', 'created_at')
+    list_filter = ('vehicule',)
+    search_fields = ('designation', 'vehicule__numero_chassis',)
+
+
+@admin.register(Contravention)
+class ContraventionAdmin(admin.ModelAdmin):
+    list_display = ('location', 'date_contravention', 'reference', 'montant', 'lieu')
+    list_filter = ('location',)
+    search_fields = ('reference', 'location__locataire', 'location__vehicule__numero_chassis')
 
 
 @admin.register(Facture)
@@ -137,6 +165,21 @@ class ConducteurAdmin(admin.ModelAdmin):
     list_display = ('nom', 'prenom', 'email', 'telephone', 'permis_numero', 'permis_date_expiration', 'actif')
     list_filter = ('actif',)
     search_fields = ('nom', 'prenom', 'email')
+
+
+@admin.register(TypeDocument)
+class TypeDocumentAdmin(admin.ModelAdmin):
+    list_display = ('libelle', 'ordre')
+    ordering = ('ordre', 'libelle')
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ('timestamp', 'user', 'action', 'model_name', 'object_id', 'object_repr')
+    list_filter = ('action', 'model_name')
+    search_fields = ('object_id', 'object_repr')
+    readonly_fields = ('user', 'action', 'model_name', 'object_id', 'object_repr', 'timestamp')
+    date_hierarchy = 'timestamp'
 
 
 admin.site.unregister(User)

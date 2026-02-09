@@ -1,24 +1,119 @@
 """Formulaires FLOTTE — validation et champs pour véhicules, ventes, utilisateurs."""
+import logging
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.db import DatabaseError
+from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
+from django_countries import countries
 from .models import (
     Marque, Modele, TypeCarburant, TypeTransmission, TypeVehicule,
     Vehicule, Location, ImportDemarche, Depense, DocumentVehicule,
     Reparation, ProfilUtilisateur, Facture, Vente,
     RapportJournalier, Maintenance, ReleveCarburant, Conducteur,
+    ChargeImport, PartieImportee, Contravention, TypeDocument,
 )
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
+
+# Liste des couleurs pour le select véhicule (extérieure / intérieure)
+COULEURS_VEHICULE = [
+    '', 'Blanc', 'Noir', 'Gris', 'Bleu', 'Rouge', 'Argent', 'Vert', 'Beige',
+    'Jaune', 'Orange', 'Marron', 'Bordeaux', 'Or', 'Ivoire', 'Autre',
+]
+
+# Liste de tous les pays (noms triés) pour datalist pays d'origine
+_LISTE_PAYS = None
+
+# ——— Listes de suggestions pour champs avec datalist (menu déroulant + saisie libre) ———
+ETAPES_IMPORT = [
+    'Dédouanement', 'Transport international', 'Contrôle technique', 'Immatriculation',
+    'Réception véhicule', 'Vérification douane', 'Paiement taxes', 'Autre',
+]
+STATUTS_ETAPE_IMPORT = ['En attente', 'En cours', 'Terminé', 'Refusé', 'Reporté']
+GARANTIES_VENTE = ['Aucune', '3 mois', '6 mois', '1 an', '2 ans', 'Constructeur']
+ETATS_LIVRAISON = ['Bon état', 'Très bon état', 'Parfait', 'Rayures', 'Choc réparé', 'Comme neuf']
+PHASES_DEPENSE = ['Import', 'Réparation', 'Préparation', 'Contrôle', 'Livraison', 'Stock', 'Autre']
+TYPES_REPARATION = [
+    'Carrosserie', 'Mécanique', 'Freinage', 'Distribution', 'Climatisation',
+    'Électricité', 'Pneumatiques', 'Vidange', 'Amortisseurs', 'Autre',
+]
+TYPES_FACTURE = ['Achat', 'Réparation', 'Assurance', 'Entretien', 'Pièces', 'Carburant', 'Autre']
+
+
+def get_liste_pays():
+    """Retourne la liste triée des noms de pays (ISO 3166-1)."""
+    global _LISTE_PAYS
+    if _LISTE_PAYS is None:
+        _LISTE_PAYS = sorted([name for _code, name in countries])
+    return _LISTE_PAYS
+
+
+class PaysOrigineDatalistWidget(forms.TextInput):
+    """
+    Champ texte avec datalist HTML5 : en tapant, le navigateur propose
+    les pays de la liste (tous les pays du monde).
+    """
+    def render(self, name, value, attrs=None, renderer=None):
+        attrs = attrs or {}
+        field_id = attrs.get('id', 'id_origine_pays')
+        datalist_id = f'{field_id}_datalist'
+        attrs.setdefault('list', datalist_id)
+        attrs.setdefault('class', 'form-input')
+        attrs.setdefault('placeholder', "Tapez pour afficher les pays…")
+        attrs.setdefault('autocomplete', 'off')  # évite conflit avec l'autocomplete navigateur
+        input_html = super().render(name, value, attrs, renderer)
+        options = ''.join(
+            format_html('<option value="{}">', escape(pays))
+            for pays in get_liste_pays()
+        )
+        datalist_html = format_html(
+            '<datalist id="{}">{}</datalist>',
+            datalist_id,
+            mark_safe(options),
+        )
+        return mark_safe(input_html + datalist_html)
+
+
+class DatalistWidget(forms.TextInput):
+    """
+    Champ texte avec datalist HTML5 : suggestions au fur et à mesure de la frappe,
+    avec possibilité de saisir une valeur libre. choices = liste de chaînes.
+    """
+    def __init__(self, choices=None, attrs=None, **kwargs):
+        super().__init__(attrs=attrs, **kwargs)
+        self.choices = list(choices) if choices else []
+
+    def render(self, name, value, attrs=None, renderer=None):
+        attrs = attrs or {}
+        field_id = attrs.get('id', f'id_{name}')
+        datalist_id = f'{field_id}_datalist'
+        attrs = {**attrs, 'list': datalist_id, 'autocomplete': 'off'}
+        attrs.setdefault('class', 'form-input')
+        input_html = super().render(name, value, attrs, renderer)
+        # Valeurs uniques non vides, triées
+        options = sorted({str(c).strip() for c in self.choices if c and str(c).strip()})
+        options_html = ''.join(
+            format_html('<option value="{}">', escape(o))
+            for o in options
+        )
+        datalist_html = format_html(
+            '<datalist id="{}">{}</datalist>',
+            datalist_id,
+            mark_safe(options_html),
+        )
+        return mark_safe(input_html + datalist_html)
 
 
 class LoginForm(AuthenticationForm):
-    """Formulaire de connexion (style FLOTTE)."""
+    """Formulaire de connexion (style FLOTTE). Accepte identifiant OU email."""
     username = forms.CharField(
-        label='Identifiant',
+        label='Identifiant ou email',
         widget=forms.TextInput(attrs={
             'class': 'form-input',
-            'placeholder': 'ex. admin',
+            'placeholder': 'Identifiant ou adresse email',
             'autocomplete': 'username',
         })
     )
@@ -30,6 +125,18 @@ class LoginForm(AuthenticationForm):
             'autocomplete': 'current-password',
         })
     )
+
+    def clean_username(self):
+        """Si la valeur ressemble à un email, résoudre vers le username du compte."""
+        value = self.cleaned_data.get('username')
+        if not value:
+            return value
+        value = value.strip()
+        if '@' in value:
+            user = User.objects.filter(email__iexact=value).first()
+            if user:
+                return user.username
+        return value
 
 
 class UserCreateForm(UserCreationForm):
@@ -136,6 +243,16 @@ class TypeVehiculeForm(forms.ModelForm):
         widgets = {'libelle': forms.TextInput(attrs={'class': 'form-input'})}
 
 
+class TypeDocumentForm(forms.ModelForm):
+    class Meta:
+        model = TypeDocument
+        fields = ('libelle', 'ordre')
+        widgets = {
+            'libelle': forms.TextInput(attrs={'class': 'form-input'}),
+            'ordre': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+        }
+
+
 class VehiculeForm(forms.ModelForm):
     """Formulaire véhicule — châssis = identifiant principal (surtout en import sans immat.)."""
     class Meta:
@@ -148,9 +265,17 @@ class VehiculeForm(forms.ModelForm):
             'prix_achat', 'origine_pays', 'etat_entree',
             'numero_immatriculation', 'date_premiere_immat',
             'consommation_moyenne', 'rejet_co2', 'puissance_fiscale',
-            'km_prochaine_vidange',
+            'km_prochaine_vidange', 'date_expiration_ct', 'date_expiration_assurance',
         )
-        labels = {'origine_pays': "Pays d'origine ou d'achat", 'statut': 'Statut (ex. en cours d\'importation)'}
+        labels = {
+            'origine_pays': "Pays d'origine ou d'achat",
+            'statut': 'Statut (ex. en cours d\'importation)',
+            'date_expiration_ct': 'Date expiration CT (véhicule au parc)',
+            'date_expiration_assurance': 'Date expiration assurance (véhicule au parc)',
+        }
+        help_texts = {
+            'origine_pays': "Tapez pour afficher la liste, puis sélectionnez un pays.",
+        }
         widgets = {
             'numero_chassis': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'ex. WDD2050461A123456'}),
             'marque': forms.Select(attrs={'class': 'form-select'}),
@@ -160,13 +285,13 @@ class VehiculeForm(forms.ModelForm):
             'type_vehicule': forms.Select(attrs={'class': 'form-select'}),
             'type_carburant': forms.Select(attrs={'class': 'form-select'}),
             'type_transmission': forms.Select(attrs={'class': 'form-select'}),
-            'couleur_exterieure': forms.TextInput(attrs={'class': 'form-input'}),
-            'couleur_interieure': forms.TextInput(attrs={'class': 'form-input'}),
+            'couleur_exterieure': forms.Select(attrs={'class': 'form-select'}),
+            'couleur_interieure': forms.Select(attrs={'class': 'form-select'}),
             'date_entree_parc': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'km_entree': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'kilometrage_actuel': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'prix_achat': forms.NumberInput(attrs={'class': 'form-input', 'min': 0, 'step': 1000}),
-            'origine_pays': forms.TextInput(attrs={'class': 'form-input'}),
+            'origine_pays': PaysOrigineDatalistWidget(),
             'etat_entree': forms.Select(attrs={'class': 'form-select'}),
             'numero_immatriculation': forms.TextInput(attrs={'class': 'form-input'}),
             'date_premiere_immat': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
@@ -174,6 +299,8 @@ class VehiculeForm(forms.ModelForm):
             'rejet_co2': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'puissance_fiscale': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'km_prochaine_vidange': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'date_expiration_ct': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'date_expiration_assurance': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -202,25 +329,50 @@ class VehiculeForm(forms.ModelForm):
             ],
             attrs={'class': 'form-select'}
         )
+        # Couleurs en select (liste déroulante) — inclure valeur existante si hors liste
+        base_choix = [('', '—')] + [(c, c) for c in COULEURS_VEHICULE if c]
+        for fname in ('couleur_exterieure', 'couleur_interieure'):
+            val = (self.instance.pk and getattr(self.instance, fname, None)) or (self.data.get(fname) if self.data else None)
+            if val and val.strip() and not any(c[0] == val for c in base_choix):
+                choix = [('', '—'), (val, val)] + [(c, c) for c in COULEURS_VEHICULE if c]
+            else:
+                choix = base_choix
+            self.fields[fname].widget = forms.Select(choices=choix, attrs={'class': 'form-select'})
+
+    def clean_origine_pays(self):
+        """Éviter qu'un montant (nombre) soit saisi par erreur dans le pays d'origine."""
+        value = (self.cleaned_data.get('origine_pays') or '').strip()
+        if not value:
+            return value
+        if value.isdigit():
+            raise forms.ValidationError(
+                'Saisir un nom de pays (ex. Allemagne, Japon), pas un nombre. '
+                'Le prix d\'achat se renseigne dans le champ « Prix d\'achat ».'
+            )
+        return value
 
 
 class LocationForm(forms.ModelForm):
-    """Formulaire location avec CT, assurance, km vidange."""
+    """Formulaire location avec CT, assurance, km vidange, conducteur assigné."""
     class Meta:
         model = Location
         fields = (
-            'vehicule', 'locataire', 'type_location', 'date_debut', 'date_fin',
-            'loyer_mensuel', 'km_inclus_mois', 'prix_km_supplementaire',
+            'vehicule', 'conducteur', 'locataire', 'type_location', 'date_debut', 'date_fin',
+            'loyer_mensuel', 'cout_location', 'frais_annexes',
+            'km_inclus_mois', 'prix_km_supplementaire',
             'date_expiration_ct', 'date_expiration_assurance', 'km_prochaine_vidange',
             'remarques', 'statut',
         )
         widgets = {
             'vehicule': forms.Select(attrs={'class': 'form-select'}),
+            'conducteur': forms.Select(attrs={'class': 'form-select'}),
             'locataire': forms.TextInput(attrs={'class': 'form-input'}),
             'type_location': forms.Select(attrs={'class': 'form-select'}),
             'date_debut': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'date_fin': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'loyer_mensuel': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'cout_location': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'frais_annexes': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'km_inclus_mois': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'prix_km_supplementaire': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'date_expiration_ct': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
@@ -238,6 +390,8 @@ class LocationForm(forms.ModelForm):
         if self.instance and self.instance.pk and self.instance.vehicule_id:
             qs = Vehicule.objects.filter(Q(statut='parc') | Q(pk=self.instance.vehicule_id)).distinct().order_by('marque__nom', 'modele__nom')
         self.fields['vehicule'].queryset = qs
+        self.fields['conducteur'].queryset = Conducteur.objects.filter(actif=True).order_by('nom', 'prenom')
+        self.fields['conducteur'].required = False
         self.fields['type_location'].widget = forms.Select(
             choices=[
                 ('LLD', 'LLD (Location Longue Durée)'),
@@ -246,32 +400,77 @@ class LocationForm(forms.ModelForm):
             ],
             attrs={'class': 'form-select'}
         )
+        # Locataire : suggestions des noms déjà saisis + saisie libre
+        try:
+            locataires = sorted(
+                Location.objects.exclude(locataire='')
+                .values_list('locataire', flat=True)
+                .distinct()
+            )
+            self.fields['locataire'].widget = DatalistWidget(choices=locataires, attrs={'class': 'form-input', 'placeholder': 'Nom du locataire'})
+        except (DatabaseError, Exception):
+            self.fields['locataire'].widget = DatalistWidget(choices=[], attrs={'class': 'form-input'})
 
 
 class ImportDemarcheForm(forms.ModelForm):
     class Meta:
         model = ImportDemarche
-        fields = ('etape', 'date_etape', 'statut_etape', 'remarque')
+        fields = ('etape', 'date_etape', 'statut_etape', 'fichier', 'remarque')
         widgets = {
-            'etape': forms.TextInput(attrs={'class': 'form-input'}),
+            'etape': DatalistWidget(choices=ETAPES_IMPORT, attrs={'class': 'form-input', 'placeholder': 'Ex. Dédouanement, Immatriculation'}),
             'date_etape': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
-            'statut_etape': forms.TextInput(attrs={'class': 'form-input'}),
+            'statut_etape': DatalistWidget(choices=STATUTS_ETAPE_IMPORT, attrs={'class': 'form-input', 'placeholder': 'Ex. En cours, Terminé'}),
+            'fichier': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': 'application/pdf,image/*'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }
 
 
 class VenteForm(forms.ModelForm):
+    """Formulaire vente : optionnellement lier à un compte client (acquéreur)."""
     class Meta:
         model = Vente
-        fields = ('date_vente', 'acquereur', 'prix_vente', 'km_vente', 'garantie_duree', 'etat_livraison')
+        fields = ('date_vente', 'acquereur', 'acquereur_compte', 'prix_vente', 'km_vente', 'garantie_duree', 'etat_livraison')
         widgets = {
             'date_vente': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
-            'acquereur': forms.TextInput(attrs={'class': 'form-input'}),
+            'acquereur': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nom de l\'acquéreur'}),
+            'acquereur_compte': forms.Select(attrs={'class': 'form-select'}),
             'prix_vente': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'km_vente': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'garantie_duree': forms.TextInput(attrs={'class': 'form-input'}),
-            'etat_livraison': forms.TextInput(attrs={'class': 'form-input'}),
+            'garantie_duree': DatalistWidget(choices=GARANTIES_VENTE, attrs={'class': 'form-input', 'placeholder': 'Ex. 6 mois, 1 an'}),
+            'etat_livraison': DatalistWidget(choices=ETATS_LIVRAISON, attrs={'class': 'form-input', 'placeholder': 'Ex. Très bon état'}),
         }
+        labels = {
+            'acquereur_compte': 'Compte client (acquéreur)',
+        }
+        help_texts = {
+            'acquereur_compte': 'Optionnel. Si l\'acquéreur a un compte Utilisateur, associez-le pour qu\'il voie cette vente.',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['acquereur_compte'].required = False
+        self.fields['acquereur_compte'].empty_label = '— Aucun compte client —'
+        # Queryset : seuls les comptes avec rôle Utilisateur (client), avec gestion d'exceptions
+        try:
+            self.fields['acquereur_compte'].queryset = User.objects.filter(
+                profil_flotte__role='user',
+                is_active=True,
+            ).select_related('profil_flotte').order_by('username')
+        except (DatabaseError, Exception) as e:
+            logger.warning('VenteForm: impossible de charger la liste des comptes clients: %s', e)
+            self.fields['acquereur_compte'].queryset = User.objects.none()
+
+    def clean_acquereur_compte(self):
+        """Vérifie que le compte sélectionné a bien le rôle Utilisateur (sécurité si formulaire modifié)."""
+        value = self.cleaned_data.get('acquereur_compte')
+        if not value:
+            return value
+        try:
+            if hasattr(value, 'profil_flotte') and value.profil_flotte.role != 'user':
+                raise forms.ValidationError('Seul un compte client (rôle Utilisateur) peut être associé.')
+        except (ProfilUtilisateur.DoesNotExist, AttributeError):
+            raise forms.ValidationError('Compte invalide pour une association acquéreur.')
+        return value
 
 
 class DepenseForm(forms.ModelForm):
@@ -281,7 +480,7 @@ class DepenseForm(forms.ModelForm):
         widgets = {
             'type_depense': forms.Select(attrs={'class': 'form-select'}),
             'libelle': forms.TextInput(attrs={'class': 'form-input'}),
-            'phase': forms.TextInput(attrs={'class': 'form-input'}),
+            'phase': DatalistWidget(choices=PHASES_DEPENSE, attrs={'class': 'form-input', 'placeholder': 'Ex. Import, Réparation'}),
             'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'date_depense': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
@@ -289,19 +488,45 @@ class DepenseForm(forms.ModelForm):
 
 
 class DocumentVehiculeForm(forms.ModelForm):
-    """Document disponible ou à faire (assurance, carte grise, CT…)."""
+    """Document disponible ou à faire — type depuis liste ou libre (autre), avec fichier optionnel."""
     class Meta:
         model = DocumentVehicule
-        fields = ('type_document', 'numero', 'date_emission', 'date_echeance', 'disponible', 'remarque')
+        fields = ('type_document_fk', 'type_document', 'numero', 'date_emission', 'date_echeance', 'disponible', 'fichier', 'remarque')
         widgets = {
-            'type_document': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Ex. Carte grise, Assurance, CT'}),
+            'type_document_fk': forms.Select(attrs={'class': 'form-select'}),
+            'type_document': DatalistWidget(choices=[], attrs={'class': 'form-input', 'placeholder': 'Si "Autre", choisir ou saisir le type'}),
             'numero': forms.TextInput(attrs={'class': 'form-input'}),
             'date_emission': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'date_echeance': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'disponible': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'fichier': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': 'application/pdf,image/*'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }
-        labels = {'disponible': 'Disponible (décoché = document à faire)'}
+        labels = {
+            'disponible': 'Disponible (décoché = document à faire)',
+            'type_document_fk': 'Type de document',
+            'type_document': 'Type (si Autre)',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['type_document_fk'].queryset = TypeDocument.objects.all()
+        self.fields['type_document_fk'].empty_label = '— Autre (saisir ci-dessous)'
+        self.fields['type_document_fk'].required = False
+        self.fields['type_document'].required = False
+        # Suggestions type document = libellés des types existants (pour saisie "Autre")
+        try:
+            types_doc = list(TypeDocument.objects.values_list('libelle', flat=True).order_by('libelle'))
+            self.fields['type_document'].widget = DatalistWidget(choices=types_doc, attrs={'class': 'form-input', 'placeholder': 'Si "Autre", choisir ou saisir le type'})
+        except (DatabaseError, Exception):
+            pass
+
+    def clean(self):
+        data = super().clean()
+        type_libre = (data.get('type_document') or '').strip()
+        if not data.get('type_document_fk') and not type_libre:
+            self.add_error('type_document_fk', 'Choisir un type dans la liste ou saisir un type dans "Type (si Autre)".')
+        return data
 
 
 class ReparationForm(forms.ModelForm):
@@ -314,12 +539,24 @@ class ReparationForm(forms.ModelForm):
         widgets = {
             'date_reparation': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'kilometrage': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'type_rep': forms.TextInput(attrs={'class': 'form-input'}),
+            'type_rep': DatalistWidget(choices=TYPES_REPARATION, attrs={'class': 'form-input', 'placeholder': 'Ex. Carrosserie, Mécanique'}),
             'description': forms.Textarea(attrs={'class': 'form-input', 'rows': 3}),
             'cout': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'prestataire': forms.TextInput(attrs={'class': 'form-input'}),
+            'prestataire': DatalistWidget(choices=[], attrs={'class': 'form-input', 'placeholder': 'Nom du prestataire'}),
             'a_faire': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            prestataires = sorted(
+                Reparation.objects.exclude(prestataire='')
+                .values_list('prestataire', flat=True)
+                .distinct()
+            )
+            self.fields['prestataire'].widget = DatalistWidget(choices=prestataires, attrs={'class': 'form-input', 'placeholder': 'Nom du prestataire'})
+        except (DatabaseError, Exception):
+            pass
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -361,15 +598,28 @@ class UserUpdateForm(forms.ModelForm):
 class FactureForm(forms.ModelForm):
     class Meta:
         model = Facture
-        fields = ('numero', 'fournisseur', 'date_facture', 'montant', 'type_facture', 'remarque')
+        fields = ('numero', 'fournisseur', 'date_facture', 'montant', 'type_facture', 'fichier', 'remarque')
         widgets = {
             'numero': forms.TextInput(attrs={'class': 'form-input'}),
-            'fournisseur': forms.TextInput(attrs={'class': 'form-input'}),
+            'fournisseur': DatalistWidget(choices=[], attrs={'class': 'form-input', 'placeholder': 'Nom du fournisseur'}),
             'date_facture': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'type_facture': forms.TextInput(attrs={'class': 'form-input'}),
+            'type_facture': DatalistWidget(choices=TYPES_FACTURE, attrs={'class': 'form-input', 'placeholder': 'Ex. Achat, Réparation'}),
+            'fichier': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': 'application/pdf,image/*'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            fournisseurs = sorted(
+                Facture.objects.exclude(fournisseur='')
+                .values_list('fournisseur', flat=True)
+                .distinct()
+            )
+            self.fields['fournisseur'].widget = DatalistWidget(choices=fournisseurs, attrs={'class': 'form-input', 'placeholder': 'Nom du fournisseur'})
+        except (DatabaseError, Exception):
+            pass
 
 
 class RapportJournalierForm(forms.ModelForm):
@@ -403,7 +653,7 @@ class MaintenanceForm(forms.ModelForm):
             'date_effectuee': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'kilometrage_effectue': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'cout': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'prestataire': forms.TextInput(attrs={'class': 'form-input'}),
+            'prestataire': DatalistWidget(choices=[], attrs={'class': 'form-input', 'placeholder': 'Nom du prestataire'}),
             'statut': forms.Select(attrs={'class': 'form-select'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }
@@ -411,6 +661,13 @@ class MaintenanceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['vehicule'].queryset = Vehicule.objects.all().order_by('marque__nom', 'modele__nom')
+        try:
+            m = list(Maintenance.objects.exclude(prestataire='').values_list('prestataire', flat=True))
+            r = list(Reparation.objects.exclude(prestataire='').values_list('prestataire', flat=True))
+            prestataires = sorted(set(m + r))
+            self.fields['prestataire'].widget = DatalistWidget(choices=prestataires, attrs={'class': 'form-input', 'placeholder': 'Nom du prestataire'})
+        except (DatabaseError, Exception):
+            pass
 
 
 class ReleveCarburantForm(forms.ModelForm):
@@ -428,13 +685,22 @@ class ReleveCarburantForm(forms.ModelForm):
             'litres': forms.NumberInput(attrs={'class': 'form-input', 'min': 0, 'step': 0.01}),
             'montant_fcfa': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'prix_litre': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
-            'lieu': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Station'}),
+            'lieu': DatalistWidget(choices=[], attrs={'class': 'form-input', 'placeholder': 'Station ou lieu'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['vehicule'].queryset = Vehicule.objects.all().order_by('marque__nom', 'modele__nom')
+        try:
+            lieux = sorted(
+                ReleveCarburant.objects.exclude(lieu='')
+                .values_list('lieu', flat=True)
+                .distinct()
+            )
+            self.fields['lieu'].widget = DatalistWidget(choices=lieux, attrs={'class': 'form-input', 'placeholder': 'Station ou lieu'})
+        except (DatabaseError, Exception):
+            pass
 
 
 class ConducteurForm(forms.ModelForm):
@@ -453,5 +719,55 @@ class ConducteurForm(forms.ModelForm):
             'permis_numero': forms.TextInput(attrs={'class': 'form-input'}),
             'permis_date_expiration': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'actif': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
+        }
+
+
+class ChargeImportForm(forms.ModelForm):
+    """Charges d'importation : fret, dédouanement, transitaire, coût total."""
+    class Meta:
+        model = ChargeImport
+        fields = ('fret', 'frais_dedouanement', 'frais_transitaire', 'cout_total', 'remarque')
+        widgets = {
+            'fret': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'frais_dedouanement': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'frais_transitaire': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'cout_total': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
+        }
+
+
+class PartieImporteeForm(forms.ModelForm):
+    """Pièce ou partie de véhicule importée."""
+    class Meta:
+        model = PartieImportee
+        fields = ('vehicule', 'designation', 'quantite', 'cout_unitaire', 'remarque')
+        widgets = {
+            'vehicule': forms.Select(attrs={'class': 'form-select'}),
+            'designation': forms.TextInput(attrs={'class': 'form-input'}),
+            'quantite': forms.NumberInput(attrs={'class': 'form-input', 'min': 1}),
+            'cout_unitaire': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.vehicule_filtre = kwargs.pop('vehicule_filtre', None)
+        super().__init__(*args, **kwargs)
+        qs = Vehicule.objects.all().order_by('marque__nom', 'modele__nom')
+        if self.vehicule_filtre:
+            self.fields['vehicule'].initial = self.vehicule_filtre
+        self.fields['vehicule'].queryset = qs
+
+
+class ContraventionForm(forms.ModelForm):
+    """Contravention / amende liée à une location."""
+    class Meta:
+        model = Contravention
+        fields = ('date_contravention', 'reference', 'montant', 'lieu', 'remarque')
+        widgets = {
+            'date_contravention': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'reference': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'N° PV'}),
+            'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
+            'lieu': forms.TextInput(attrs={'class': 'form-input'}),
             'remarque': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
         }

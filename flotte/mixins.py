@@ -1,18 +1,29 @@
 """Mixins pour les vues FLOTTE (restriction admin, manager, user).
 Décorateurs et classes pour contrôle d'accès par rôle."""
+import logging
 from functools import wraps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import ObjectDoesNotExist
+
+logger = logging.getLogger(__name__)
 
 
 def user_role(request):
-    """Retourne le rôle de l'utilisateur (admin, manager, user)."""
+    """Retourne le rôle de l'utilisateur (admin, manager, user).
+    En cas d'absence de profil ou d'exception, retourne 'user' par défaut."""
     if not request.user.is_authenticated:
         return None
-    if request.user.is_superuser:
+    if getattr(request.user, 'is_superuser', False):
         return 'admin'
-    if hasattr(request.user, 'profil_flotte'):
-        return request.user.profil_flotte.role
+    try:
+        if hasattr(request.user, 'profil_flotte') and request.user.profil_flotte:
+            return request.user.profil_flotte.role
+    except ObjectDoesNotExist:
+        return 'user'
+    except (AttributeError, TypeError) as e:
+        logger.debug('user_role: profil_flotte inaccessible pour user %s: %s', request.user.pk, e)
+        return 'user'
     return 'user'
 
 
