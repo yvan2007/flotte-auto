@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Paramétrage — Types de document{% endblock %}
+{% block page_title %}Paramétrage — Types de document{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:parametrage_index' %}">Paramétrage</a><span>›</span><span class="current">Types de document</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Types de document pour les véhicules (carte grise, assurance, CT, vignette…). Utilisés dans la liste déroulante lors de l'ajout d'un document.</p>
+</div>
+<div class="toolbar">
+  <a href="{% url 'flotte:type_document_create' %}" class="btn btn-primary">Ajouter un type</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ordre</th>
+        <th>Libellé</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in types %}
+      <tr>
+        <td>{{ t.ordre }}</td>
+        <td>{{ t.libelle }}</td>
+        <td><a href="{% url 'flotte:type_document_update' t.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3">Aucun type. <a href="{% url 'flotte:type_document_create' %}">Ajouter un type</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p>
+  <a href="{% url 'flotte:parametrage_marques' %}" class="btn btn-ghost btn-sm">Marques</a>
+  <a href="{% url 'flotte:parametrage_type_vehicule' %}" class="btn btn-ghost btn-sm">Types véhicule</a>
+  <a href="{% url 'flotte:parametrage_utilisateurs' %}" class="btn btn-ghost btn-sm">Utilisateurs</a>
+</p>
+{% endblock %}

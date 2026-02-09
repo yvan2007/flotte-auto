@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Recherche{% endblock %}
+{% block page_title %}Recherche{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Recherche</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom: 1.5rem;">
+  <form action="{% url 'flotte:recherche' %}" method="get" class="recherche-form" role="search" id="recherche-form">
+    <label for="recherche-q" class="sr-only">Recherche globale</label>
+    <input type="search" id="recherche-q" name="q" class="form-input" placeholder="Châssis, immat., marque, locataire, acquéreur, conducteur, fournisseur…" value="{{ q }}" style="max-width: 400px;" aria-label="Recherche globale" autofocus autocomplete="off">
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+  </form>
+  <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.9rem;">Les résultats s'affichent au fur et à mesure de la saisie.</p>
+</div>
+
+<div id="recherche-resultats">
+  {% if q %}
+    {% if not vehicules and not locations and not ventes and not conducteurs and not factures %}
+  <p class="alert alert-info">Aucun résultat pour «&nbsp;{{ q|escape }}&nbsp;». Essayez avec d'autres termes.</p>
+    {% else %}
+  <div class="recherche-resultats-inner">
+    {% if vehicules %}
+    <div class="card card-table" style="margin-bottom: 1.25rem;">
+      <h2 class="card-title">Véhicules ({{ vehicules|length }})</h2>
+      <ul>
+        {% for v in vehicules %}
+        <li class="search-result-item"><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="search-result-link">{{ v.libelle_court }}</a><span class="search-result-meta">{{ v.numero_chassis }}{% if v.numero_immatriculation %} · {{ v.numero_immatriculation }}{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if locations and is_manager_or_admin %}
+    <div class="card card-table" style="margin-bottom: 1.25rem;">
+      <h2 class="card-title">Locations ({{ locations|length }})</h2>
+      <ul>
+        {% for loc in locations %}
+        <li class="search-result-item"><a href="{% url 'flotte:location_detail' loc.pk %}" class="search-result-link">{{ loc.locataire }}</a><span class="search-result-meta">{{ loc.vehicule.libelle_court|default:loc.vehicule.numero_chassis }} · {{ loc.type_location }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if ventes %}
+    <div class="card card-table" style="margin-bottom: 1.25rem;">
+      <h2 class="card-title">Ventes ({{ ventes|length }})</h2>
+      <ul>
+        {% for v in ventes %}
+        <li class="search-result-item"><a href="{% url 'flotte:vehicule_detail' v.vehicule_id %}" class="search-result-link">{{ v.vehicule.libelle_court }}</a><span class="search-result-meta">{{ v.acquereur|default:"—" }} · {{ v.date_vente }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if conducteurs %}
+    <div class="card card-table" style="margin-bottom: 1.25rem;">
+      <h2 class="card-title">Conducteurs ({{ conducteurs|length }})</h2>
+      <ul>
+        {% for c in conducteurs %}
+        <li class="search-result-item"><a href="{% url 'flotte:conducteur_update' c.pk %}" class="search-result-link">{{ c.nom }} {{ c.prenom }}</a><span class="search-result-meta">{% if c.email %}{{ c.email }}{% endif %}{% if c.email and c.telephone %} · {% endif %}{% if c.telephone %}{{ c.telephone }}{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if factures and is_manager_or_admin %}
+    <div class="card card-table" style="margin-bottom: 1.25rem;">
+      <h2 class="card-title">Factures ({{ factures|length }})</h2>
+      <ul>
+        {% for f in factures %}
+        <li class="search-result-item"><a href="{% url 'flotte:vehicule_detail' f.vehicule_id %}" class="search-result-link">{{ f.vehicule.libelle_court }}</a><span class="search-result-meta">{{ f.numero }}{% if f.fournisseur %} · {{ f.fournisseur }}{% endif %}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+    {% endif %}
+  {% else %}
+  <p class="text-muted" id="recherche-hint">Saisir un mot (châssis, marque, locataire, acquéreur…) pour voir les résultats apparaître.</p>
+  {% endif %}
+</div>
+
+<script>
+(function() {
+  var apiUrl = '{% url "flotte:recherche_api" %}';
+  var container = document.getElementById('recherche-resultats');
+  var input = document.getElementById('recherche-q');
+  var hint = document.getElementById('recherche-hint');
+  var debounceTimer = null;
+  var debounceMs = 320;
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    var div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function render(data, q) {
+    var html = '';
+    var total = (data.vehicules.length + data.locations.length + data.ventes.length + data.conducteurs.length + data.factures.length);
+    if (total === 0) {
+      html = '<p class="alert alert-info">Aucun résultat pour «&nbsp;' + escapeHtml(q) + '&nbsp;». Essayez avec d\'autres termes.</p>';
+    } else {
+      if (data.vehicules.length) {
+        html += '<div class="card card-table" style="margin-bottom: 1.25rem;"><h2 class="card-title">Véhicules (' + data.vehicules.length + ')</h2><ul>';
+        data.vehicules.forEach(function(r) { html += '<li class="search-result-item"><a href="' + escapeHtml(r.url) + '" class="search-result-link">' + escapeHtml(r.label) + '</a></li>'; });
+        html += '</ul></div>';
+      }
+      if (data.locations.length) {
+        html += '<div class="card card-table" style="margin-bottom: 1.25rem;"><h2 class="card-title">Locations (' + data.locations.length + ')</h2><ul>';
+        data.locations.forEach(function(r) { html += '<li class="search-result-item"><a href="' + escapeHtml(r.url) + '" class="search-result-link">' + escapeHtml(r.label) + '</a></li>'; });
+        html += '</ul></div>';
+      }
+      if (data.ventes.length) {
+        html += '<div class="card card-table" style="margin-bottom: 1.25rem;"><h2 class="card-title">Ventes (' + data.ventes.length + ')</h2><ul>';
+        data.ventes.forEach(function(r) { html += '<li class="search-result-item"><a href="' + escapeHtml(r.url) + '" class="search-result-link">' + escapeHtml(r.label) + '</a></li>'; });
+        html += '</ul></div>';
+      }
+      if (data.conducteurs.length) {
+        html += '<div class="card card-table" style="margin-bottom: 1.25rem;"><h2 class="card-title">Conducteurs (' + data.conducteurs.length + ')</h2><ul>';
+        data.conducteurs.forEach(function(r) { html += '<li class="search-result-item"><a href="' + escapeHtml(r.url) + '" class="search-result-link">' + escapeHtml(r.label) + '</a></li>'; });
+        html += '</ul></div>';
+      }
+      if (data.factures.length) {
+        html += '<div class="card card-table" style="margin-bottom: 1.25rem;"><h2 class="card-title">Factures (' + data.factures.length + ')</h2><ul>';
+        data.factures.forEach(function(r) { html += '<li class="search-result-item"><a href="' + escapeHtml(r.url) + '" class="search-result-link">' + escapeHtml(r.label) + '</a></li>'; });
+        html += '</ul></div>';
+      }
+    }
+    container.innerHTML = html;
+  }
+
+  function doSearch() {
+    var q = (input.value || '').trim();
+    if (history.replaceState) history.replaceState(null, '', q ? ('?q=' + encodeURIComponent(q)) : window.location.pathname);
+    if (!q) {
+      container.innerHTML = '<p class="text-muted" id="recherche-hint">Saisir un mot (châssis, marque, locataire, acquéreur…) pour voir les résultats apparaître.</p>';
+      return;
+    }
+    container.innerHTML = '<p class="text-muted">Recherche en cours…</p>';
+    fetch(apiUrl + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+      .then(function(res) { return res.json(); })
+      .then(function(data) { render(data, q); })
+      .catch(function() { container.innerHTML = '<p class="alert alert-danger">Erreur lors de la recherche.</p>'; });
+  }
+
+  input.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(doSearch, debounceMs);
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      clearTimeout(debounceTimer);
+      doSearch();
+    }
+  });
+
+  if ((input.value || '').trim()) {
+    doSearch();
+  }
+})();
+</script>
+{% endblock %}

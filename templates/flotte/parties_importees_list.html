@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Parties importées{% endblock %}
+{% block page_title %}Pièces / parties de véhicules importées{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Parties importées</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Suivi des pièces ou parties importées</h2>
+    <p><a href="{% url 'flotte:partie_importee_create_standalone' %}" class="btn btn-primary">Ajouter une pièce / partie</a></p>
+  </div>
+  <form method="get" class="filters">
+    <label for="vehicule">Véhicule:</label>
+    <select name="vehicule" id="vehicule" class="form-select">
+      <option value="">— Tous —</option>
+      {% for v in vehicules %}
+      <option value="{{ v.pk }}" {% if request.GET.vehicule == v.pk|stringformat:"d" %}selected{% endif %}>{{ v.libelle_court }} ({{ v.numero_chassis }})</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-outline">Filtrer</button>
+  </form>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Désignation</th>
+        <th>Véhicule</th>
+        <th class="num">Quantité</th>
+        <th class="num">Coût unit. (FCFA)</th>
+        <th class="num">Coût total (FCFA)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in parties %}
+      <tr>
+        <td>{{ p.designation }}</td>
+        <td>{% if p.vehicule %}<a href="{% url 'flotte:vehicule_detail' p.vehicule.pk %}">{{ p.vehicule.libelle_court }}</a>{% else %}—{% endif %}</td>
+        <td class="num">{{ p.quantite }}</td>
+        <td class="num">{% if p.cout_unitaire %}{{ p.cout_unitaire|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td class="num">{% if p.cout_total %}{{ p.cout_total|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td><a href="{% url 'flotte:partie_importee_update' p.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Aucune pièce importée enregistrée.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pagination">
+  <span class="page-info">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+</div>
+{% endif %}
+{% endblock %}

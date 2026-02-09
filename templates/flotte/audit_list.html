@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Journal d'audit{% endblock %}
+{% block page_title %}Journal d'audit{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:parametrage_index' %}">Paramétrage</a><span>›</span><span class="current">Journal d'audit</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 class="card-title">Traçabilité des modifications</h2>
+  <p class="card-desc">Consultation et export des créations, modifications et suppressions sur les principaux modèles (véhicules, ventes, dépenses, factures, conducteurs, utilisateurs, paramétrage).</p>
+</div>
+
+<form method="get" action="{% url 'flotte:audit_list' %}" class="card card-form filtres-audit">
+  <div class="form-row">
+    <label for="date_from">Du</label>
+    <input type="date" id="date_from" name="date_from" value="{{ date_from|default:'' }}" class="form-input">
+  </div>
+  <div class="form-row">
+    <label for="date_to">Au</label>
+    <input type="date" id="date_to" name="date_to" value="{{ date_to|default:'' }}" class="form-input">
+  </div>
+  <div class="form-row">
+    <label for="model">Modèle</label>
+    <input type="text" id="model" name="model" value="{{ model_name|default:'' }}" placeholder="ex. flotte.Vehicule" class="form-input">
+  </div>
+  <div class="form-row">
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+    <a href="{% url 'flotte:audit_list' %}?export=csv{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if model_name %}&model={{ model_name }}{% endif %}" class="btn btn-ghost">Exporter CSV</a>
+  </div>
+</form>
+
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Utilisateur</th>
+        <th>Action</th>
+        <th>Modèle</th>
+        <th>ID</th>
+        <th>Représentation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in audit_logs %}
+      <tr>
+        <td>{{ log.timestamp|date:"d/m/Y H:i" }}</td>
+        <td>{{ log.user.username|default:"—" }}</td>
+        <td><span class="badge {% if log.action == 'create' %}badge-ok{% elif log.action == 'delete' %}badge-warn{% else %}badge-muted{% endif %}">{{ log.get_action_display }}</span></td>
+        <td>{{ log.model_name|default:"—" }}</td>
+        <td>{{ log.object_id|default:"—" }}</td>
+        <td>{{ log.object_repr|truncatechars:50|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Aucune entrée d'audit (ou aucun résultat pour ces filtres).</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="text-muted" style="margin-top: 0.5rem;">Affichage limité à 500 entrées. Utilisez les filtres ou l'export CSV pour une période précise. Rétention recommandée : conserver les logs au moins 1 à 2 ans selon votre politique.</p>
+{% endblock %}

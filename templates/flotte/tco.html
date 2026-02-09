@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}TCO — Coût total de possession{% endblock %}
+{% block page_title %}TCO — Coût total de possession{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">TCO</span></nav>
+{% endblock %}
+{% block content %}
+<p class="card-desc" style="margin-bottom: 1.25rem;">Coût total de possession par véhicule : acquisition (achat + import) + dépenses + maintenance + carburant − prix de vente. Montants en FCFA.</p>
+<div class="toolbar">
+  <a href="{% url 'flotte:export_reglementaire' %}" class="btn btn-ghost btn-sm">Export réglementaire (CSV)</a>
+  <a href="{% url 'flotte:export_charges_import' %}" class="btn btn-ghost btn-sm">Export charges d'import (CSV)</a>
+  <a href="{% url 'flotte:export_locations' %}" class="btn btn-ghost btn-sm">Export locations (CSV)</a>
+</div>
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Véhicule</th>
+        <th>Châssis</th>
+        <th>Acquisition</th>
+        <th>Dépenses</th>
+        <th>Maintenance</th>
+        <th>Carburant</th>
+        <th>Vente</th>
+        <th>TCO</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="{% url 'flotte:vehicule_detail' row.vehicule.pk %}">{{ row.vehicule.libelle_court }}</a></td>
+        <td>{{ row.vehicule.numero_chassis }}</td>
+        <td>{{ row.acquisition|floatformat:0 }}</td>
+        <td>{{ row.depenses|floatformat:0 }}</td>
+        <td>{{ row.maintenance|floatformat:0 }}</td>
+        <td>{{ row.carburant|floatformat:0 }}</td>
+        <td>{{ row.vente_prix|floatformat:0 }}</td>
+        <td><strong>{{ row.tco|floatformat:0 }}</strong></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">Aucun véhicule.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p style="margin-top: 1rem;"><a href="{% url 'flotte:ca' %}" class="btn btn-ghost btn-sm">Chiffre d'affaires</a> <a href="{% url 'flotte:parc' %}" class="btn btn-ghost btn-sm">Parc</a></p>
+{% endblock %}

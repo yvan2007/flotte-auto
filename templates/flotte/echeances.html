@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block title %}Échéances{% endblock %}
+{% block page_title %}Échéances{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><span class="current">Échéances</span></nav>
+{% endblock %}
+{% block content %}
+<p class="card-desc" style="margin-bottom: 1.25rem;">Vue consolidée des échéances sur les 90 prochains jours : contrôle technique, assurance, documents véhicule, permis conducteurs, maintenance préventive. Conformité flotte automobile.</p>
+
+<section class="card" style="margin-bottom: 1.5rem;">
+  <h2 class="card-title">Contrôle technique (CT) — Locations en cours</h2>
+  <p class="card-desc">Dates d'expiration CT entre {{ date_debut }} et {{ date_fin }}.</p>
+  {% if echeances_ct %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Locataire</th>
+          <th>Expiration CT</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loc in echeances_ct %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' loc.vehicule_id %}">{{ loc.vehicule.libelle_court }}</a></td>
+          <td>{{ loc.locataire }}</td>
+          <td>{{ loc.date_expiration_ct }}</td>
+          <td><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche location</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucune échéance CT dans la période.</p></div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-bottom: 1.5rem;">
+  <h2 class="card-title">Assurance — Locations en cours</h2>
+  <p class="card-desc">Dates d'expiration assurance entre {{ date_debut }} et {{ date_fin }}.</p>
+  {% if echeances_assurance %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Locataire</th>
+          <th>Expiration assurance</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loc in echeances_assurance %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' loc.vehicule_id %}">{{ loc.vehicule.libelle_court }}</a></td>
+          <td>{{ loc.locataire }}</td>
+          <td>{{ loc.date_expiration_assurance }}</td>
+          <td><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche location</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucune échéance assurance dans la période.</p></div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-bottom: 1.5rem;">
+  <h2 class="card-title">CT et assurance — Véhicules au parc</h2>
+  <p class="card-desc">Véhicules au parc (hors location) dont le CT ou l'assurance expire entre {{ date_debut }} et {{ date_fin }}.</p>
+  {% if echeances_ct_vehicule or echeances_assurance_vehicule %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Type</th>
+          <th>Date expiration</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in echeances_ct_vehicule %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a></td>
+          <td>CT</td>
+          <td>{{ v.date_expiration_ct }}</td>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></td>
+        </tr>
+        {% endfor %}
+        {% for v in echeances_assurance_vehicule %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a></td>
+          <td>Assurance</td>
+          <td>{{ v.date_expiration_assurance }}</td>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucune échéance CT/assurance véhicule au parc dans la période.</p></div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-bottom: 1.5rem;">
+  <h2 class="card-title">Documents véhicule — Date d'échéance</h2>
+  <p class="card-desc">Documents dont l'échéance est entre {{ date_debut }} et {{ date_fin }}.</p>
+  {% if echeances_documents %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Type document</th>
+          <th>N°</th>
+          <th>Échéance</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in echeances_documents %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' doc.vehicule_id %}">{{ doc.vehicule.libelle_court }}</a></td>
+          <td>{{ doc.libelle_type }}</td>
+          <td>{{ doc.numero|default:"—" }}</td>
+          <td>{{ doc.date_echeance }}</td>
+          <td><a href="{% url 'flotte:vehicule_detail' doc.vehicule_id %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucun document avec échéance dans la période.</p></div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-bottom: 1.5rem;">
+  <h2 class="card-title">Permis conducteurs — Expiration</h2>
+  <p class="card-desc">Conducteurs actifs dont le permis expire entre {{ date_debut }} et {{ date_fin }}.</p>
+  {% if echeances_permis %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Conducteur</th>
+          <th>N° permis</th>
+          <th>Expiration</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in echeances_permis %}
+        <tr>
+          <td>{{ c.nom }} {{ c.prenom }}</td>
+          <td>{{ c.permis_numero|default:"—" }}</td>
+          <td>{{ c.permis_date_expiration }}</td>
+          <td><a href="{% url 'flotte:conducteur_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucun permis avec expiration dans la période.</p></div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2 class="card-title">Maintenance préventive — À faire</h2>
+  <p class="card-desc">Maintenances à faire (date prévue dans la période ou non renseignée).</p>
+  {% if echeances_maintenance %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Type</th>
+          <th>Date prévue</th>
+          <th>Km prévu</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in echeances_maintenance %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' m.vehicule_id %}">{{ m.vehicule.libelle_court }}</a></td>
+          <td>{{ m.get_type_maintenance_display }}</td>
+          <td>{{ m.date_prevue|default:"—" }}</td>
+          <td>{{ m.kilometrage_prevu|default:"—" }}</td>
+          <td><a href="{% url 'flotte:maintenance_update' m.pk %}" class="btn btn-ghost btn-sm">Modifier</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top: 0.75rem;"><a href="{% url 'flotte:maintenance_list' %}" class="btn btn-primary btn-sm">Voir toute la maintenance</a></p>
+  {% else %}
+  <div class="empty-state"><p>Aucune maintenance à faire dans la période.</p><p><a href="{% url 'flotte:maintenance_list' %}">Voir la maintenance</a></p></div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1.5rem;">
+  <h2 class="card-title">Vidange — Km atteint ou dépassé</h2>
+  <p class="card-desc">Véhicules au parc ou en location dont le kilométrage actuel atteint ou dépasse le km de prochaine vidange.</p>
+  {% if alertes_vidange_vehicules or alertes_vidange_locations %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Véhicule</th>
+          <th>Km actuel</th>
+          <th>Km vidange</th>
+          <th>Contexte</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in alertes_vidange_vehicules %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}">{{ v.libelle_court }}</a></td>
+          <td>{{ v.kilometrage_actuel }}</td>
+          <td>{{ v.km_prochaine_vidange }}</td>
+          <td>Véhicule (parc)</td>
+          <td><a href="{% url 'flotte:vehicule_detail' v.pk %}" class="btn btn-ghost btn-sm">Fiche véhicule</a></td>
+        </tr>
+        {% endfor %}
+        {% for loc in alertes_vidange_locations %}
+        <tr>
+          <td><a href="{% url 'flotte:vehicule_detail' loc.vehicule_id %}">{{ loc.vehicule.libelle_court }}</a></td>
+          <td>{{ loc.vehicule.kilometrage_actuel }}</td>
+          <td>{{ loc.km_prochaine_vidange }}</td>
+          <td>Location — {{ loc.locataire }}</td>
+          <td><a href="{% url 'flotte:location_detail' loc.pk %}" class="btn btn-ghost btn-sm">Fiche location</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><p>Aucune alerte vidange (km).</p></div>
+  {% endif %}
+</section>
+{% endblock %}
