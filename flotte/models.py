@@ -492,7 +492,7 @@ class Location(models.Model):
 
     @property
     def cout_total_location(self):
-        """Loyer + frais annexes + somme des pénalités (contraventions)."""
+        """Coût total de la location (facture locataire) : loyer + frais annexes + contraventions à la charge du locataire."""
         from decimal import Decimal
         total = self.loyer_mensuel or Decimal(0)
         total += self.frais_annexes or Decimal(0)
@@ -501,15 +501,21 @@ class Location(models.Model):
 
 
 class Contravention(models.Model):
-    """Contravention / amende liée à une location — impact sur le coût total."""
+    """Contravention / amende reçue pendant la location. Prise en charge par le locataire :
+    le montant est automatiquement ajouté au coût total de la location (facture de location)."""
     location = models.ForeignKey(
         Location, on_delete=models.CASCADE, related_name='contraventions'
     )
     date_contravention = models.DateField('Date', null=True, blank=True)
+    motif = models.CharField(
+        'Motif', max_length=200, blank=True,
+        help_text='Ex: Excès de vitesse, Stationnement interdit, Non-respect de la signalisation'
+    )
     reference = models.CharField('Référence / N° PV', max_length=80, blank=True)
     montant = models.DecimalField(
-        'Montant / pénalité (FCFA)', max_digits=14, decimal_places=0,
-        null=True, blank=True
+        'Montant (FCFA)', max_digits=14, decimal_places=0,
+        null=True, blank=True,
+        help_text='Montant à la charge du locataire, ajouté à la facture de location'
     )
     lieu = models.CharField('Lieu', max_length=120, blank=True)
     remarque = models.TextField('Remarque', blank=True)

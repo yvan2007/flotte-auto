@@ -42,6 +42,11 @@ TYPES_REPARATION = [
     'Électricité', 'Pneumatiques', 'Vidange', 'Amortisseurs', 'Autre',
 ]
 TYPES_FACTURE = ['Achat', 'Réparation', 'Assurance', 'Entretien', 'Pièces', 'Carburant', 'Autre']
+MOTIFS_CONTRAVENTION = [
+    'Excès de vitesse', 'Stationnement interdit', 'Non-respect de la signalisation',
+    'Défaut de ceinture', 'Téléphone au volant', 'Défaut d\'assurance',
+    'Contrôle technique expiré', 'Autre',
+]
 
 
 def get_liste_pays():
@@ -774,12 +779,13 @@ class PartieImporteeForm(forms.ModelForm):
 
 
 class ContraventionForm(forms.ModelForm):
-    """Contravention / amende liée à une location."""
+    """Contravention / amende reçue pendant la location — à la charge du locataire, ajoutée à la facture de location."""
     class Meta:
         model = Contravention
-        fields = ('date_contravention', 'reference', 'montant', 'lieu', 'remarque')
+        fields = ('date_contravention', 'motif', 'reference', 'montant', 'lieu', 'remarque')
         widgets = {
             'date_contravention': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'motif': DatalistWidget(choices=MOTIFS_CONTRAVENTION, attrs={'class': 'form-input', 'placeholder': 'Ex. Excès de vitesse, Stationnement interdit'}),
             'reference': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'N° PV'}),
             'montant': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'lieu': forms.TextInput(attrs={'class': 'form-input'}),

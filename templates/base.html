@@ -85,9 +85,13 @@
           Conducteurs
         </a>
         {% if is_manager_or_admin %}
-        <a href="{% url 'flotte:location_list' %}" class="nav-link {% if 'location' in request.resolver_match.url_name %}active{% endif %}">
+        <a href="{% url 'flotte:location_list' %}" class="nav-link {% if 'location' in request.resolver_match.url_name and request.resolver_match.url_name != 'contraventions_list' %}active{% endif %}">
           <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
           Location
+        </a>
+        <a href="{% url 'flotte:contraventions_list' %}" class="nav-link {% if request.resolver_match.url_name == 'contraventions_list' %}active{% endif %}">
+          <span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span>
+          Contraventions
         </a>
         {% endif %}
         {% if is_admin %}

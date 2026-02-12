@@ -6,7 +6,8 @@
 {% endblock %}
 {% block content %}
 <div class="card">
-  <p><strong>Location:</strong> {{ location.vehicule.libelle_court }} — {{ location.locataire }}</p>
+  <p><strong>Location:</strong> {{ location.vehicule.libelle_court }} ({{ location.vehicule.numero_chassis }}) — {{ location.locataire }}</p>
+  <p class="contravention-notice" style="margin-bottom:1rem; padding:0.75rem; background:var(--bg-muted, #f5f5f5); border-radius:4px; font-size:0.9rem;">Le montant de la contravention sera automatiquement ajouté à la facture de location et sera à la charge du locataire.</p>
   <form method="post" class="form">
     {% csrf_token %}
     {{ form.non_field_errors }}

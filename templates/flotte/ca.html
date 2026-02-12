@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize static %}
 {% block title %}Chiffre d'affaires{% endblock %}
 {% block page_title %}Chiffre d'affaires{% endblock %}
 {% block breadcrumb %}
@@ -7,46 +7,18 @@
 {% endblock %}
 
 {% block extra_css %}
-<style>
-  .ca-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding: 1rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
-  .ca-filters label { font-size: 0.85rem; font-weight: 600; color: var(--beige-800); margin-right: 0.25rem; }
-  .ca-filters .select { min-width: 120px; }
-  .ca-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
-  @media (max-width: 768px) { .ca-charts-grid { grid-template-columns: 1fr; } }
-  .ca-chart-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow); min-height: 300px; position: relative; }
-  .ca-chart-wrap h3 { margin: 0 0 1rem; font-size: 1.05rem; font-weight: 600; color: var(--beige-800); }
-  .ca-chart-container { position: relative; height: 260px; }
-  .ca-chart-wrap.is-loading .ca-chart-container { opacity: 0.5; pointer-events: none; }
-  .ca-chart-loading { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(255,255,255,0.7); border-radius: var(--radius-lg); z-index: 2; }
-  .ca-chart-wrap.is-loading .ca-chart-loading { display: flex; }
-  .ca-chart-loading span { font-size: 0.9rem; color: var(--text-muted); }
-  .ca-chart-empty { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: var(--beige-50); border-radius: var(--radius-lg); z-index: 1; }
-  .ca-chart-wrap.has-no-data .ca-chart-empty { display: flex; }
-  .ca-chart-wrap.has-no-data .ca-chart-container { opacity: 0.3; }
-  .ca-chart-empty p { margin: 0; font-size: 0.95rem; color: var(--text-muted); text-align: center; padding: 1rem; }
-  .ca-chart-empty-hint { font-size: 0.85rem; opacity: 0.9; display: block; margin-top: 0.35rem; }
-  .ca-chart-error { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; background: rgba(255, 220, 220, 0.9); border-radius: var(--radius-lg); z-index: 1; }
-  .ca-chart-wrap.has-error .ca-chart-error { display: flex; }
-  .ca-chart-wrap.has-error .ca-chart-container { opacity: 0.3; }
-  .ca-chart-error p { margin: 0; font-size: 0.9rem; color: var(--beige-800); text-align: center; padding: 1rem; }
-  .ca-mask-toggle { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; font-size: 0.85rem; color: var(--text-muted); background: var(--beige-100); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: background var(--transition), color var(--transition); }
-  .ca-mask-toggle:hover { background: var(--beige-200); color: var(--text); }
-  .ca-mask-toggle.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-  .ca-mask-toggle svg { width: 18px; height: 18px; flex-shrink: 0; }
-  .montant-fcfa { font-variant-numeric: tabular-nums; }
-  body.montants-masques .montant-fcfa { letter-spacing: 0.1em; }
-</style>
+<link rel="stylesheet" href="{% static 'css/ca-page.css' %}">
 {% endblock %}
 
 {% block content %}
 <section class="ca-hero">
   <div class="ca-hero-inner">
     <div class="ca-hero-icon" aria-hidden="true">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     </div>
     <div class="ca-hero-text">
       <h2 class="ca-hero-title">Chiffre d'affaires</h2>
-      <p class="ca-hero-desc">Synthèse des ventes, évolution par période et indicateurs clés.</p>
+      <p class="ca-hero-desc">Synthèse des ventes, évolution par période et indicateurs clés. Les statistiques correspondent à l’ensemble des ventes enregistrées avec un montant (FCFA).</p>
     </div>
     <div class="ca-mask-toggle" id="ca-mask-toggle" role="button" tabindex="0" aria-pressed="false" title="Masquer / Afficher les montants">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -55,63 +27,69 @@
   </div>
 </section>
 
+<h3 class="ca-section-title">Indicateurs clés</h3>
 <div class="kpi-grid kpi-grid-ca">
   <div class="kpi-card kpi-card-primary">
     <span class="kpi-icon" aria-hidden="true">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     </span>
     <span class="kpi-label">CA total (FCFA)</span>
     <span class="kpi-value montant-fcfa" data-montant="{{ total_ca|floatformat:0 }}">{{ total_ca|floatformat:0 }}</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-icon" aria-hidden="true">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     </span>
     <span class="kpi-label">Nombre de ventes</span>
     <span class="kpi-value">{{ nb_ventes }}</span>
   </div>
   <div class="kpi-card">
     <span class="kpi-icon" aria-hidden="true">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
     </span>
     <span class="kpi-label">Moyenne par vente (FCFA)</span>
     <span class="kpi-value montant-fcfa" data-montant="{{ moyenne_vente|floatformat:0 }}">{{ moyenne_vente|floatformat:0 }}</span>
   </div>
 </div>
 
-<div class="ca-filters">
-  <label for="ca-granularite">Période :</label>
-  <select id="ca-granularite" class="select" aria-label="Granularité (jour, mois, année)">
-    <option value="jour">Par jour</option>
-    <option value="mois" selected>Par mois</option>
-    <option value="annee">Par année</option>
-  </select>
-  <label for="ca-annee">Année :</label>
-  <select id="ca-annee" class="select" aria-label="Année">
-    {% for y in annees %}
-    <option value="{{ y }}" {% if y == annee_courante %}selected{% endif %}>{{ y }}</option>
-    {% endfor %}
-  </select>
-  <span id="ca-mois-wrap" style="display: none;">
-    <label for="ca-mois">Mois :</label>
-    <select id="ca-mois" class="select" aria-label="Mois">
-      <option value="1" {% if mois_courant == 1 %}selected{% endif %}>Janvier</option>
-      <option value="2" {% if mois_courant == 2 %}selected{% endif %}>Février</option>
-      <option value="3" {% if mois_courant == 3 %}selected{% endif %}>Mars</option>
-      <option value="4" {% if mois_courant == 4 %}selected{% endif %}>Avril</option>
-      <option value="5" {% if mois_courant == 5 %}selected{% endif %}>Mai</option>
-      <option value="6" {% if mois_courant == 6 %}selected{% endif %}>Juin</option>
-      <option value="7" {% if mois_courant == 7 %}selected{% endif %}>Juillet</option>
-      <option value="8" {% if mois_courant == 8 %}selected{% endif %}>Août</option>
-      <option value="9" {% if mois_courant == 9 %}selected{% endif %}>Septembre</option>
-      <option value="10" {% if mois_courant == 10 %}selected{% endif %}>Octobre</option>
-      <option value="11" {% if mois_courant == 11 %}selected{% endif %}>Novembre</option>
-      <option value="12" {% if mois_courant == 12 %}selected{% endif %}>Décembre</option>
+<h3 class="ca-section-title">Filtrer les graphiques</h3>
+<div class="ca-filters-section">
+  <div class="ca-filters">
+    <label for="ca-granularite">Période</label>
+    <select id="ca-granularite" class="select" aria-label="Granularité (jour, mois, année)">
+      <option value="jour">Par jour</option>
+      <option value="mois" selected>Par mois</option>
+      <option value="annee">Par année</option>
     </select>
-  </span>
-  <button type="button" class="btn btn-primary btn-sm" id="ca-apply">Actualiser</button>
+    <label for="ca-annee">Année</label>
+    <select id="ca-annee" class="select" aria-label="Année">
+      {% for y in annees %}
+      <option value="{{ y }}" {% if y == annee_courante %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+    <span id="ca-mois-wrap" style="display: none;">
+      <label for="ca-mois">Mois</label>
+      <select id="ca-mois" class="select" aria-label="Mois">
+        <option value="1" {% if mois_courant == 1 %}selected{% endif %}>Janvier</option>
+        <option value="2" {% if mois_courant == 2 %}selected{% endif %}>Février</option>
+        <option value="3" {% if mois_courant == 3 %}selected{% endif %}>Mars</option>
+        <option value="4" {% if mois_courant == 4 %}selected{% endif %}>Avril</option>
+        <option value="5" {% if mois_courant == 5 %}selected{% endif %}>Mai</option>
+        <option value="6" {% if mois_courant == 6 %}selected{% endif %}>Juin</option>
+        <option value="7" {% if mois_courant == 7 %}selected{% endif %}>Juillet</option>
+        <option value="8" {% if mois_courant == 8 %}selected{% endif %}>Août</option>
+        <option value="9" {% if mois_courant == 9 %}selected{% endif %}>Septembre</option>
+        <option value="10" {% if mois_courant == 10 %}selected{% endif %}>Octobre</option>
+        <option value="11" {% if mois_courant == 11 %}selected{% endif %}>Novembre</option>
+        <option value="12" {% if mois_courant == 12 %}selected{% endif %}>Décembre</option>
+      </select>
+    </span>
+    <button type="button" class="btn btn-primary btn-sm" id="ca-apply">Actualiser</button>
+  </div>
 </div>
 
+<h3 class="ca-section-title">Évolution du CA</h3>
+<div class="ca-charts-section">
 <div class="ca-charts-grid">
   <div class="ca-chart-wrap" id="ca-chart-wrap-ca">
     <div class="ca-chart-loading" aria-live="polite"><span>Chargement…</span></div>
@@ -131,6 +109,7 @@
       <canvas id="ca-chart-ventes" aria-label="Graphique nombre de ventes"></canvas>
     </div>
   </div>
+</div>
 </div>
 
 <div class="card card-ca-summary">
@@ -222,32 +201,40 @@
     if (chartCa) chartCa.destroy();
     chartCa = null;
     if (!labels.length) return;
+    var dataNum = data.map(function(v) { return Number(v) || 0; });
+    var h = ctx.parentElement ? ctx.parentElement.clientHeight || 280 : 280;
     var ctx2d = ctx.getContext('2d');
-    var gradient = ctx2d.createLinearGradient(0, 0, 0, ctx.parentElement ? ctx.parentElement.clientHeight || 260 : 260);
-    gradient.addColorStop(0, 'rgba(125, 107, 82, 0.5)');
-    gradient.addColorStop(1, 'rgba(125, 107, 82, 0.15)');
+    var gradient = ctx2d.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, 'rgba(125, 107, 82, 0.55)');
+    gradient.addColorStop(0.6, 'rgba(125, 107, 82, 0.25)');
+    gradient.addColorStop(1, 'rgba(125, 107, 82, 0.08)');
     chartCa = new Chart(ctx2d, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [{
           label: 'CA (FCFA)',
-          data: data,
+          data: dataNum,
           backgroundColor: gradient,
-          borderColor: 'rgb(139, 118, 89)',
+          borderColor: 'rgba(139, 118, 89, 0.9)',
           borderWidth: 1,
           borderRadius: 6,
+          borderSkipped: false,
+          barPercentage: 0.65,
+          categoryPercentage: 0.8,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 400 },
+        animation: { duration: 600 },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(50, 50, 50, 0.9)',
-            padding: 10,
+            backgroundColor: 'rgba(40, 40, 40, 0.95)',
+            padding: 12,
+            titleFont: { size: 13 },
+            bodyFont: { size: 12 },
             callbacks: {
               label: function(item) {
                 var v = item.raw;
@@ -260,7 +247,10 @@
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 11 } } },
+          x: {
+            grid: { display: false },
+            ticks: { maxRotation: 45, font: { size: 11 }, maxTicksLimit: 12 },
+          },
           y: {
             beginAtZero: true,
             grid: { color: 'rgba(0,0,0,0.06)' },
@@ -285,40 +275,61 @@
     if (chartVentes) chartVentes.destroy();
     chartVentes = null;
     if (!labels.length) return;
+    var dataNum = nbVentes.map(function(v) { return Number(v) || 0; });
+    var onePoint = dataNum.length === 1;
     chartVentes = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: {
         labels: labels,
         datasets: [{
           label: 'Nombre de ventes',
-          data: nbVentes,
-          borderColor: 'rgb(82, 125, 107)',
-          backgroundColor: 'rgba(82, 125, 107, 0.12)',
+          data: dataNum,
+          borderColor: 'rgb(72, 140, 115)',
+          backgroundColor: 'rgba(72, 140, 115, 0.15)',
           borderWidth: 2,
           fill: true,
-          tension: 0.3,
-          pointRadius: 4,
-          pointHoverRadius: 6,
+          tension: 0.35,
+          spanGaps: true,
+          pointRadius: onePoint ? 8 : 5,
+          pointHoverRadius: onePoint ? 10 : 7,
+          pointBackgroundColor: 'rgb(72, 140, 115)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 400 },
+        animation: { duration: 600 },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(50, 50, 50, 0.9)',
-            padding: 10,
-            callbacks: { label: function(item) { return item.raw + ' vente(s)'; } }
+            backgroundColor: 'rgba(40, 40, 40, 0.95)',
+            padding: 12,
+            titleFont: { size: 13 },
+            bodyFont: { size: 12 },
+            callbacks: {
+              label: function(item) {
+                var v = item.raw;
+                return (v === 1 ? '1 vente' : v + ' ventes');
+              }
+            }
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 11 } } },
+          x: {
+            grid: { display: false },
+            ticks: { maxRotation: 45, font: { size: 11 }, maxTicksLimit: 12 },
+          },
           y: {
             beginAtZero: true,
             grid: { color: 'rgba(0,0,0,0.06)' },
-            ticks: { stepSize: 1, font: { size: 11 } }
+            ticks: {
+              stepSize: 1,
+              font: { size: 11 },
+              precision: 0,
+            },
+            min: 0,
           }
         }
       }
@@ -344,14 +355,16 @@
       .then(function(json) {
         setLoading(false);
         if (!json) return;
-        var labels = json.labels || [];
-        var data = json.data || [];
-        var nbVentes = json.nb_ventes || [];
+        var labels = Array.isArray(json.labels) ? json.labels : [];
+        var data = (json.data || []).map(function(v) { return Number(v) || 0; });
+        var nbVentes = (json.nb_ventes || []).map(function(v) { return Number(v) || 0; });
         if (labels.length === 0) {
           if (chartCa) { chartCa.destroy(); chartCa = null; }
           if (chartVentes) { chartVentes.destroy(); chartVentes = null; }
           setChartState('no-data');
         } else {
+          if (data.length !== labels.length) data = labels.map(function(_, i) { return data[i] !== undefined ? Number(data[i]) : 0; });
+          if (nbVentes.length !== labels.length) nbVentes = labels.map(function(_, i) { return nbVentes[i] !== undefined ? Number(nbVentes[i]) : 0; });
           setChartState('normal');
           buildChartCa(labels, data);
           buildChartVentes(labels, nbVentes);

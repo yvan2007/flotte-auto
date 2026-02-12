@@ -772,7 +772,12 @@ def location_detail(request, pk):
         Location.objects.select_related('vehicule').prefetch_related('contraventions'),
         pk=pk
     )
-    context = {'location': loc, **get_sidebar_context(request)}
+    total_contraventions = sum((c.montant or Decimal(0)) for c in loc.contraventions.all())
+    context = {
+        'location': loc,
+        'total_contraventions': total_contraventions,
+        **get_sidebar_context(request),
+    }
     return render(request, 'flotte/location_detail.html', context)
 
 
@@ -1457,13 +1462,28 @@ def import_list(request):
     return render(request, 'flotte/import_list.html', context)
 
 
-# ——— Réparations, Documents, Ventes, CA, Maintenance, Carburant, Conducteurs ———
+# ——— Réparations, Documents, Ventes, CA, Maintenance, Carburant, Conducteurs, Contraventions ———
 @login_required
 def reparations_list(request):
     """Liste des réparations."""
     reps = Reparation.objects.select_related('vehicule').order_by('-date_reparation', '-id')[:200]
     context = {'reparations': reps, **get_sidebar_context(request)}
     return render(request, 'flotte/reparations_list.html', context)
+
+
+@manager_or_admin_required
+def contraventions_list(request):
+    """Liste de toutes les contraventions (véhicules loués)."""
+    contraventions = Contravention.objects.select_related(
+        'location', 'location__vehicule__marque', 'location__vehicule__modele'
+    ).order_by('-date_contravention', '-id')[:500]
+    total_montant = sum((c.montant or Decimal(0)) for c in contraventions)
+    context = {
+        'contraventions': contraventions,
+        'total_montant': total_montant,
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/contraventions_list.html', context)
 
 
 @login_required

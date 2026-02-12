@@ -67,6 +67,7 @@ urlpatterns = [
     path('location/ajout/', views.LocationCreateView.as_view(), name='location_create'),
     path('location/<int:pk>/', views.location_detail, name='location_detail'),
     path('location/<int:pk>/modifier/', views.LocationUpdateView.as_view(), name='location_update'),
+    path('contraventions/', views.contraventions_list, name='contraventions_list'),
     path('location/<int:location_pk>/contraventions/ajout/', views.ContraventionCreateView.as_view(), name='contravention_create'),
     path('contraventions/<int:pk>/modifier/', views.ContraventionUpdateView.as_view(), name='contravention_update'),
     # Autres sections

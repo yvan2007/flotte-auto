@@ -126,9 +126,9 @@ class PartieImporteeAdmin(admin.ModelAdmin):
 
 @admin.register(Contravention)
 class ContraventionAdmin(admin.ModelAdmin):
-    list_display = ('location', 'date_contravention', 'reference', 'montant', 'lieu')
+    list_display = ('location', 'date_contravention', 'motif', 'reference', 'montant', 'lieu')
     list_filter = ('location',)
-    search_fields = ('reference', 'location__locataire', 'location__vehicule__numero_chassis')
+    search_fields = ('reference', 'motif', 'location__locataire', 'location__vehicule__numero_chassis')
 
 
 class PenaliteFactureInline(admin.TabularInline):

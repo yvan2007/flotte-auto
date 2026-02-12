@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Contraventions{% endblock %}
+{% block page_title %}Contraventions{% endblock %}
+{% block breadcrumb %}
+<nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="{% url 'flotte:dashboard' %}">Tableau de bord</a><span>›</span><span class="current">Contraventions</span></nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p class="card-desc">Toutes les contraventions enregistrées pour les véhicules loués. Chaque montant est à la charge du locataire et intégré à la facture de location.</p>
+</div>
+<div class="toolbar">
+  <a href="{% url 'flotte:location_list' %}" class="btn btn-ghost">Voir les locations</a>
+</div>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Motif</th>
+        <th>Réf. / N° PV</th>
+        <th>Lieu</th>
+        <th>Montant (FCFA)</th>
+        <th>Véhicule</th>
+        <th>Location / Locataire</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contraventions %}
+      <tr>
+        <td>{{ c.date_contravention|default:"—" }}</td>
+        <td>{{ c.motif|default:"—" }}</td>
+        <td>{{ c.reference|default:"—" }}</td>
+        <td>{{ c.lieu|default:"—" }}</td>
+        <td class="montant-fcfa">{% if c.montant %}{{ c.montant|floatformat:0 }}{% else %}—{% endif %}</td>
+        <td>
+          <a href="{% url 'flotte:vehicule_detail' c.location.vehicule.pk %}">{{ c.location.vehicule.libelle_court }}</a>
+          <br><span class="text-muted">{{ c.location.vehicule.numero_chassis }}</span>
+        </td>
+        <td>
+          <a href="{% url 'flotte:location_detail' c.location.pk %}">{{ c.location.locataire }}</a>
+          <br><span class="text-muted">{{ c.location.date_debut }} → {{ c.location.date_fin }}</span>
+        </td>
+        <td>
+          <a href="{% url 'flotte:contravention_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a>
+          <a href="{% url 'flotte:location_detail' c.location.pk %}" class="btn btn-ghost btn-sm">Fiche location</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8">Aucune contravention enregistrée. Les contraventions s'ajoutent depuis la fiche de chaque <a href="{% url 'flotte:location_list' %}">location</a>.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if contraventions %}
+<p class="total-line" style="margin-top:1rem;"><strong>Total des montants affichés ({{ contraventions|length }} contravention(s)) :</strong> {{ total_montant|floatformat:0 }} FCFA (à la charge des locataires, intégrés aux factures de location).</p>
+{% endif %}
+{% endblock %}

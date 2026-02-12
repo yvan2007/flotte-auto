@@ -24,17 +24,27 @@
     <p><strong>Frais annexes (assurance, entretien, carburant…):</strong> {% if location.frais_annexes %}{{ location.frais_annexes|floatformat:0 }} FCFA{% else %}—{% endif %}</p>
     <p><strong>Km inclus / mois:</strong> {{ location.km_inclus_mois|default:"—" }}</p>
     <p><strong>Prix km supplémentaire:</strong> {% if location.prix_km_supplementaire %}{{ location.prix_km_supplementaire }} FCFA/km{% else %}—{% endif %}</p>
-    <p class="total-line"><strong>Coût total (loyer + frais + contraventions):</strong> {{ location.cout_total_location|floatformat:0 }} FCFA</p>
+    <p class="total-line"><strong>Coût total facture de location (loyer + frais + contraventions à la charge du locataire):</strong> {{ location.cout_total_location|floatformat:0 }} FCFA</p>
   </div>
   <div class="card fiche-block">
     <h3>Contraventions / amendes</h3>
+    <p class="contravention-notice"><strong>Règle :</strong> Toute contravention reçue pendant la période de location est à la charge du locataire. Le montant est automatiquement ajouté à la facture de location (coût total ci-dessus), avec mention du motif, de la date et du véhicule concerné.</p>
     {% if is_manager_or_admin %}<p><a href="{% url 'flotte:contravention_create' location.pk %}" class="btn btn-primary btn-sm">Ajouter une contravention</a></p>{% endif %}
     {% if location.contraventions.all %}
     <ul class="activity-list">
       {% for c in location.contraventions.all %}
-      <li>{{ c.date_contravention|default:"" }} {% if c.reference %}{{ c.reference }}{% endif %} {% if c.lieu %}{{ c.lieu }}{% endif %} — {% if c.montant %}{{ c.montant|floatformat:0 }} FCFA{% else %}—{% endif %} {% if is_manager_or_admin %}<a href="{% url 'flotte:contravention_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}</li>
+      <li>
+        <strong>Véhicule :</strong> {{ location.vehicule.libelle_court }} ({{ location.vehicule.numero_chassis }}) —
+        {% if c.date_contravention %}{{ c.date_contravention }}{% endif %}
+        {% if c.motif %}<strong>Motif :</strong> {{ c.motif }}{% endif %}
+        {% if c.reference %} — N° PV {{ c.reference }}{% endif %}
+        {% if c.lieu %} — Lieu : {{ c.lieu }}{% endif %}
+        {% if c.montant %} — <strong>{{ c.montant|floatformat:0 }} FCFA</strong> (à la charge du locataire){% else %}—{% endif %}
+        {% if is_manager_or_admin %}<a href="{% url 'flotte:contravention_update' c.pk %}" class="btn btn-ghost btn-sm">Modifier</a>{% endif %}
+      </li>
       {% endfor %}
     </ul>
+    <p><strong>Total contraventions (intégré à la facture de location) :</strong> {{ location.contraventions.all|length }} contravention(s) — {{ total_contraventions|floatformat:0 }} FCFA à la charge du locataire.</p>
     {% else %}
     <p>Aucune contravention enregistrée.</p>
     {% endif %}
