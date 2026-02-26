@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Count, Sum, Avg
+from django.db.models import Case, Count, IntegerField, Sum, Avg, Value, When
 from django.utils import timezone
 
 from .models import Marque, Modele, Vehicule, Vente, Location, Conducteur
@@ -73,8 +73,20 @@ class VenteViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class LocationViewSet(viewsets.ReadOnlyModelViewSet):
-    """Locations — liste et détail (lecture seule)."""
-    queryset = Location.objects.select_related('vehicule').order_by('-date_debut')
+    """Locations — liste et détail (lecture seule). En cours / à venir en haut, terminées en bas."""
+    queryset = (
+        Location.objects.select_related('vehicule')
+        .annotate(
+            statut_order=Case(
+                When(statut='en_cours', then=Value(0)),
+                When(statut='a_venir', then=Value(1)),
+                When(statut='termine', then=Value(2)),
+                default=Value(2),
+                output_field=IntegerField(),
+            )
+        )
+        .order_by('statut_order', '-date_debut')
+    )
     serializer_class = LocationListSerializer
 
     def get_serializer_class(self):

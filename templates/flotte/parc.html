@@ -35,7 +35,7 @@
   </div>
 </div>
 <div class="toolbar">
-  <form method="get" class="filters" style="flex: 1; min-width: 0;">
+  <form method="get" class="filters">
     <select name="statut" class="select" aria-label="Filtrer par état">
       <option value="">Tous les statuts</option>
       <option value="parc" {% if request.GET.statut == 'parc' %}selected{% endif %}>Au parc</option>

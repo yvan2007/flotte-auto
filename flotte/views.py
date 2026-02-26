@@ -18,7 +18,7 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_GET
-from django.db.models import Avg, Count, Prefetch, Q, Sum
+from django.db.models import Avg, Case, Count, IntegerField, Prefetch, Q, Sum, Value, When
 from django.db.models.functions import TruncDate, TruncMonth, TruncYear
 from django.utils import timezone
 from decimal import Decimal
@@ -40,7 +40,7 @@ from .forms import (
     ReparationForm, FactureForm, ImportDemarcheForm, VenteForm,
     RapportJournalierForm, MaintenanceForm, ReleveCarburantForm, ConducteurForm,
     ChargeImportForm, PartieImporteeForm, ContraventionForm, TypeDocumentForm,
-    PhotoVehiculeForm, PenaliteFactureForm,
+    PhotoVehiculeForm, PenaliteFactureForm, CAAmountCodeForm,
 )
 from .mixins import (
     AdminRequiredMixin, ManagerRequiredMixin,
@@ -156,6 +156,19 @@ def dashboard(request):
     by_marque = list(
         qs.values('marque__nom').annotate(n=Count('id')).order_by('-n')
     )
+    # Occupation de la flotte (véhicules en location vs total)
+    vehicules_en_location_qs = Vehicule.objects.filter(
+        locations__statut='en_cours'
+    ).distinct()
+    nb_vehicules_en_location = vehicules_en_location_qs.count()
+    # Disponibles : véhicules au parc sans location en cours
+    vehicules_disponibles_qs = qs.filter(statut='parc').exclude(
+        locations__statut='en_cours'
+    ).distinct()
+    nb_vehicules_disponibles = vehicules_disponibles_qs.count()
+    taux_occupation = 0
+    if total:
+        taux_occupation = round((nb_vehicules_en_location / total) * 100)
     # Alertes : locations dont CT ou assurance expire dans les 30 jours
     now = timezone.now().date()
     fin_alerte = now + timedelta(days=30)
@@ -219,6 +232,9 @@ def dashboard(request):
         'vendus': vendus,
         'total': total,
         'by_marque': by_marque,
+        'vehicules_en_location': nb_vehicules_en_location,
+        'vehicules_disponibles': nb_vehicules_disponibles,
+        'taux_occupation': taux_occupation,
         'alertes_ct': alertes_ct,
         'alertes_assurance': alertes_assurance,
         'alertes_permis': alertes_permis,
@@ -738,7 +754,17 @@ class LocationListView(ManagerRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return Location.objects.select_related('vehicule__marque', 'vehicule__modele').order_by('-date_debut')
+        qs = Location.objects.select_related('vehicule__marque', 'vehicule__modele')
+        qs = qs.annotate(
+            statut_order=Case(
+                When(statut='en_cours', then=Value(0)),
+                When(statut='a_venir', then=Value(1)),
+                When(statut='termine', then=Value(2)),
+                default=Value(2),
+                output_field=IntegerField(),
+            )
+        )
+        return qs.order_by('statut_order', '-date_debut')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1593,6 +1619,32 @@ def ca_view(request):
     annee_defaut = derniere_annee_avec_vente if derniere_annee_avec_vente else now.year
     if annee_defaut not in annees:
         annees = sorted(set(annees) | {annee_defaut})
+
+    # CA par année (année par défaut vs année précédente) pour indicateur de tendance
+    from decimal import Decimal as _Decimal
+    ca_annee = qs_ventes_ca.filter(date_vente__year=annee_defaut).aggregate(
+        total=Sum('prix_vente')
+    )['total'] or _Decimal('0')
+    ca_annee_prec = qs_ventes_ca.filter(date_vente__year=annee_defaut - 1).aggregate(
+        total=Sum('prix_vente')
+    )['total'] or _Decimal('0')
+    diff_abs = ca_annee - ca_annee_prec
+    diff_pct = _Decimal('0')
+    if ca_annee_prec:
+        diff_pct = (diff_abs / ca_annee_prec) * _Decimal('100')
+
+    # Top 5 véhicules par CA (toutes périodes)
+    top_vehicules = list(
+        qs_ventes_ca.values(
+            'vehicule_id',
+            'vehicule__marque__nom',
+            'vehicule__modele__nom',
+            'vehicule__numero_chassis',
+        )
+        .annotate(total_ca=Sum('prix_vente'), nb_ventes=Count('id'))
+        .order_by('-total_ca')[:5]
+    )
+
     context = {
         'total_ca': agg['total_ca'] or Decimal('0'),
         'nb_ventes': agg['nb_ventes'] or 0,
@@ -1600,9 +1652,66 @@ def ca_view(request):
         'annee_courante': annee_defaut,
         'mois_courant': now.month,
         'annees': annees,
+        'ca_annee': ca_annee,
+        'ca_annee_prec': ca_annee_prec,
+        'ca_diff_abs': diff_abs,
+        'ca_diff_pct': diff_pct,
+        'top_vehicules': top_vehicules,
         **get_sidebar_context(request),
     }
     return render(request, 'flotte/ca.html', context)
+
+
+@login_required
+def ca_check_code(request):
+    """API JSON : vérifie le code d'affichage des montants de CA pour l'utilisateur courant."""
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'message': 'Méthode non autorisée.'}, status=405)
+    profil = getattr(request.user, 'profil_flotte', None)
+    if not profil:
+        return JsonResponse({'ok': False, 'message': 'Profil utilisateur introuvable.'}, status=400)
+    try:
+        import json
+
+        payload = json.loads(request.body.decode('utf-8')) if request.body else {}
+    except (TypeError, ValueError):
+        payload = {}
+    code = (payload.get('code') or '').strip()
+    # Si aucun code n'est défini côté profil, on considère que tout est autorisé
+    if not profil.code_ca_hash:
+        return JsonResponse({'ok': True, 'message': 'Aucun code défini (accès autorisé).'})
+    if profil.check_code_ca(code):
+        return JsonResponse({'ok': True})
+    return JsonResponse({'ok': False, 'message': 'Code incorrect.'}, status=400)
+
+
+@manager_or_admin_required
+def parametrage_ca_code(request):
+    """Page de réglage du code d'affichage des montants CA pour l'utilisateur courant."""
+    profil = getattr(request.user, 'profil_flotte', None)
+    if not profil:
+        messages.error(request, "Profil utilisateur introuvable.")
+        return redirect('flotte:parametrage_index')
+    if request.method == 'POST':
+        form = CAAmountCodeForm(request.POST, user=request.user)
+        if form.is_valid():
+            new_code = form.cleaned_data.get('new_code') or ''
+            profil.set_code_ca(new_code)
+            profil.save(update_fields=['code_ca_hash'])
+            if new_code:
+                messages.success(request, "Code d'affichage des montants mis à jour.")
+            else:
+                messages.success(request, "Code supprimé : l'affichage des montants n'est plus protégé.")
+            return redirect('flotte:parametrage_index')
+    else:
+        form = CAAmountCodeForm(user=request.user)
+    context = {
+        'form': form,
+        'title': "Code d'affichage des montants (CA)",
+        'back_url': reverse_lazy('flotte:parametrage_index'),
+        **get_sidebar_context(request),
+    }
+    return render(request, 'flotte/parametrage_form.html', context)
 
 
 @manager_or_admin_required
@@ -1623,8 +1732,17 @@ def rapport_download(request, pk):
 
 @login_required
 def maintenance_list(request):
-    """Liste des maintenances préventives."""
-    maintenances = Maintenance.objects.select_related('vehicule').order_by('-date_prevue', '-id')[:200]
+    """Liste des maintenances préventives (à faire / en cours en haut, effectuées en bas)."""
+    qs = Maintenance.objects.select_related('vehicule').annotate(
+        statut_order=Case(
+            When(statut='a_faire', then=Value(0)),
+            When(statut='en_cours', then=Value(1)),
+            When(statut='effectue', then=Value(2)),
+            default=Value(2),
+            output_field=IntegerField(),
+        )
+    ).order_by('statut_order', '-date_prevue', '-id')[:200]
+    maintenances = qs
     context = {
         'maintenances': maintenances,
         **get_sidebar_context(request),

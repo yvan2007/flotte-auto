@@ -14,7 +14,11 @@
   <a href="{% url 'flotte:export_locations' %}" class="btn btn-ghost btn-sm">Exporter en CSV</a>
 </div>
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer les locations :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-locations">
+  </div>
+  <table class="table" id="table-locations">
     <thead>
       <tr>
         <th>Véhicule</th>

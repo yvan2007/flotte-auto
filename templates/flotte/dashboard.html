@@ -1,11 +1,35 @@
 {% extends "base.html" %}
 {% block title %}Tableau de bord{% endblock %}
 {% block page_title %}Tableau de bord{% endblock %}
+{% block extra_css %}
+{{ block.super }}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+>
+{% endblock %}
 {% block breadcrumb %}
 <nav class="breadcrumb" aria-label="Fil d'Ariane"><span class="current">Tableau de bord</span></nav>
 {% endblock %}
 {% block content %}
-<p class="card-desc" style="margin-bottom: 1.25rem;">Vue d'ensemble du parc, des véhicules en import et des alertes (CT, assurance, permis, documents). <a href="{% url 'flotte:echeances' %}">Voir toutes les échéances</a> (90 jours).</p>
+<p class="card-desc dashboard-intro">Vue d'ensemble du parc, des véhicules en import et des alertes (CT, assurance, permis, documents). <a href="{% url 'flotte:echeances' %}">Voir toutes les échéances</a> (90 jours).</p>
+<div class="card dashboard-usage-card">
+  <h2 class="card-title">Occupation de la flotte</h2>
+  <p class="card-desc">Répartition en temps réel des véhicules en location et disponibles.</p>
+  <div class="dashboard-usage">
+    <div class="dashboard-usage-numbers">
+      <span><strong>{{ vehicules_en_location }}</strong> en location</span>
+      <span><strong>{{ vehicules_disponibles }}</strong> disponibles</span>
+      <span><strong>{{ total }}</strong> au total</span>
+    </div>
+    <div class="dashboard-usage-bar" role="progressbar" aria-label="Taux d'occupation" aria-valuenow="{{ taux_occupation }}" aria-valuemin="0" aria-valuemax="100">
+      <div class="dashboard-usage-fill" style="width: {{ taux_occupation }}%;"></div>
+    </div>
+    <p class="dashboard-usage-percent">{{ taux_occupation }}&nbsp;% de la flotte en location</p>
+  </div>
+</div>
 <div class="kpi-grid">
   <div class="kpi-card">
     <span class="kpi-label">Véhicules dans le parc</span>
@@ -52,6 +76,20 @@
     {% else %}
     <div class="empty-state"><p>Aucun véhicule en cours d'import.</p><p><a href="{% url 'flotte:parc' %}">Voir le parc</a></p></div>
     {% endif %}
+  </div>
+  <div class="card">
+    <h2 class="card-title">Locations en cours</h2>
+    <p class="card-desc">Liste des 10 dernières locations actives, actualisée automatiquement.</p>
+    <ul class="activity-list" id="dashboard-locations-en-cours">
+      <li>
+        <span class="li-content text-muted">Chargement des locations en cours…</span>
+      </li>
+    </ul>
+  </div>
+  <div class="card map-card">
+    <h2 class="card-title">Localisation simulée des véhicules en location</h2>
+    <p class="card-desc">Carte de démonstration basée sur les véhicules actuellement en location (positions fictives).</p>
+    <div id="dashboard-map" class="dashboard-map" aria-label="Carte des véhicules en location"></div>
   </div>
   <div class="card">
     <h2 class="card-title">Alertes — CT (visite technique)</h2>
@@ -141,4 +179,131 @@
   </div>
 </div>
 <p style="margin-top: 1rem;"><a href="{% url 'flotte:echeances' %}" class="btn btn-primary btn-sm">Voir toutes les échéances (90 jours)</a></p>
+<script>
+(function() {
+  const container = document.getElementById('dashboard-locations-en-cours');
+  if (!container) return;
+
+  function renderLocations(data) {
+    const locations = data && data.locations ? data.locations : [];
+    if (!locations.length) {
+      container.innerHTML = '<li><span class="li-content text-muted">Aucune location en cours pour le moment.</span></li>';
+      return;
+    }
+    container.innerHTML = locations.map(function(loc) {
+      const dateDebut = new Date(loc.date_debut);
+      const dateFin = new Date(loc.date_fin);
+      const format = function(d) {
+        if (!d || isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('fr-FR');
+      };
+      const badge = '<span class="badge badge-ok">En cours</span>';
+      const titre = loc.vehicule || 'Véhicule';
+      const locataire = loc.locataire || '';
+      return (
+        '<li>' +
+          '<span class="li-content">' +
+            badge + ' ' +
+            '<strong>' + titre + '</strong>' +
+            (locataire ? ' — ' + locataire : '') +
+            ' <span class="text-muted">(du ' + format(dateDebut) + ' au ' + format(dateFin) + ')</span>' +
+          '</span>' +
+        '</li>'
+      );
+    }).join('');
+  }
+
+  function refreshLocations() {
+    fetch('{% url "flotte:api_locations_list" %}?statut=en_cours&limit=10', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function(response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      })
+      .then(renderLocations)
+      .catch(function() {
+        container.innerHTML = '<li><span class="li-content text-muted">Impossible d’actualiser les locations en cours.</span></li>';
+      });
+  }
+
+  refreshLocations();
+  setInterval(refreshLocations, 60000);
+})();
+</script>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<script>
+(function() {
+  var mapEl = document.getElementById('dashboard-map');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  // Centre par défaut (ex. Abidjan) pour la simulation
+  var center = [5.345, -4.024];
+  var map = L.map(mapEl).setView(center, 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  var markers = {};
+
+  function randomOffset() {
+    return (Math.random() - 0.5) * 0.01; // déplacement très léger pour la simulation
+  }
+
+  function upsertMarkers(locations) {
+    var activeIds = {};
+    locations.forEach(function(loc) {
+      activeIds[loc.id] = true;
+      var marker = markers[loc.id];
+      if (!marker) {
+        var lat = center[0] + randomOffset();
+        var lng = center[1] + randomOffset();
+        marker = L.marker([lat, lng]).addTo(map);
+        markers[loc.id] = marker;
+      } else {
+        var ll = marker.getLatLng();
+        marker.setLatLng([ll.lat + randomOffset(), ll.lng + randomOffset()]);
+      }
+      var title = loc.vehicule || 'Véhicule';
+      var locataire = loc.locataire ? ' — ' + loc.locataire : '';
+      marker.bindPopup(title + locataire);
+    });
+    Object.keys(markers).forEach(function(id) {
+      if (!activeIds[id]) {
+        map.removeLayer(markers[id]);
+        delete markers[id];
+      }
+    });
+  }
+
+  function refreshMap() {
+    fetch('{% url "flotte:api_locations_list" %}?statut=en_cours&limit=20', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(function(response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      })
+      .then(function(data) {
+        upsertMarkers(data && data.locations ? data.locations : []);
+      })
+      .catch(function() {
+        // on ignore les erreurs pour ne pas casser le dashboard
+      });
+  }
+
+  refreshMap();
+  setInterval(refreshMap, 60000);
+})();
+</script>
 {% endblock %}

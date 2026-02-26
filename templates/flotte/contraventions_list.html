@@ -13,7 +13,11 @@
   <a href="{% url 'flotte:location_list' %}" class="btn btn-ghost">Voir les locations</a>
 </div>
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer les contraventions :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-contraventions">
+  </div>
+  <table class="table" id="table-contraventions">
     <thead>
       <tr>
         <th>Date</th>

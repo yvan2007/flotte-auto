@@ -50,6 +50,26 @@
     <span class="kpi-label">Moyenne par vente (FCFA)</span>
     <span class="kpi-value montant-fcfa" data-montant="{{ moyenne_vente|floatformat:0 }}">{{ moyenne_vente|floatformat:0 }}</span>
   </div>
+  <div class="kpi-card">
+    <span class="kpi-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+    </span>
+    <span class="kpi-label">CA {{ annee_courante }}</span>
+    <span class="kpi-value montant-fcfa" data-montant="{{ ca_annee|floatformat:0 }}">{{ ca_annee|floatformat:0 }}</span>
+    <p class="ca-kpi-sub">
+      {% if ca_annee_prec %}
+        {% if ca_diff_pct > 0 %}
+          <span class="badge badge-ok">+{{ ca_diff_pct|floatformat:1 }}&nbsp;%</span> vs {{ annee_courante|add:"-1" }}
+        {% elif ca_diff_pct < 0 %}
+          <span class="badge badge-warn">{{ ca_diff_pct|floatformat:1 }}&nbsp;%</span> vs {{ annee_courante|add:"-1" }}
+        {% else %}
+          <span class="badge badge-muted">Stable</span> vs {{ annee_courante|add:"-1" }}
+        {% endif %}
+      {% else %}
+        <span class="badge badge-muted">Aucune donnée pour {{ annee_courante|add:"-1" }}</span>
+      {% endif %}
+    </p>
+  </div>
 </div>
 
 <h3 class="ca-section-title">Filtrer les graphiques</h3>
@@ -112,6 +132,43 @@
 </div>
 </div>
 
+<h3 class="ca-section-title">Véhicules les plus rentables</h3>
+<div class="card card-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Véhicule</th>
+        <th class="num">CA total (FCFA)</th>
+        <th class="num">Nombre de ventes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in top_vehicules %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>
+          <strong>
+            <a href="{% url 'flotte:vehicule_detail' v.vehicule_id %}">
+              {{ v.vehicule__marque__nom|default:"—" }} {{ v.vehicule__modele__nom|default:"" }}
+            </a>
+          </strong>
+          <div class="text-muted" style="font-size: 0.8rem;">
+            {{ v.vehicule__numero_chassis|default:"" }}
+          </div>
+        </td>
+        <td class="num montant-fcfa" data-montant="{{ v.total_ca|floatformat:0 }}">{{ v.total_ca|floatformat:0 }}</td>
+        <td class="num">{{ v.nb_ventes }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-muted">Aucune vente avec montant n'a encore été enregistrée.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 <div class="card card-ca-summary">
   <div class="card-ca-summary-header">
     <span class="card-ca-summary-icon" aria-hidden="true">
@@ -138,6 +195,7 @@
 <script>
 (function() {
   var STORAGE_KEY = 'flotte_mask_amounts';
+  var CHECK_CODE_URL = '{% url "flotte:ca_check_code" %}';
   var apiUrl = '{% url "flotte:ca_api_evolution" %}';
 
   function getMask() { try { return localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) { return false; } }
@@ -155,9 +213,57 @@
     });
   }
 
+  function getCsrfToken() {
+    var name = 'csrftoken';
+    var cookies = document.cookie ? document.cookie.split(';') : [];
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].trim();
+      if (c.substring(0, name.length + 1) === (name + '=')) {
+        return decodeURIComponent(c.substring(name.length + 1));
+      }
+    }
+    return '';
+  }
+
+  function requestUnlock() {
+    var code = window.prompt('Code pour afficher les montants (CA) :');
+    if (!code) return;
+    fetch(CHECK_CODE_URL, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': getCsrfToken(),
+      },
+      body: JSON.stringify({ code: code })
+    })
+      .then(function(response) { return response.json().then(function(data) { return { ok: response.ok, data: data }; }); })
+      .then(function(result) {
+        if (result.ok && result.data && result.data.ok) {
+          setMask(false);
+          applyMaskToPage();
+        } else {
+          var msg = (result.data && result.data.message) || 'Code incorrect.';
+          window.alert(msg);
+        }
+      })
+      .catch(function() {
+        window.alert('Erreur lors de la vérification du code.');
+      });
+  }
+
   var maskToggle = document.getElementById('ca-mask-toggle');
   if (maskToggle) {
-    maskToggle.addEventListener('click', function() { setMask(!getMask()); applyMaskToPage(); });
+    maskToggle.addEventListener('click', function() {
+      var isMasked = getMask();
+      if (isMasked) {
+        requestUnlock();
+      } else {
+        setMask(true);
+        applyMaskToPage();
+      }
+    });
     maskToggle.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); maskToggle.click(); } });
   }
   applyMaskToPage();
@@ -201,40 +307,50 @@
     if (chartCa) chartCa.destroy();
     chartCa = null;
     if (!labels.length) return;
+
     var dataNum = data.map(function(v) { return Number(v) || 0; });
     var h = ctx.parentElement ? ctx.parentElement.clientHeight || 280 : 280;
     var ctx2d = ctx.getContext('2d');
     var gradient = ctx2d.createLinearGradient(0, 0, 0, h);
-    gradient.addColorStop(0, 'rgba(125, 107, 82, 0.55)');
-    gradient.addColorStop(0.6, 'rgba(125, 107, 82, 0.25)');
-    gradient.addColorStop(1, 'rgba(125, 107, 82, 0.08)');
+    gradient.addColorStop(0, 'rgba(125, 107, 82, 0.45)');
+    gradient.addColorStop(0.6, 'rgba(125, 107, 82, 0.18)');
+    gradient.addColorStop(1, 'rgba(125, 107, 82, 0.02)');
+
+    var onePoint = dataNum.length === 1;
+
     chartCa = new Chart(ctx2d, {
-      type: 'bar',
+      type: 'line',
       data: {
         labels: labels,
         datasets: [{
           label: 'CA (FCFA)',
           data: dataNum,
+          borderColor: 'rgba(125, 107, 82, 0.95)',
           backgroundColor: gradient,
-          borderColor: 'rgba(139, 118, 89, 0.9)',
-          borderWidth: 1,
-          borderRadius: 6,
-          borderSkipped: false,
-          barPercentage: 0.65,
-          categoryPercentage: 0.8,
+          borderWidth: 2,
+          tension: 0.35,
+          fill: true,
+          spanGaps: true,
+          pointRadius: onePoint ? 7 : 4,
+          pointHoverRadius: onePoint ? 9 : 6,
+          pointBackgroundColor: 'rgba(125, 107, 82, 1)',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 600 },
+        animation: { duration: 700, easing: 'easeOutQuart' },
+        interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(40, 40, 40, 0.95)',
+            backgroundColor: 'rgba(20, 20, 20, 0.96)',
             padding: 12,
             titleFont: { size: 13 },
             bodyFont: { size: 12 },
+            cornerRadius: 8,
             callbacks: {
               label: function(item) {
                 var v = item.raw;
@@ -249,11 +365,18 @@
         scales: {
           x: {
             grid: { display: false },
-            ticks: { maxRotation: 45, font: { size: 11 }, maxTicksLimit: 12 },
+            ticks: {
+              maxRotation: 45,
+              font: { size: 11 },
+              maxTicksLimit: 12,
+            },
           },
           y: {
             beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.06)' },
+            grid: {
+              color: 'rgba(0,0,0,0.05)',
+              drawBorder: false,
+            },
             ticks: {
               font: { size: 11 },
               callback: function(v) {
@@ -300,7 +423,8 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 600 },
+        animation: { duration: 650, easing: 'easeOutQuart' },
+        interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
           tooltip: {

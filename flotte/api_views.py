@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.db.models import Count, Sum, Avg, Q
+from django.db.models import Case, Count, IntegerField, Q, Sum, Avg, Value, When
 
 from .models import (
     Marque, Modele, Vehicule, Vente, Conducteur,
@@ -188,8 +188,16 @@ def api_conducteurs_list(request):
 
 @login_required
 def api_locations_list(request):
-    """GET /api/locations/ — Liste des locations (résumé). Query: statut, limit."""
-    qs = Location.objects.select_related('vehicule').order_by('-date_debut')
+    """GET /api/locations/ — Liste des locations (résumé). En cours / à venir en haut, terminées en bas."""
+    qs = Location.objects.select_related('vehicule').annotate(
+        statut_order=Case(
+            When(statut='en_cours', then=Value(0)),
+            When(statut='a_venir', then=Value(1)),
+            When(statut='termine', then=Value(2)),
+            default=Value(2),
+            output_field=IntegerField(),
+        )
+    ).order_by('statut_order', '-date_debut')
     statut = request.GET.get('statut', '').strip()
     if statut and statut in ('en_cours', 'a_venir', 'termine'):
         qs = qs.filter(statut=statut)

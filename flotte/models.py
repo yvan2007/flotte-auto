@@ -645,6 +645,32 @@ class ProfilUtilisateur(models.Model):
     def __str__(self):
         return f'{self.user.username} — {self.get_role_display()}'
 
+    # Code d'affichage des montants (chiffre d'affaires, etc.), stocké de façon hachée
+    code_ca_hash = models.CharField(
+        'Code affichage montants CA (haché)', max_length=128, blank=True
+    )
+
+    def set_code_ca(self, raw_code: str | None):
+        """Définit ou réinitialise le code (4–8 chiffres recommandé)."""
+        from django.contrib.auth.hashers import make_password
+
+        raw_code = (raw_code or '').strip()
+        if not raw_code:
+            self.code_ca_hash = ''
+        else:
+            self.code_ca_hash = make_password(raw_code)
+
+    def check_code_ca(self, raw_code: str | None) -> bool:
+        """Vérifie le code saisi. Retourne False si aucun code défini."""
+        from django.contrib.auth.hashers import check_password
+
+        if not self.code_ca_hash:
+            return False
+        raw_code = (raw_code or '').strip()
+        if not raw_code:
+            return False
+        return check_password(raw_code, self.code_ca_hash)
+
 
 class RapportJournalier(models.Model):
     """Rapport journalier ou document CA (PDF) déposé pour consultation."""

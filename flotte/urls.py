@@ -81,6 +81,7 @@ urlpatterns = [
     path('export-charges-import/', views.export_charges_import, name='export_charges_import'),
     path('export-locations/', views.export_locations, name='export_locations'),
     path('ca/api/evolution/', views.ca_api_evolution, name='ca_api_evolution'),
+    path('ca/api/check-code/', views.ca_check_code, name='ca_check_code'),
     path('ca/rapport/<int:pk>/', views.rapport_download, name='rapport_download'),
     path('ca/rapport/<int:pk>/modifier/', views.RapportJournalierUpdateView.as_view(), name='rapport_update'),
     path('maintenance/', views.maintenance_list, name='maintenance_list'),
@@ -115,6 +116,7 @@ urlpatterns = [
     path('parametrage/utilisateurs/', views.parametrage_utilisateurs, name='parametrage_utilisateurs'),
     path('parametrage/utilisateurs/ajout/', views.UserCreateView.as_view(), name='utilisateur_create'),
     path('parametrage/utilisateurs/<int:pk>/modifier/', views.UserUpdateView.as_view(), name='utilisateur_update'),
+    path('parametrage/ca-code/', views.parametrage_ca_code, name='parametrage_ca_code'),
     path('parametrage/audit/', views.audit_list, name='audit_list'),
     # API — index et endpoints JSON
     path('api/', api_views.api_index, name='api_index'),

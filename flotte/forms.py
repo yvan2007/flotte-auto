@@ -180,6 +180,57 @@ class UserCreateForm(UserCreationForm):
         return user
 
 
+class CAAmountCodeForm(forms.Form):
+    """Formulaire pour définir / changer le code d'affichage des montants de CA."""
+
+    old_code = forms.CharField(
+        label='Ancien code',
+        max_length=8,
+        required=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'autocomplete': 'off'}),
+        help_text="Laissez vide si aucun code n'a encore été défini.",
+    )
+    new_code = forms.CharField(
+        label='Nouveau code',
+        max_length=8,
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'autocomplete': 'off'}),
+        help_text='4 à 8 chiffres recommandés.',
+    )
+    confirm_code = forms.CharField(
+        label='Confirmation du nouveau code',
+        max_length=8,
+        widget=forms.PasswordInput(attrs={'class': 'form-input', 'autocomplete': 'off'}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned = super().clean()
+        new_code = (cleaned.get('new_code') or '').strip()
+        confirm = (cleaned.get('confirm_code') or '').strip()
+        old_code = (cleaned.get('old_code') or '').strip()
+
+        if not new_code:
+            self.add_error('new_code', 'Le nouveau code est obligatoire.')
+        elif not new_code.isdigit() or not (4 <= len(new_code) <= 8):
+            self.add_error('new_code', 'Le code doit contenir entre 4 et 8 chiffres.')
+
+        if new_code and confirm and new_code != confirm:
+            self.add_error('confirm_code', 'La confirmation ne correspond pas au nouveau code.')
+
+        profil = getattr(self.user, 'profil_flotte', None) if self.user and self.user.is_authenticated else None
+        if profil and profil.code_ca_hash:
+            # Un code existe déjà : l'ancien code est obligatoire et doit être correct
+            if not old_code:
+                self.add_error('old_code', 'Veuillez saisir l’ancien code.')
+            elif not profil.check_code_ca(old_code):
+                self.add_error('old_code', 'Ancien code incorrect.')
+
+        return cleaned
+
+
 class MarqueForm(forms.ModelForm):
     """Une même marque ne peut pas exister deux fois."""
     class Meta:

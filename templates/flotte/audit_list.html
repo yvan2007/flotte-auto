@@ -30,7 +30,11 @@
 </form>
 
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer le journal :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-audit">
+  </div>
+  <table class="table" id="table-audit">
     <thead>
       <tr>
         <th>Date</th>

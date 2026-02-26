@@ -8,7 +8,11 @@
   <p class="card-desc">Réparations effectuées ou à faire sur chaque véhicule.</p>
 </div>
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer les réparations :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-reparations">
+  </div>
+  <table class="table" id="table-reparations">
     <thead>
       <tr>
         <th>Véhicule</th>

@@ -8,7 +8,11 @@
   <p class="card-desc">Historique des ventes — acquéreur, prix, km à la vente, garantie, état livraison.</p>
 </div>
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer les ventes :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-ventes">
+  </div>
+  <table class="table" id="table-ventes">
     <thead>
       <tr>
         <th>Véhicule</th>

@@ -10,7 +10,11 @@
   <p class="card-desc">Véhicules en cours d'importation — Douane → Homologation → Immatriculation → Carte grise → Assurance.</p>
 </div>
 <div class="card card-table">
-  <table class="table">
+  <div class="table-filter-wrap">
+    <span class="table-filter-label">Filtrer les imports :</span>
+    <input type="search" class="table-filter-input" placeholder="Rechercher dans le tableau" data-table-filter="table-imports">
+  </div>
+  <table class="table" id="table-imports">
     <thead>
       <tr>
         <th>Véhicule (châssis)</th>

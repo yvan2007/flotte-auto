@@ -136,6 +136,12 @@ body.montants-masques .montant-fcfa {
   color: var(--text-muted);
 }
 
+.ca-kpi-sub {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
 /* —— Filtres —— */
 .ca-filters-section {
   margin-bottom: 1.75rem;
