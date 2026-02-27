@@ -280,6 +280,9 @@ body { margin: 0; font-family: var(--font-sans); color: var(--text); background:
 .logo-icon svg { width: 20px; height: 20px; stroke-width: 2; }
 .sidebar-footer { padding: 1rem; border-top: 1px solid var(--sidebar-border, var(--border)); }
 .sidebar-footer .btn { display: inline-flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center; }
+.sidebar-footer-text { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; font-size: 0.8rem; color: var(--text-muted); }
+.sidebar-footer-title { font-weight: 600; color: var(--text-title); letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.78rem; }
+.sidebar-footer-sub { font-size: 0.78rem; }
 
 .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
 .header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.25rem 1.5rem; background: var(--bg-card); border-bottom: 1px solid var(--border); }

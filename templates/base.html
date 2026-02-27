@@ -101,11 +101,16 @@
         </a>
         {% endif %}
       </nav>
-      {% if is_manager_or_admin %}
       <div class="sidebar-footer">
+        {% if is_manager_or_admin %}
         <a href="{% url 'flotte:vehicule_create' %}" class="btn btn-primary btn-sm">Nouveau véhicule</a>
+        {% else %}
+        <div class="sidebar-footer-text">
+          <span class="sidebar-footer-title">FLOTTE CI</span>
+          <span class="sidebar-footer-sub">Gestion import & parc véhicules</span>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
     </aside>
     <main class="main">
       <header class="header">
