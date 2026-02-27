@@ -1,0 +1,195 @@
+/**
+ * Animations pour les cartes statistiques du dashboard
+ */
+
+/* Animation d'apparition au chargement */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style de base pour les small-box */
+.small-box {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+/* Délais d'animation pour chaque carte */
+.row .col-lg-3:nth-child(1) .small-box {
+  animation-delay: 0.1s;
+}
+
+.row .col-lg-3:nth-child(2) .small-box {
+  animation-delay: 0.2s;
+}
+
+.row .col-lg-3:nth-child(3) .small-box {
+  animation-delay: 0.3s;
+}
+
+.row .col-lg-3:nth-child(4) .small-box {
+  animation-delay: 0.4s;
+}
+
+/* Effet de brillance animé */
+.small-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+/* Animation hover - Soulèvement et brillance */
+.small-box:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.small-box:hover::before {
+  opacity: 1;
+  left: 100%;
+  top: 100%;
+}
+
+/* Animation de l'icône au hover */
+.small-box .icon {
+  transition: all 0.3s ease;
+}
+
+.small-box:hover .icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.small-box:hover .icon i {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* Animation pulse pour l'icône */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Animation du footer au hover */
+.small-box-footer {
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.small-box:hover .small-box-footer {
+  padding-left: 15px;
+  letter-spacing: 0.5px;
+}
+
+.small-box-footer i {
+  transition: transform 0.3s ease;
+}
+
+.small-box:hover .small-box-footer i {
+  transform: translateX(5px);
+}
+
+/* Animation du texte interne */
+.small-box .inner {
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.small-box:hover .inner h3 {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+/* Effet actif/click */
+.small-box:active {
+  transform: translateY(-4px) scale(1.01);
+  transition: all 0.1s ease;
+}
+
+/* === Améliorations pour le thème sombre === */
+[data-theme="dark"] .small-box {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .small-box:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Effet néon pour les cartes en thème sombre */
+[data-theme="dark"] .small-box.bg-info {
+  box-shadow: 0 8px 24px rgba(23, 162, 184, 0.3);
+}
+
+[data-theme="dark"] .small-box.bg-info:hover {
+  box-shadow: 0 12px 32px rgba(23, 162, 184, 0.4), 0 0 20px rgba(23, 162, 184, 0.2);
+}
+
+[data-theme="dark"] .small-box.bg-success {
+  box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);
+}
+
+[data-theme="dark"] .small-box.bg-success:hover {
+  box-shadow: 0 12px 32px rgba(40, 167, 69, 0.4), 0 0 20px rgba(40, 167, 69, 0.2);
+}
+
+[data-theme="dark"] .small-box.bg-warning {
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);
+}
+
+[data-theme="dark"] .small-box.bg-warning:hover {
+  box-shadow: 0 12px 32px rgba(255, 193, 7, 0.4), 0 0 20px rgba(255, 193, 7, 0.2);
+}
+
+[data-theme="dark"] .small-box.bg-danger {
+  box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3);
+}
+
+[data-theme="dark"] .small-box.bg-danger:hover {
+  box-shadow: 0 12px 32px rgba(220, 53, 69, 0.4), 0 0 20px rgba(220, 53, 69, 0.2);
+}
+
+/* Animation des chiffres (compteur) */
+.small-box .inner h3 {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .small-box:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+/* Amélioration de la lisibilité */
+.small-box .inner h3,
+.small-box .inner p {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

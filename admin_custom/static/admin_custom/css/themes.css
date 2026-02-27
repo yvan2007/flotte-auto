@@ -1,0 +1,2469 @@
+/* Thème Crystal Glass (liquid-glass) - Turquoise moderne et élégant */
+[data-theme="liquid-glass"] {
+    --primary-color: #06B6D4;
+    --secondary-color: #22D3EE;
+    --accent-color: #67E8F9;
+    --bg-color: #F0FDFA;
+    --bg-secondary: #CCFBF1;
+    --text-color: #134E4A;
+    --text-secondary: #115E59;
+    --border-color: #99F6E4;
+    --hover-bg: #A5F3FC;
+    --dashboard-bg: #F0FDFA;
+    --card-bg: #FFFFFF;
+    --info-color: #06B6D4;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --shadow: rgba(6, 182, 212, 0.1);
+    --shadow-hover: rgba(6, 182, 212, 0.2);
+    --gradient-primary: linear-gradient(135deg, #ECFEFF, #06B6D4);
+    --gradient-secondary: linear-gradient(135deg, #22D3EE, #06B6D4);
+    --gradient-box: linear-gradient(135deg, #ECFEFF, #67E8F9);
+    --glass-effect: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(6, 182, 212, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.15);
+    --glass-inner-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+    --border-radius: 16px;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --btn-primary-bg: #06B6D4;
+    --btn-primary-hover: #0891B2;
+    --btn-secondary-bg: #CFFAFE;
+    --btn-secondary-hover: #A5F3FC;
+    --table-bg: #FFFFFF;
+    --table-header-bg: #CFFAFE;
+    --table-border: #99F6E4;
+    --table-row-hover: #ECFEFF;
+    --table-stripe: #F0FDFA;
+    --header-content: #FFFFFF;
+}
+
+/* Thème Nostalgie - Ambre vintage, papier ancien, chaleur rétro */
+[data-theme="nostalgie"] {
+    --primary-color: #B45309;
+    --secondary-color: #D97706;
+    --accent-color: #F59E0B;
+    --bg-color: #FFF7ED;
+    --bg-secondary: #FFEDD5;
+    --text-color: #431407;
+    --text-secondary: #9A3412;
+    --border-color: #FDBA74;
+    --hover-bg: #FFEDD5;
+    --dashboard-bg: #FFF7ED;
+    --card-bg: #FFFBEB;
+    --info-color: #0EA5E9;
+    --success-color: #059669;
+    --warning-color: #D97706;
+    --error-color: #DC2626;
+    --shadow: rgba(180, 83, 9, 0.12);
+    --shadow-hover: rgba(180, 83, 9, 0.22);
+    --gradient-primary: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #F59E0B 100%);
+    --gradient-secondary: linear-gradient(135deg, #FBBF24 0%, #D97706 50%, #B45309 100%);
+    --gradient-box: linear-gradient(135deg, #FFFBEB 0%, #FDE68A 50%, #F59E0B 100%);
+    --font-family: 'Georgia', 'Times New Roman', serif;
+    --header-content: #FFFFFF;
+    --border-radius: 8px;
+    --paper-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B45309' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Thème Océan - Bleu profond méditerranéen, vagues et lumière */
+[data-theme="ocean"] {
+    --primary-color: #0369A1;
+    --secondary-color: #0284C7;
+    --accent-color: #0EA5E9;
+    --bg-color: #EFF6FF;
+    --bg-secondary: #DBEAFE;
+    --text-color: #0C4A6E;
+    --text-secondary: #075985;
+    --border-color: #BAE6FD;
+    --hover-bg: #DBEAFE;
+    --dashboard-bg: #EFF6FF;
+    --card-bg: #FFFFFF;
+    --info-color: #0284C7;
+    --success-color: #0D9488;
+    --warning-color: #F59E0B;
+    --error-color: #DC2626;
+    --shadow: rgba(2, 132, 199, 0.12);
+    --shadow-hover: rgba(2, 132, 199, 0.2);
+    --gradient-primary: linear-gradient(135deg, #E0F2FE 0%, #7DD3FC 50%, #0284C7 100%);
+    --gradient-secondary: linear-gradient(135deg, #38BDF8 0%, #0284C7 50%, #0369A1 100%);
+    --gradient-box: linear-gradient(135deg, #EFF6FF 0%, #BAE6FD 50%, #0EA5E9 100%);
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
+    --header-content: #FFFFFF;
+    --border-radius: 10px;
+}
+
+/* Thème Sunset - Rose corail chaleureux et moderne */
+[data-theme="sunset"] {
+    --primary-color: #F43F5E;
+    --secondary-color: #FB7185;
+    --accent-color: #FDA4AF;
+    --bg-color: #FFF1F2;
+    --bg-secondary: #FFE4E6;
+    --text-color: #881337;
+    --text-secondary: #9F1239;
+    --border-color: #FECDD3;
+    --hover-bg: #FFE4E6;
+    --dashboard-bg: #FFF1F2;
+    --card-bg: #FFFFFF;
+    --info-color: #3B82F6;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --shadow: rgba(244, 63, 94, 0.15);
+    --shadow-hover: rgba(244, 63, 94, 0.25);
+    --gradient-primary: linear-gradient(135deg, #FFE4E6, #F43F5E);
+    --gradient-secondary: linear-gradient(135deg, #FB7185, #E11D48);
+    --gradient-box: linear-gradient(135deg, #FFE4E6, #FB7185);
+    --font-family: 'Inter', sans-serif;
+    --header-content: #FFFFFF;
+}
+
+/* Thème Forêt - Vert sauge, mousse et sous-bois naturel */
+[data-theme="forest"] {
+    --primary-color: #047857;
+    --secondary-color: #059669;
+    --accent-color: #10B981;
+    --bg-color: #F0FDF4;
+    --bg-secondary: #DCFCE7;
+    --text-color: #052E16;
+    --text-secondary: #065F46;
+    --border-color: #86EFAC;
+    --hover-bg: #DCFCE7;
+    --dashboard-bg: #F0FDF4;
+    --card-bg: #FFFFFF;
+    --info-color: #0D9488;
+    --success-color: #047857;
+    --warning-color: #CA8A04;
+    --error-color: #DC2626;
+    --shadow: rgba(4, 120, 87, 0.1);
+    --shadow-hover: rgba(4, 120, 87, 0.18);
+    --gradient-primary: linear-gradient(135deg, #ECFDF5 0%, #6EE7B7 50%, #059669 100%);
+    --gradient-secondary: linear-gradient(135deg, #34D399 0%, #059669 50%, #047857 100%);
+    --gradient-box: linear-gradient(135deg, #F0FDF4 0%, #86EFAC 50%, #10B981 100%);
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
+    --header-content: #FFFFFF;
+    --border-radius: 10px;
+}
+
+/* Thème Sombre (Dark) - Néon vibrant sur fond sombre */
+[data-theme="dark"] {
+    --primary-color: #A78BFA;
+    --secondary-color: #C4B5FD;
+    --accent-color: #DDD6FE;
+    --bg-color: #0A0A0F;
+    --bg-secondary: #18181B;
+    --text-color: #FAFAFA;
+    --text-secondary: #D4D4D8;
+    --border-color: #27272A;
+    --hover-bg: #18181B;
+    --dashboard-bg: #0A0A0F;
+    --card-bg: #18181B;
+    --info-color: #60A5FA;
+    --success-color: #34D399;
+    --warning-color: #FBBF24;
+    --error-color: #F87171;
+    --shadow: rgba(0, 0, 0, 0.6);
+    --shadow-hover: rgba(167, 139, 250, 0.4);
+    --gradient-primary: linear-gradient(135deg, #7C3AED, #A78BFA);
+    --gradient-secondary: linear-gradient(135deg, #8B5CF6, #6366F1);
+    --gradient-box: linear-gradient(135deg, #18181B, #27272A);
+    --font-family: 'Inter', sans-serif;
+    --header-content: #FFFFFF;
+    
+    /* Couleurs néon pour cartes multicolores */
+    --card-color-1: #A78BFA;
+    --card-color-2: #60A5FA;
+    --card-color-3: #34D399;
+    --card-color-4: #FBBF24;
+    --card-bg-1: linear-gradient(135deg, #7C3AED, #A78BFA);
+    --card-bg-2: linear-gradient(135deg, #2563EB, #60A5FA);
+    --card-bg-3: linear-gradient(135deg, #059669, #34D399);
+    --card-bg-4: linear-gradient(135deg, #D97706, #FBBF24);
+}
+
+/* Thème Black - Noir profond avec accents cyan électriques */
+[data-theme="black"] {
+    --primary-color: #06B6D4;
+    --secondary-color: #22D3EE;
+    --accent-color: #67E8F9;
+    --bg-color: #000000;
+    --bg-secondary: #0A0A0A;
+    --text-color: #F0F9FF;
+    --text-secondary: #BAE6FD;
+    --border-color: #164E63;
+    --hover-bg: #0A0A0A;
+    --dashboard-bg: #000000;
+    --card-bg: #0A0A0A;
+    --info-color: #06B6D4;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --shadow: rgba(0, 0, 0, 0.8);
+    --shadow-hover: rgba(6, 182, 212, 0.4);
+    --gradient-primary: linear-gradient(135deg, #000000, #06B6D4);
+    --gradient-secondary: linear-gradient(135deg, #22D3EE, #0891B2);
+    --gradient-box: linear-gradient(135deg, #0A0A0A, #164E63);
+    --font-family: 'Inter', sans-serif;
+    --header-content: #FFFFFF;
+}
+
+/* Navigation Dark - Style moderne sombre */
+[data-theme="dark"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="dark"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(96, 165, 250, 0.3) 50%, 
+        transparent 100%);
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link span,
+[data-theme="dark"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link:hover span,
+[data-theme="dark"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+[data-theme="dark"] .custom-admin-nav .nav-link.active span,
+[data-theme="dark"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 600;
+}
+
+/* Thème Par Défaut - Neutre, corporate, passe-partout */
+[data-theme="default"] {
+    --primary-color: #6366F1;
+    --secondary-color: #818CF8;
+    --accent-color: #A5B4FC;
+    /* Fonds neutres et doux - confortables pour les yeux */
+    --bg-color: #F1F3F4;
+    --bg-secondary: #E8EAED;
+    --text-color: #202124;
+    --text-secondary: #5F6368;
+    --border-color: #DADCE0;
+    --hover-bg: #E8EAED;
+    --dashboard-bg: #F1F3F4;
+    --card-bg: #FFFFFF;
+    --info-color: #3B82F6;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --shadow: rgba(0, 0, 0, 0.06);
+    --shadow-hover: rgba(0, 0, 0, 0.1);
+    --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
+    --gradient-secondary: linear-gradient(135deg, #818CF8, #4F46E5);
+    --gradient-box: linear-gradient(135deg, #EEF2FF, #818CF8);
+    --font-family: 'Inter', sans-serif;
+    --header-content: #FFFFFF;
+    
+    /* Couleurs pour cartes multicolores */
+    --card-color-1: #6366F1;
+    --card-color-2: #8B5CF6;
+    --card-color-3: #EC4899;
+    --card-color-4: #F59E0B;
+    --card-bg-1: linear-gradient(135deg, #6366F1, #8B5CF6);
+    --card-bg-2: linear-gradient(135deg, #8B5CF6, #EC4899);
+    --card-bg-3: linear-gradient(135deg, #EC4899, #F43F5E);
+    --card-bg-4: linear-gradient(135deg, #F59E0B, #EF4444);
+}
+
+[data-theme="default"] #header {
+    background: var(--gradient-box) !important;
+}
+
+/* Navigation Default - Style classique */
+[data-theme="default"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="default"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(59, 130, 246, 0.2) 50%, 
+        transparent 100%);
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link span,
+[data-theme="default"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 2px 6px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link:hover span,
+[data-theme="default"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+[data-theme="default"] .custom-admin-nav .nav-link.active span,
+[data-theme="default"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 600;
+}
+
+/* Application globale des variables - Thème par défaut propre */
+body {
+    background-color: var(--bg-color, #f4f6f9);
+    color: var(--text-color, #212529);
+    font-family: var(--font-family, 'Inter', sans-serif);
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Contraste texte global pour thèmes (dark, black, sunset, forest, ocean, nostalgie) */
+[data-theme="dark"] body,
+[data-theme="black"] body,
+[data-theme="sunset"] body,
+[data-theme="forest"] body,
+[data-theme="ocean"] body,
+[data-theme="nostalgie"] body {
+    color: var(--text-color);
+}
+
+/* Titres principaux : toujours bien contrastés */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4,
+[data-theme="black"] h1, 
+[data-theme="black"] h2, 
+[data-theme="black"] h3, 
+[data-theme="black"] h4,
+[data-theme="sunset"] h1, 
+[data-theme="sunset"] h2, 
+[data-theme="sunset"] h3, 
+[data-theme="sunset"] h4,
+[data-theme="forest"] h1, 
+[data-theme="forest"] h2, 
+[data-theme="forest"] h3, 
+[data-theme="forest"] h4,
+[data-theme="ocean"] h1,
+[data-theme="ocean"] h2,
+[data-theme="ocean"] h3,
+[data-theme="ocean"] h4,
+[data-theme="nostalgie"] h1,
+[data-theme="nostalgie"] h2,
+[data-theme="nostalgie"] h3,
+[data-theme="nostalgie"] h4 {
+    color: var(--text-color);
+}
+
+/* Conteneur principal - fond selon thème */
+#container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+[data-theme] #container {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Thème Crystal Glass (liquid-glass) - Fond lumineux, effet verre léger */
+[data-theme="liquid-glass"] body {
+    background: linear-gradient(135deg, #E3FDFD 0%, #F8FEFF 50%, #CBE7E8 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+}
+
+[data-theme="liquid-glass"] body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(137, 210, 220, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(227, 253, 253, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="liquid-glass"] #container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Optimisation des performances - SUPPRIMER le blur sur les lignes de tableau */
+/* Le blur sur chaque ligne cause des lags avec beaucoup d'éléments */
+[data-theme="liquid-glass"] table tbody tr,
+[data-theme="liquid-glass"] .dataTables_wrapper tbody tr {
+    /* Pas de backdrop-filter sur les lignes pour éviter les lags */
+    background: transparent;
+    /* Accélération GPU pour meilleures performances */
+    will-change: background-color;
+    transform: translateZ(0);
+}
+
+[data-theme="liquid-glass"] .card,
+[data-theme="liquid-glass"] .module {
+    background: var(--glass-effect);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 
+        var(--glass-shadow),
+        var(--glass-inner-shadow);
+    border-radius: var(--border-radius);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    isolation: isolate;
+    contain: layout style paint;
+    will-change: transform;
+    transform: translateZ(0);
+    color: var(--text-color);
+}
+
+[data-theme="liquid-glass"] .card-body,
+[data-theme="liquid-glass"] .module .content {
+    color: var(--text-color);
+}
+
+[data-theme="liquid-glass"] .card-body p,
+[data-theme="liquid-glass"] .card-body span,
+[data-theme="liquid-glass"] .card-body div,
+[data-theme="liquid-glass"] .card-body label {
+    color: var(--text-color);
+}
+
+[data-theme="liquid-glass"] .card::before,
+[data-theme="liquid-glass"] .module::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        transparent 100%);
+    pointer-events: none;
+}
+
+[data-theme="liquid-glass"] .card:hover,
+[data-theme="liquid-glass"] .module:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(137, 210, 220, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+[data-theme="liquid-glass"] .card-header,
+[data-theme="liquid-glass"] .module h2 {
+    background: rgba(137, 210, 220, 0.35);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    color: var(--text-color);
+}
+
+[data-theme="liquid-glass"] .card-header::after,
+[data-theme="liquid-glass"] .module h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+}
+
+[data-theme="liquid-glass"] .btn-primary,
+[data-theme="liquid-glass"] .btn-success,
+[data-theme="liquid-glass"] .btn-info,
+[data-theme="liquid-glass"] .btn-warning,
+[data-theme="liquid-glass"] .btn-danger {
+    background: var(--gradient-box);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(137, 210, 220, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-theme="liquid-glass"] .btn-primary::before,
+[data-theme="liquid-glass"] .btn-success::before,
+[data-theme="liquid-glass"] .btn-info::before,
+[data-theme="liquid-glass"] .btn-warning::before,
+[data-theme="liquid-glass"] .btn-danger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
+}
+
+[data-theme="liquid-glass"] .btn-primary:hover::before,
+[data-theme="liquid-glass"] .btn-success:hover::before,
+[data-theme="liquid-glass"] .btn-info:hover::before,
+[data-theme="liquid-glass"] .btn-warning:hover::before,
+[data-theme="liquid-glass"] .btn-danger:hover::before {
+    left: 100%;
+}
+
+[data-theme="liquid-glass"] .btn-primary:hover,
+[data-theme="liquid-glass"] .btn-success:hover,
+[data-theme="liquid-glass"] .btn-info:hover,
+[data-theme="liquid-glass"] .btn-warning:hover,
+[data-theme="liquid-glass"] .btn-danger:hover {
+    background: var(--btn-primary-hover);
+    box-shadow: 0 6px 20px rgba(137, 210, 220, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+}
+
+[data-theme="liquid-glass"] table,
+[data-theme="liquid-glass"] .dataTables_wrapper {
+    background: var(--table-bg);
+    /* Réduire le blur sur le conteneur de tableau pour meilleures performances */
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    border: 1px solid var(--table-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 
+        var(--glass-shadow),
+        var(--glass-inner-shadow);
+    /* Optimisations de performance */
+    contain: layout style paint;
+    will-change: contents;
+}
+
+/* DataTables - Crystal Glass (texte sombre sur fond clair) */
+[data-theme="liquid-glass"] .dataTables_wrapper table tbody td {
+    color: var(--text-color) !important;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="liquid-glass"] .dataTables_wrapper table tbody td * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] .dataTables_wrapper table thead th {
+    color: var(--text-color) !important;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] .dataTables_wrapper table thead th * {
+    color: var(--text-color) !important;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] table thead th {
+    background: var(--table-header-bg);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    color: var(--text-color) !important;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] table thead th a,
+[data-theme="liquid-glass"] table thead th span,
+[data-theme="liquid-glass"] table thead th * {
+    color: var(--text-color) !important;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] table thead th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+}
+
+[data-theme="liquid-glass"] table tbody tr {
+    background: transparent;
+    border-bottom: 1px solid var(--table-border);
+    /* Transition simplifiée pour meilleures performances avec beaucoup d'éléments */
+    transition: background-color 0.2s ease;
+    /* Accélération GPU pour éviter les lags */
+    will-change: background-color;
+    transform: translateZ(0);
+    /* Isolation pour éviter les recalculs inutiles */
+    contain: layout style;
+}
+
+[data-theme="liquid-glass"] table tbody td {
+    color: var(--text-color) !important;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="liquid-glass"] table tbody td a {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+[data-theme="liquid-glass"] table tbody td a:hover {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] table tbody tr:nth-child(even) {
+    background: rgba(227, 253, 253, 0.25);
+}
+
+[data-theme="liquid-glass"] table tbody tr:nth-child(even) td {
+    background: rgba(227, 253, 253, 0.25) !important;
+}
+
+[data-theme="liquid-glass"] table tbody tr:hover {
+    background: rgba(203, 231, 232, 0.4);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="liquid-glass"] table tbody tr:hover td {
+    background: rgba(203, 231, 232, 0.4) !important;
+}
+
+[data-theme="liquid-glass"] table tbody td * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] table tbody td span,
+[data-theme="liquid-glass"] table tbody td div,
+[data-theme="liquid-glass"] table tbody td p,
+[data-theme="liquid-glass"] table tbody td strong,
+[data-theme="liquid-glass"] table tbody td em {
+    color: var(--text-color) !important;
+    font-weight: 500;
+}
+
+[data-theme="liquid-glass"] table tbody td label {
+    color: var(--text-color) !important;
+    font-weight: 600;
+}
+
+[data-theme="liquid-glass"] table tbody td input,
+[data-theme="liquid-glass"] table tbody td select,
+[data-theme="liquid-glass"] table tbody td textarea {
+    background: rgba(255, 255, 255, 0.7) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--glass-border);
+}
+
+[data-theme="liquid-glass"] table tbody td input::placeholder,
+[data-theme="liquid-glass"] table tbody td textarea::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="liquid-glass"] .form-control,
+[data-theme="liquid-glass"] select,
+[data-theme="liquid-glass"] input,
+[data-theme="liquid-glass"] textarea {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-color);
+    font-weight: 400;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+[data-theme="liquid-glass"] .form-control::placeholder,
+[data-theme="liquid-glass"] input::placeholder,
+[data-theme="liquid-glass"] textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+[data-theme="liquid-glass"] .form-control:focus,
+[data-theme="liquid-glass"] select:focus,
+[data-theme="liquid-glass"] input:focus,
+[data-theme="liquid-glass"] textarea:focus {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(137, 210, 220, 0.25);
+    outline: none;
+}
+
+[data-theme="liquid-glass"] .small-box {
+    background: var(--gradient-box) !important;
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    isolation: isolate;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-inner-shadow);
+    color: var(--text-color);
+    position: relative;
+    overflow: hidden;
+    /* Transition optimisée pour meilleures performances */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Optimisations de performance */
+    will-change: transform;
+    contain: layout style paint;
+}
+
+[data-theme="liquid-glass"] .small-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+[data-theme="liquid-glass"] .small-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(137, 210, 220, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+}
+
+/* Navigation Crystal Glass */
+[data-theme="liquid-glass"] .custom-admin-nav {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px rgba(137, 210, 220, 0.2);
+    position: relative;
+    overflow: visible;
+    isolation: isolate;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        transparent 100%);
+    pointer-events: none;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 2px 8px rgba(137, 210, 220, 0.15);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    color: var(--text-color) !important;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
+    z-index: 0;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link span,
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link i {
+    position: relative;
+    z-index: 1;
+    color: var(--text-color) !important;
+    font-weight: 600;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link:hover {
+    background: rgba(203, 231, 232, 0.7);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(137, 210, 220, 0.25);
+    transform: translateY(-2px);
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link:hover span,
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link:hover i {
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link:hover::before {
+    left: 100%;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link:hover::after {
+    opacity: 1;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-box);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(137, 210, 220, 0.35);
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link.active span,
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link.active i {
+    color: var(--text-color) !important;
+    font-weight: 700;
+}
+
+[data-theme="liquid-glass"] .custom-admin-nav .nav-link.active::after {
+    opacity: 1;
+}
+
+/* Thème Nostalgie - Texture papier */
+[data-theme="nostalgie"] body {
+    background: var(--bg-color);
+    background-image: var(--paper-texture);
+}
+
+[data-theme="nostalgie"] .card,
+[data-theme="nostalgie"] .module {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    position: relative;
+    border-radius: var(--border-radius, 8px);
+}
+
+[data-theme="nostalgie"] .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+}
+
+/* Navigation Nostalgie - Style rétro */
+[data-theme="nostalgie"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: 0 4px 12px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="nostalgie"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(180, 83, 9, 0.15) 50%, 
+        transparent 100%);
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 4px var(--shadow);
+    font-weight: 600;
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link span,
+[data-theme="nostalgie"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 4px 8px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link:hover span,
+[data-theme="nostalgie"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+[data-theme="nostalgie"] .custom-admin-nav .nav-link.active span,
+[data-theme="nostalgie"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 700;
+}
+
+/* Thème Océan - Fond lumineux avec reflets */
+[data-theme="ocean"] body {
+    background: var(--bg-color);
+    background-image: 
+        linear-gradient(135deg, rgba(2, 132, 199, 0.04) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(14, 165, 233, 0.06) 0%, transparent 50%);
+}
+
+/* Thème Sunset - Fond chaud (palette Sunset) */
+[data-theme="sunset"] body {
+    background: var(--bg-color);
+    background-image: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FFF7ED 100%);
+}
+
+/* Thème Forêt - Fond nature doux */
+[data-theme="forest"] body {
+    background: var(--bg-color);
+    background-image: 
+        linear-gradient(135deg, rgba(4, 120, 87, 0.05) 0%, transparent 50%),
+        linear-gradient(225deg, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+}
+
+/* Thème Dark - Fond sombre (palette Sombre) */
+[data-theme="dark"] body {
+    background: var(--bg-color);
+    background-image: radial-gradient(ellipse at top, #374151 0%, #1F2937 50%, #111827 100%);
+}
+
+/* Thème Default - Fond clair (palette Par Défaut) */
+/* Thème Black - Fond ultra sombre */
+[data-theme="black"] body {
+    background: var(--bg-color);
+    background-image: radial-gradient(ellipse at top, #111827 0%, #000000 100%);
+}
+
+[data-theme="ocean"] .card,
+[data-theme="ocean"] .module {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    border-radius: var(--border-radius, 8px);
+}
+
+/* Navigation Océan - Style frais */
+[data-theme="ocean"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="ocean"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(2, 132, 199, 0.18) 50%, 
+        transparent 100%);
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link span,
+[data-theme="ocean"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link:hover span,
+[data-theme="ocean"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link.active span,
+[data-theme="ocean"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 600;
+}
+
+[data-theme="ocean"] .custom-admin-nav .nav-link.active {
+    box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+/* Thème Sunset - Dégradés chaleureux */
+[data-theme="sunset"] .card-header,
+[data-theme="sunset"] .module h2 {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+[data-theme="sunset"] .small-box {
+    background: var(--gradient-primary) !important;
+}
+
+/* Navigation Sunset - Style chaleureux */
+[data-theme="sunset"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="sunset"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(249, 115, 22, 0.2) 50%, 
+        transparent 100%);
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link span,
+[data-theme="sunset"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link:hover span,
+[data-theme="sunset"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link:hover {
+    box-shadow: 0 4px 12px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link.active span,
+[data-theme="sunset"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 600;
+}
+
+[data-theme="sunset"] .custom-admin-nav .nav-link.active {
+    box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+/* Thème Forêt - Nature raffinée */
+[data-theme="forest"] .card,
+[data-theme="forest"] .module {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    border-radius: var(--border-radius, 10px);
+}
+
+/* Navigation Forêt - Style nature */
+[data-theme="forest"] .custom-admin-nav {
+    background: var(--bg-secondary);
+    border-bottom: 3px solid var(--primary-color);
+    box-shadow: 0 4px 16px var(--shadow);
+    padding: 12px 20px;
+}
+
+[data-theme="forest"] .custom-admin-nav::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(4, 120, 87, 0.18) 50%, 
+        transparent 100%);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link span,
+[data-theme="forest"] .custom-admin-nav .nav-link i {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link:hover span,
+[data-theme="forest"] .custom-admin-nav .nav-link:hover i {
+    color: var(--primary-color);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link:hover {
+    box-shadow: 0 4px 12px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+[data-theme="forest"] .custom-admin-nav .nav-link.active span,
+[data-theme="forest"] .custom-admin-nav .nav-link.active i {
+    color: white;
+    font-weight: 600;
+}
+
+/* Application des couleurs - Header (tous thèmes, priorité sur modern_admin) */
+[data-theme] #header {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    border-bottom: 2px solid var(--accent-color) !important;
+    box-shadow: 0 2px 8px var(--shadow) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme] #header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+    pointer-events: none;
+}
+
+[data-theme] #header a,
+[data-theme] #header #user-tools,
+[data-theme] #header #branding,
+[data-theme] #header .admin-title,
+[data-theme] #header .brand-link {
+    color: var(--header-content, #FFFFFF) !important;
+}
+
+[data-theme] #header a:hover {
+    color: var(--header-content, #FFFFFF) !important;
+    opacity: 0.9;
+}
+
+/* Header Crystal Glass */
+[data-theme="liquid-glass"] #header {
+    background: var(--gradient-box) !important;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px rgba(137, 210, 220, 0.25);
+}
+
+[data-theme="liquid-glass"] #header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+    pointer-events: none;
+}
+
+[data-theme="liquid-glass"] #header a {
+    color: var(--text-color) !important;
+}
+
+[data-theme="liquid-glass"] .brand-link {
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+[data-theme="liquid-glass"] .brand-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+}
+
+.card,
+.module {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.3s ease;
+    border-radius: var(--border-radius, 8px);
+}
+
+.card:hover,
+.module:hover {
+    box-shadow: 0 8px 24px var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.card-header,
+.module h2 {
+    background: var(--gradient-primary);
+    color: white;
+    border-bottom: 2px solid var(--accent-color);
+    font-weight: 600;
+}
+
+.small-box {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    color: white;
+    border-radius: var(--border-radius, 8px);
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.small-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px var(--shadow-hover);
+}
+
+.form-control,
+select,
+input {
+    border-color: var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: var(--border-radius, 6px);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+select:focus,
+input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+    outline: none;
+}
+
+/* Boutons avec support de thème dynamique */
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger,
+.btn-secondary {
+    background: var(--gradient-primary, var(--btn-primary-bg, #417690));
+    border: none;
+    color: white;
+    border-radius: var(--border-radius, 6px);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.1));
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-info:hover,
+.btn-warning:hover,
+.btn-danger:hover {
+    background: var(--gradient-secondary, var(--btn-primary-hover, #79aec8));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-hover, rgba(0, 0, 0, 0.2));
+}
+
+.btn-secondary {
+    background: var(--btn-secondary-bg, var(--bg-secondary, #f8f9fa));
+    color: var(--text-color, #333);
+}
+
+.btn-secondary:hover {
+    background: var(--btn-secondary-hover, var(--hover-bg, #f5f5f5));
+}
+
+/* Boutons dans les thèmes sombres : texte clair pour le contraste */
+[data-theme="dark"] .btn,
+[data-theme="dark"] button[type="submit"],
+[data-theme="dark"] input[type="submit"],
+[data-theme="dark"] .btn-secondary,
+[data-theme="black"] .btn,
+[data-theme="black"] button[type="submit"],
+[data-theme="black"] input[type="submit"],
+[data-theme="black"] .btn-secondary,
+[data-theme="sunset"] .btn,
+[data-theme="sunset"] button[type="submit"],
+[data-theme="sunset"] input[type="submit"],
+[data-theme="sunset"] .btn-secondary,
+[data-theme="forest"] .btn,
+[data-theme="forest"] button[type="submit"],
+[data-theme="forest"] input[type="submit"],
+[data-theme="forest"] .btn-secondary,
+[data-theme="ocean"] .btn,
+[data-theme="ocean"] button[type="submit"],
+[data-theme="ocean"] input[type="submit"],
+[data-theme="ocean"] .btn-secondary {
+    color: var(--text-color);
+}
+
+/* Grilles et tables avec support de thème */
+table,
+.dataTables_wrapper {
+    background: var(--table-bg, var(--card-bg, white));
+    border: 1px solid var(--table-border, var(--border-color, #ddd));
+    border-radius: var(--border-radius, 8px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+table thead th {
+    background: var(--table-header-bg, var(--gradient-primary, #417690));
+    color: white;
+    border-bottom: 2px solid var(--table-border, var(--accent-color, #5b80d2));
+    padding: 12px;
+    font-weight: 600;
+}
+
+table tbody tr {
+    background: transparent;
+    border-bottom: 1px solid var(--table-border, var(--border-color, #ddd));
+    transition: all 0.2s ease;
+}
+
+table tbody tr:nth-child(even) {
+    background: var(--table-stripe, var(--bg-secondary, #f8f9fa));
+}
+
+table tbody tr:hover {
+    background: var(--table-row-hover, var(--hover-bg, #f5f5f5));
+    transform: scale(1.01);
+}
+
+/* Couleur de texte des cellules en fonction du thème */
+table tbody td {
+    padding: 12px;
+    color: var(--text-color, #333);
+    font-weight: 400;
+}
+
+/* Forcer un bon contraste pour les thèmes sur les cellules génériques */
+[data-theme="dark"] table tbody td,
+[data-theme="black"] table tbody td,
+[data-theme="sunset"] table tbody td,
+[data-theme="forest"] table tbody td,
+[data-theme="ocean"] table tbody td,
+[data-theme="nostalgie"] table tbody td {
+    color: var(--text-color);
+}
+
+/* Amélioration de la lisibilité du texte */
+.card,
+.module {
+    color: var(--text-color);
+}
+
+.card-body,
+.module .content {
+    color: var(--text-color);
+}
+
+/* Cartes et contenus dans les thèmes sombres : utiliser la couleur de texte du thème */
+[data-theme="dark"] .card,
+[data-theme="dark"] .module,
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .module .content,
+[data-theme="black"] .card,
+[data-theme="black"] .module,
+[data-theme="black"] .card-body,
+[data-theme="black"] .module .content,
+[data-theme="sunset"] .card,
+[data-theme="sunset"] .module,
+[data-theme="sunset"] .card-body,
+[data-theme="sunset"] .module .content,
+[data-theme="forest"] .card,
+[data-theme="forest"] .module,
+[data-theme="forest"] .card-body,
+[data-theme="forest"] .module .content,
+[data-theme="ocean"] .card,
+[data-theme="ocean"] .module,
+[data-theme="ocean"] .card-body,
+[data-theme="ocean"] .module .content,
+[data-theme="nostalgie"] .card,
+[data-theme="nostalgie"] .module,
+[data-theme="nostalgie"] .card-body,
+[data-theme="nostalgie"] .module .content {
+    color: var(--text-color);
+}
+
+/* Textes dans les formulaires - meilleur contraste */
+.form-control,
+select,
+input,
+textarea {
+    color: var(--text-color);
+    font-weight: 400;
+}
+
+/* Labels bien visibles */
+label {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Liens bien visibles */
+a {
+    color: var(--primary-color);
+}
+
+a:hover {
+    color: var(--accent-color);
+}
+
+/* Textes dans les tableaux - contraste amélioré */
+table tbody td a {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+table tbody td a:hover {
+    color: var(--accent-color);
+}
+
+/* Navigation personnalisée - Améliorée avec liquid glass */
+.custom-admin-nav {
+    background: var(--bg-secondary);
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 4px var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-admin-nav::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%);
+    pointer-events: none;
+}
+
+.custom-admin-nav .nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: var(--border-radius, 6px);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.custom-admin-nav .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--hover-bg);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.custom-admin-nav .nav-link span,
+.custom-admin-nav .nav-link i {
+    position: relative;
+    z-index: 1;
+    color: inherit;
+    font-weight: inherit;
+}
+
+.custom-admin-nav .nav-link:hover {
+    background: var(--hover-bg);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.custom-admin-nav .nav-link:hover::before {
+    opacity: 1;
+}
+
+/* Style général pour le lien actif - utilise les variables CSS */
+.custom-admin-nav .nav-link.active {
+    background: var(--gradient-primary, var(--primary-color));
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px var(--shadow-hover, var(--shadow));
+    font-weight: 600;
+}
+
+/* Content wrapper - fond et texte selon thème */
+.content-wrapper {
+    background: var(--dashboard-bg) !important;
+    color: var(--text-color) !important;
+    min-height: calc(100vh - 200px);
+}
+
+[data-theme] .content-wrapper,
+[data-theme] .content-wrapper .content,
+[data-theme] .content-wrapper .content-header,
+[data-theme] .content-wrapper .container-fluid,
+[data-theme] .content-wrapper .row {
+    background: var(--dashboard-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .content-wrapper h1,
+[data-theme] .content-wrapper h2,
+[data-theme] .content-wrapper h3,
+[data-theme] .content-wrapper h4,
+[data-theme] .content-wrapper .m-0,
+[data-theme] .content-wrapper p,
+[data-theme] .content-wrapper span,
+[data-theme] .content-wrapper label {
+    color: var(--text-color) !important;
+}
+
+[data-theme] .content-wrapper a {
+    color: var(--primary-color) !important;
+}
+
+[data-theme] .content-wrapper a:hover {
+    color: var(--accent-color) !important;
+}
+
+.content {
+    padding: 20px;
+}
+
+/* ============================================
+   APPLICATION THÈME - TOUTES LES SECTIONS VISIBLES
+   (style daisyUI : base = fond, base-content = texte)
+   ============================================ */
+
+/* Zone principale #content */
+[data-theme] #content {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] #content h1,
+[data-theme] #content h2,
+[data-theme] #content h3,
+[data-theme] #content h4,
+[data-theme] #content p,
+[data-theme] #content span,
+[data-theme] #content label,
+[data-theme] #content td,
+[data-theme] #content th {
+    color: var(--text-color) !important;
+}
+
+[data-theme] #content a {
+    color: var(--primary-color) !important;
+}
+
+[data-theme] #content-main {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* Breadcrumbs (fil d'Ariane) */
+[data-theme] .breadcrumbs {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 1px 3px var(--shadow) !important;
+}
+
+[data-theme] .breadcrumbs a {
+    color: var(--primary-color) !important;
+}
+
+[data-theme] .breadcrumbs a:hover {
+    color: var(--accent-color) !important;
+}
+
+/* AdminLTE content-header / breadcrumb */
+[data-theme] .content-header,
+[data-theme] section.content-header {
+    background: transparent !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .content-header h1,
+[data-theme] .content-header .m-0,
+[data-theme] .breadcrumb-item,
+[data-theme] .breadcrumb-item a {
+    color: var(--text-color) !important;
+}
+
+[data-theme] .breadcrumb-item.active {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme] .breadcrumb-item a:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Filtres changelist */
+[data-theme] #changelist-filter {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme] #changelist-filter h3 {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    color: var(--header-content, #FFFFFF) !important;
+}
+
+[data-theme] #changelist-filter a,
+[data-theme] #changelist-filter li {
+    color: var(--text-color) !important;
+}
+
+[data-theme] #changelist-filter a:hover {
+    background: var(--hover-bg) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Recherche changelist */
+[data-theme] #changelist-search {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme] #changelist-search input {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Tableaux .results / #result_list */
+[data-theme] .results,
+[data-theme] #result_list {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme] .results thead th,
+[data-theme] #result_list thead th {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    color: var(--header-content, #FFFFFF) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .results tbody td,
+[data-theme] .results tbody tr,
+[data-theme] #result_list tbody td {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .results tbody tr:hover,
+[data-theme] #result_list tbody tr:hover {
+    background: var(--hover-bg) !important;
+}
+
+/* Object tools (boutons d'action au-dessus des listes) */
+[data-theme] .object-tools a {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    color: var(--header-content, #FFFFFF) !important;
+    border-color: var(--accent-color) !important;
+}
+
+[data-theme] .object-tools a:hover {
+    background: var(--gradient-secondary) !important;
+    color: var(--header-content, #FFFFFF) !important;
+}
+
+/* Theme switcher (bouton Thèmes) */
+[data-theme] .theme-switcher,
+[data-theme] #theme-switcher {
+    --theme-switcher-bg: var(--card-bg);
+    --theme-switcher-border: var(--border-color);
+}
+
+[data-theme] .theme-toggle-btn {
+    background: transparent !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+}
+
+[data-theme] .theme-toggle-btn:hover {
+    border-color: var(--primary-color) !important;
+}
+
+[data-theme] .theme-menu {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 8px 24px var(--shadow-hover) !important;
+}
+
+[data-theme] .theme-menu-header {
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme] .theme-option {
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .theme-option:hover {
+    background: var(--hover-bg) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Small-box dans le dashboard (stats) - texte lisible sur gradient */
+[data-theme] .content-wrapper .small-box .inner,
+[data-theme] .content-wrapper .small-box .inner h3,
+[data-theme] .content-wrapper .small-box .inner p,
+[data-theme] .content-wrapper .small-box .small-box-footer {
+    color: var(--header-content, #FFFFFF) !important;
+}
+
+[data-theme="liquid-glass"] .content-wrapper .small-box .inner,
+[data-theme="liquid-glass"] .content-wrapper .small-box .inner h3,
+[data-theme="liquid-glass"] .content-wrapper .small-box .inner p {
+    color: var(--text-color) !important;
+}
+
+/* Cartes et modules dans content */
+[data-theme] .content-wrapper .card,
+[data-theme] .content-wrapper .card-body,
+[data-theme] .content-wrapper .module {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .content-wrapper .card-header {
+    background: var(--gradient-box, var(--gradient-primary)) !important;
+    color: var(--header-content, #FFFFFF) !important;
+    border-color: var(--accent-color) !important;
+}
+
+/* Footer et messages */
+[data-theme] #footer {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+[data-theme] .messagelist li {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme] .messagelist li.success {
+    border-left-color: var(--success-color) !important;
+}
+
+[data-theme] .messagelist li.error {
+    border-left-color: var(--error-color) !important;
+}
+
+[data-theme] .messagelist li.info {
+    border-left-color: var(--info-color) !important;
+}
+
+/* ============================================
+   AMÉLIORATIONS GLOBALES POUR TOUS LES THÈMES
+   ============================================ */
+
+/* Boutons - Support dynamique de thème */
+.btn,
+button[type="submit"],
+input[type="submit"],
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger,
+.btn-secondary {
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.1));
+}
+
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger {
+    background: var(--gradient-primary, #417690);
+    border: none;
+    color: white;
+    border-radius: var(--border-radius, 6px);
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-info:hover,
+.btn-warning:hover,
+.btn-danger:hover {
+    background: var(--gradient-secondary, #79aec8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-hover, rgba(0, 0, 0, 0.2));
+}
+
+.btn-secondary {
+    background: var(--btn-secondary-bg, var(--bg-secondary, #f8f9fa));
+    color: var(--text-color, #333);
+    border: 1px solid var(--border-color, #ddd);
+}
+
+.btn-secondary:hover {
+    background: var(--btn-secondary-hover, var(--hover-bg, #f5f5f5));
+}
+
+/* Grilles DataTables - Support dynamique de thème */
+.dataTables_wrapper {
+    background: var(--table-bg, var(--card-bg, white));
+    border: 1px solid var(--table-border, var(--border-color, #ddd));
+    border-radius: var(--border-radius, 8px);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    background: var(--card-bg, white);
+    border: 1px solid var(--border-color, #ddd);
+    color: var(--text-color, #333);
+    border-radius: var(--border-radius, 6px);
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: var(--primary-color, #417690);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 65, 118, 144), 0.1);
+    outline: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: var(--card-bg, white);
+    border: 1px solid var(--border-color, #ddd);
+    color: var(--text-color, #333) !important;
+    border-radius: var(--border-radius, 6px);
+    transition: all 0.3s ease;
+    margin: 0 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--hover-bg, #f5f5f5);
+    border-color: var(--primary-color, #417690);
+    color: var(--primary-color, #417690) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--gradient-primary, #417690) !important;
+    border-color: var(--primary-color, #417690);
+    color: white !important;
+}
+
+/* Liens */
+a {
+    color: var(--primary-color, #417690);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--accent-color, #5b80d2);
+}
+
+/* Badges et labels */
+.badge,
+.label {
+    background: var(--gradient-primary, #417690);
+    color: white;
+    border-radius: var(--border-radius, 6px);
+    padding: 4px 8px;
+    font-weight: 600;
+}
+
+/* ============================================
+   MÊME LOGIQUE QUE LIQUID-GLASS POUR TOUS LES AUTRES THÈMES
+   Règles explicites par thème pour forcer les couleurs partout
+   ============================================ */
+[data-theme="nostalgie"] body,
+[data-theme="ocean"] body,
+[data-theme="sunset"] body,
+[data-theme="forest"] body,
+[data-theme="dark"] body,
+[data-theme="black"] body {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    min-height: 100vh;
+}
+
+[data-theme="default"] body {
+    background: #F1F3F4 !important;
+}
+
+[data-theme="nostalgie"] #container,
+[data-theme="ocean"] #container,
+[data-theme="sunset"] #container,
+[data-theme="forest"] #container,
+[data-theme="dark"] #container,
+[data-theme="default"] #container,
+[data-theme="black"] #container {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] #header,
+[data-theme="ocean"] #header,
+[data-theme="sunset"] #header,
+[data-theme="forest"] #header,
+[data-theme="dark"] #header,
+[data-theme="default"] #header,
+[data-theme="black"] #header {
+    background: var(--gradient-box) !important;
+    border-bottom: 2px solid var(--accent-color) !important;
+    box-shadow: 0 2px 8px var(--shadow) !important;
+}
+
+[data-theme="nostalgie"] #header a,
+[data-theme="nostalgie"] #header #user-tools,
+[data-theme="nostalgie"] #header #branding,
+[data-theme="nostalgie"] #header .admin-title,
+[data-theme="ocean"] #header a,
+[data-theme="ocean"] #header #user-tools,
+[data-theme="ocean"] #header #branding,
+[data-theme="ocean"] #header .admin-title,
+[data-theme="sunset"] #header a,
+[data-theme="sunset"] #header #user-tools,
+[data-theme="sunset"] #header #branding,
+[data-theme="sunset"] #header .admin-title,
+[data-theme="forest"] #header a,
+[data-theme="forest"] #header #user-tools,
+[data-theme="forest"] #header #branding,
+[data-theme="forest"] #header .admin-title,
+[data-theme="dark"] #header a,
+[data-theme="dark"] #header #user-tools,
+[data-theme="dark"] #header #branding,
+[data-theme="dark"] #header .admin-title,
+[data-theme="default"] #header #user-tools,
+[data-theme="default"] #header #user-tools a,
+[data-theme="black"] #header a,
+[data-theme="black"] #header #user-tools,
+[data-theme="black"] #header #branding,
+[data-theme="black"] #header .admin-title {
+    color: var(--header-content) !important;
+}
+
+/* Thème default : titre, icône et user-tools du header en noir */
+[data-theme="default"] #header #branding,
+[data-theme="default"] #header #branding *,
+[data-theme="default"] #header .brand-link,
+[data-theme="default"] #header .admin-title,
+[data-theme="default"] #header .brand-link i,
+[data-theme="default"] #header .admin-logo-fallback,
+[data-theme="default"] #header .admin-logo-fallback i,
+[data-theme="default"] #header #user-tools,
+[data-theme="default"] #header #user-tools *,
+[data-theme="default"] #header #user-tools a {
+    color: #000000 !important;
+}
+
+[data-theme="default"] #header .admin-logo {
+    filter: brightness(0) !important;
+}
+
+[data-theme="nostalgie"] .content-wrapper,
+[data-theme="ocean"] .content-wrapper,
+[data-theme="sunset"] .content-wrapper,
+[data-theme="forest"] .content-wrapper,
+[data-theme="dark"] .content-wrapper,
+[data-theme="default"] .content-wrapper,
+[data-theme="black"] .content-wrapper {
+    background: var(--dashboard-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] .content-wrapper .content,
+[data-theme="nostalgie"] .content-wrapper .content-header,
+[data-theme="nostalgie"] .content-wrapper h1,
+[data-theme="nostalgie"] .content-wrapper h2,
+[data-theme="nostalgie"] .content-wrapper p,
+[data-theme="nostalgie"] .content-wrapper span,
+[data-theme="nostalgie"] .content-wrapper label,
+[data-theme="ocean"] .content-wrapper .content,
+[data-theme="ocean"] .content-wrapper .content-header,
+[data-theme="ocean"] .content-wrapper h1,
+[data-theme="ocean"] .content-wrapper h2,
+[data-theme="ocean"] .content-wrapper p,
+[data-theme="ocean"] .content-wrapper span,
+[data-theme="ocean"] .content-wrapper label,
+[data-theme="sunset"] .content-wrapper .content,
+[data-theme="sunset"] .content-wrapper .content-header,
+[data-theme="sunset"] .content-wrapper h1,
+[data-theme="sunset"] .content-wrapper h2,
+[data-theme="sunset"] .content-wrapper p,
+[data-theme="sunset"] .content-wrapper span,
+[data-theme="sunset"] .content-wrapper label,
+[data-theme="forest"] .content-wrapper .content,
+[data-theme="forest"] .content-wrapper .content-header,
+[data-theme="forest"] .content-wrapper h1,
+[data-theme="forest"] .content-wrapper h2,
+[data-theme="forest"] .content-wrapper p,
+[data-theme="forest"] .content-wrapper span,
+[data-theme="forest"] .content-wrapper label,
+[data-theme="dark"] .content-wrapper .content,
+[data-theme="dark"] .content-wrapper .content-header,
+[data-theme="dark"] .content-wrapper h1,
+[data-theme="dark"] .content-wrapper h2,
+[data-theme="dark"] .content-wrapper p,
+[data-theme="dark"] .content-wrapper span,
+[data-theme="dark"] .content-wrapper label,
+[data-theme="default"] .content-wrapper .content,
+[data-theme="default"] .content-wrapper .content-header,
+[data-theme="default"] .content-wrapper h1,
+[data-theme="default"] .content-wrapper h2,
+[data-theme="default"] .content-wrapper p,
+[data-theme="default"] .content-wrapper span,
+[data-theme="default"] .content-wrapper label,
+[data-theme="black"] .content-wrapper .content,
+[data-theme="black"] .content-wrapper .content-header,
+[data-theme="black"] .content-wrapper h1,
+[data-theme="black"] .content-wrapper h2,
+[data-theme="black"] .content-wrapper p,
+[data-theme="black"] .content-wrapper span,
+[data-theme="black"] .content-wrapper label {
+    background: transparent !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] #content,
+[data-theme="ocean"] #content,
+[data-theme="sunset"] #content,
+[data-theme="forest"] #content,
+[data-theme="dark"] #content,
+[data-theme="default"] #content,
+[data-theme="black"] #content {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] #content h1,
+[data-theme="nostalgie"] #content h2,
+[data-theme="nostalgie"] #content p,
+[data-theme="nostalgie"] #content span,
+[data-theme="nostalgie"] #content label,
+[data-theme="nostalgie"] #content td,
+[data-theme="nostalgie"] #content th,
+[data-theme="ocean"] #content h1,
+[data-theme="ocean"] #content h2,
+[data-theme="ocean"] #content p,
+[data-theme="ocean"] #content span,
+[data-theme="ocean"] #content label,
+[data-theme="ocean"] #content td,
+[data-theme="ocean"] #content th,
+[data-theme="sunset"] #content h1,
+[data-theme="sunset"] #content h2,
+[data-theme="sunset"] #content p,
+[data-theme="sunset"] #content span,
+[data-theme="sunset"] #content label,
+[data-theme="sunset"] #content td,
+[data-theme="sunset"] #content th,
+[data-theme="forest"] #content h1,
+[data-theme="forest"] #content h2,
+[data-theme="forest"] #content p,
+[data-theme="forest"] #content span,
+[data-theme="forest"] #content label,
+[data-theme="forest"] #content td,
+[data-theme="forest"] #content th,
+[data-theme="dark"] #content h1,
+[data-theme="dark"] #content h2,
+[data-theme="dark"] #content p,
+[data-theme="dark"] #content span,
+[data-theme="dark"] #content label,
+[data-theme="dark"] #content td,
+[data-theme="dark"] #content th,
+[data-theme="default"] #content h1,
+[data-theme="default"] #content h2,
+[data-theme="default"] #content p,
+[data-theme="default"] #content span,
+[data-theme="default"] #content label,
+[data-theme="default"] #content td,
+[data-theme="default"] #content th,
+[data-theme="black"] #content h1,
+[data-theme="black"] #content h2,
+[data-theme="black"] #content p,
+[data-theme="black"] #content span,
+[data-theme="black"] #content label,
+[data-theme="black"] #content td,
+[data-theme="black"] #content th {
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] .breadcrumbs,
+[data-theme="ocean"] .breadcrumbs,
+[data-theme="sunset"] .breadcrumbs,
+[data-theme="forest"] .breadcrumbs,
+[data-theme="dark"] .breadcrumbs,
+[data-theme="default"] .breadcrumbs,
+[data-theme="black"] .breadcrumbs {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="nostalgie"] .breadcrumbs a,
+[data-theme="ocean"] .breadcrumbs a,
+[data-theme="sunset"] .breadcrumbs a,
+[data-theme="forest"] .breadcrumbs a,
+[data-theme="dark"] .breadcrumbs a,
+[data-theme="default"] .breadcrumbs a,
+[data-theme="black"] .breadcrumbs a {
+    color: var(--primary-color) !important;
+}
+
+[data-theme="nostalgie"] .card,
+[data-theme="nostalgie"] .module,
+[data-theme="ocean"] .card,
+[data-theme="ocean"] .module,
+[data-theme="sunset"] .card,
+[data-theme="sunset"] .module,
+[data-theme="forest"] .card,
+[data-theme="forest"] .module,
+[data-theme="dark"] .card,
+[data-theme="dark"] .module,
+[data-theme="default"] .card,
+[data-theme="default"] .module,
+[data-theme="black"] .card,
+[data-theme="black"] .module {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="nostalgie"] .card-body,
+[data-theme="nostalgie"] .module .content,
+[data-theme="ocean"] .card-body,
+[data-theme="ocean"] .module .content,
+[data-theme="sunset"] .card-body,
+[data-theme="sunset"] .module .content,
+[data-theme="forest"] .card-body,
+[data-theme="forest"] .module .content,
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .module .content,
+[data-theme="default"] .card-body,
+[data-theme="default"] .module .content,
+[data-theme="black"] .card-body,
+[data-theme="black"] .module .content {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] .card-header,
+[data-theme="nostalgie"] .module h2,
+[data-theme="ocean"] .card-header,
+[data-theme="ocean"] .module h2,
+[data-theme="sunset"] .card-header,
+[data-theme="sunset"] .module h2,
+[data-theme="forest"] .card-header,
+[data-theme="forest"] .module h2,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .module h2,
+[data-theme="default"] .card-header,
+[data-theme="default"] .module h2,
+[data-theme="black"] .card-header,
+[data-theme="black"] .module h2 {
+    background: var(--gradient-box) !important;
+    color: var(--header-content) !important;
+    border-color: var(--accent-color) !important;
+}
+
+[data-theme="nostalgie"] .small-box,
+[data-theme="ocean"] .small-box,
+[data-theme="sunset"] .small-box,
+[data-theme="forest"] .small-box,
+[data-theme="dark"] .small-box,
+[data-theme="default"] .small-box,
+[data-theme="black"] .small-box {
+    background: var(--gradient-box) !important;
+    color: var(--header-content) !important;
+}
+
+[data-theme="nostalgie"] .small-box .inner,
+[data-theme="nostalgie"] .small-box .inner h3,
+[data-theme="nostalgie"] .small-box .inner p,
+[data-theme="nostalgie"] .small-box .small-box-footer,
+[data-theme="ocean"] .small-box .inner,
+[data-theme="ocean"] .small-box .inner h3,
+[data-theme="ocean"] .small-box .inner p,
+[data-theme="ocean"] .small-box .small-box-footer,
+[data-theme="sunset"] .small-box .inner,
+[data-theme="sunset"] .small-box .inner h3,
+[data-theme="sunset"] .small-box .inner p,
+[data-theme="sunset"] .small-box .small-box-footer,
+[data-theme="forest"] .small-box .inner,
+[data-theme="forest"] .small-box .inner h3,
+[data-theme="forest"] .small-box .inner p,
+[data-theme="forest"] .small-box .small-box-footer,
+[data-theme="dark"] .small-box .inner,
+[data-theme="dark"] .small-box .inner h3,
+[data-theme="dark"] .small-box .inner p,
+[data-theme="dark"] .small-box .small-box-footer,
+[data-theme="default"] .small-box .inner,
+[data-theme="default"] .small-box .inner h3,
+[data-theme="default"] .small-box .inner p,
+[data-theme="default"] .small-box .small-box-footer,
+[data-theme="black"] .small-box .inner,
+[data-theme="black"] .small-box .inner h3,
+[data-theme="black"] .small-box .inner p,
+[data-theme="black"] .small-box .small-box-footer {
+    color: var(--header-content) !important;
+}
+
+[data-theme="nostalgie"] .results,
+[data-theme="nostalgie"] #result_list,
+[data-theme="ocean"] .results,
+[data-theme="ocean"] #result_list,
+[data-theme="sunset"] .results,
+[data-theme="sunset"] #result_list,
+[data-theme="forest"] .results,
+[data-theme="forest"] #result_list,
+[data-theme="dark"] .results,
+[data-theme="dark"] #result_list,
+[data-theme="default"] .results,
+[data-theme="default"] #result_list,
+[data-theme="black"] .results,
+[data-theme="black"] #result_list {
+    background: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] .results thead th,
+[data-theme="nostalgie"] #result_list thead th,
+[data-theme="ocean"] .results thead th,
+[data-theme="ocean"] #result_list thead th,
+[data-theme="sunset"] .results thead th,
+[data-theme="sunset"] #result_list thead th,
+[data-theme="forest"] .results thead th,
+[data-theme="forest"] #result_list thead th,
+[data-theme="dark"] .results thead th,
+[data-theme="dark"] #result_list thead th,
+[data-theme="default"] .results thead th,
+[data-theme="default"] #result_list thead th,
+[data-theme="black"] .results thead th,
+[data-theme="black"] #result_list thead th {
+    background: var(--gradient-box) !important;
+    color: var(--header-content) !important;
+}
+
+[data-theme="nostalgie"] .results tbody td,
+[data-theme="nostalgie"] .results tbody tr,
+[data-theme="ocean"] .results tbody td,
+[data-theme="ocean"] .results tbody tr,
+[data-theme="sunset"] .results tbody td,
+[data-theme="sunset"] .results tbody tr,
+[data-theme="forest"] .results tbody td,
+[data-theme="forest"] .results tbody tr,
+[data-theme="dark"] .results tbody td,
+[data-theme="dark"] .results tbody tr,
+[data-theme="default"] .results tbody td,
+[data-theme="default"] .results tbody tr,
+[data-theme="black"] .results tbody td,
+[data-theme="black"] .results tbody tr {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] .object-tools a,
+[data-theme="ocean"] .object-tools a,
+[data-theme="sunset"] .object-tools a,
+[data-theme="forest"] .object-tools a,
+[data-theme="dark"] .object-tools a,
+[data-theme="default"] .object-tools a,
+[data-theme="black"] .object-tools a {
+    background: var(--gradient-box) !important;
+    color: var(--header-content) !important;
+}
+
+[data-theme="nostalgie"] #changelist-filter,
+[data-theme="ocean"] #changelist-filter,
+[data-theme="sunset"] #changelist-filter,
+[data-theme="forest"] #changelist-filter,
+[data-theme="dark"] #changelist-filter,
+[data-theme="default"] #changelist-filter,
+[data-theme="black"] #changelist-filter {
+    background: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="nostalgie"] #changelist-filter h3,
+[data-theme="ocean"] #changelist-filter h3,
+[data-theme="sunset"] #changelist-filter h3,
+[data-theme="forest"] #changelist-filter h3,
+[data-theme="dark"] #changelist-filter h3,
+[data-theme="default"] #changelist-filter h3,
+[data-theme="black"] #changelist-filter h3 {
+    background: var(--gradient-box) !important;
+    color: var(--header-content) !important;
+}
+
+[data-theme] .theme-switcher {
+    background: transparent !important;
+}
+
+[data-theme="nostalgie"] .theme-menu,
+[data-theme="ocean"] .theme-menu,
+[data-theme="sunset"] .theme-menu,
+[data-theme="forest"] .theme-menu,
+[data-theme="dark"] .theme-menu,
+[data-theme="default"] .theme-menu,
+[data-theme="black"] .theme-menu {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="nostalgie"] .theme-option,
+[data-theme="ocean"] .theme-option,
+[data-theme="sunset"] .theme-option,
+[data-theme="forest"] .theme-option,
+[data-theme="dark"] .theme-option,
+[data-theme="default"] .theme-option,
+[data-theme="black"] .theme-option {
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}

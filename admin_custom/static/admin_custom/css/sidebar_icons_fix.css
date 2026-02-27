@@ -1,0 +1,175 @@
+/**
+ * Fix pour forcer l'affichage permanent des icônes du sidebar
+ * Les icônes de la section CONTENU doivent toujours être visibles
+ * TOUTES les icônes et textes restent en BLANC peu importe le thème
+ */
+
+/* Forcer l'affichage de TOUTES les icônes dans le sidebar EN BLANC */
+.sidebar .nav-link i,
+.sidebar-nav .nav-link i,
+.nav-section .nav-link i,
+aside .nav-link i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 1rem !important;
+  width: 20px !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Textes des liens en BLANC */
+.sidebar .nav-link span,
+.sidebar-nav .nav-link span,
+.nav-section .nav-link span,
+aside .nav-link span {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Titres des sections en BLANC */
+.sidebar .nav-section-title,
+.sidebar-nav .nav-section-title,
+.nav-section-title,
+aside .nav-section-title {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Liens actifs : icônes et textes en BLANC pur */
+.sidebar .nav-link.active i,
+.sidebar-nav .nav-link.active i,
+.nav-section .nav-link.active i,
+aside .nav-link.active i,
+.sidebar .nav-link.active span,
+.sidebar-nav .nav-link.active span,
+.nav-section .nav-link.active span,
+aside .nav-link.active span {
+  color: #FFFFFF !important;
+}
+
+/* Liens au survol : icônes et textes en BLANC pur */
+.sidebar .nav-link:hover i,
+.sidebar-nav .nav-link:hover i,
+.nav-section .nav-link:hover i,
+aside .nav-link:hover i,
+.sidebar .nav-link:hover span,
+.sidebar-nav .nav-link:hover span,
+.nav-section .nav-link:hover span,
+aside .nav-link:hover span {
+  color: #FFFFFF !important;
+}
+
+/* Même pour les liens non actifs - TRÈS IMPORTANT - EN BLANC */
+.sidebar .nav-link:not(.active) i,
+.sidebar-nav .nav-link:not(.active) i,
+.nav-section .nav-link:not(.active) i,
+aside .nav-link:not(.active) i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar .nav-link:not(.active) span,
+.sidebar-nav .nav-link:not(.active) span,
+.nav-section .nav-link:not(.active) span,
+aside .nav-link:not(.active) span {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Pour tous les thèmes - FORCER LE BLANC */
+[data-theme] .sidebar .nav-link i,
+[data-theme] .sidebar-nav .nav-link i,
+[data-theme] .nav-section .nav-link i,
+[data-theme] aside .nav-link i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme] .sidebar .nav-link span,
+[data-theme] .sidebar-nav .nav-link span,
+[data-theme] .nav-section .nav-link span,
+[data-theme] aside .nav-link span {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme] .sidebar .nav-section-title,
+[data-theme] .sidebar-nav .nav-section-title,
+[data-theme] .nav-section-title,
+[data-theme] aside .nav-section-title {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme] .sidebar .nav-link:not(.active) i,
+[data-theme] .sidebar-nav .nav-link:not(.active) i,
+[data-theme] .nav-section .nav-link:not(.active) i,
+[data-theme] aside .nav-link:not(.active) i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme] .sidebar .nav-link:not(.active) span,
+[data-theme] .sidebar-nav .nav-link:not(.active) span,
+[data-theme] .nav-section .nav-link:not(.active) span,
+[data-theme] aside .nav-link:not(.active) span {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme] .sidebar .nav-link.active i,
+[data-theme] .sidebar-nav .nav-link.active i,
+[data-theme] .nav-section .nav-link.active i,
+[data-theme] aside .nav-link.active i,
+[data-theme] .sidebar .nav-link.active span,
+[data-theme] .sidebar-nav .nav-link.active span,
+[data-theme] .nav-section .nav-link.active span,
+[data-theme] aside .nav-link.active span {
+  color: #FFFFFF !important;
+}
+
+[data-theme] .sidebar .nav-link:hover i,
+[data-theme] .sidebar-nav .nav-link:hover i,
+[data-theme] .nav-section .nav-link:hover i,
+[data-theme] aside .nav-link:hover i,
+[data-theme] .sidebar .nav-link:hover span,
+[data-theme] .sidebar-nav .nav-link:hover span,
+[data-theme] .nav-section .nav-link:hover span,
+[data-theme] aside .nav-link:hover span {
+  color: #FFFFFF !important;
+}
+
+/* Spécifique pour Font Awesome - EN BLANC */
+.sidebar .nav-link i.fa-solid,
+.sidebar .nav-link i.fa-regular,
+.sidebar .nav-link i.fa-brands,
+.sidebar-nav .nav-link i.fa-solid,
+.sidebar-nav .nav-link i.fa-regular,
+.sidebar-nav .nav-link i.fa-brands,
+.nav-section .nav-link i.fa-solid,
+.nav-section .nav-link i.fa-regular,
+.nav-section .nav-link i.fa-brands {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Logo et header du sidebar en BLANC */
+.sidebar-logo,
+.sidebar-logo span,
+.sidebar-header a {
+  color: #FFFFFF !important;
+}
+
+.sidebar-logo i {
+  color: #FFFFFF !important;
+}
+
+/* Informations utilisateur en bas en BLANC */
+.sidebar-user-name,
+.sidebar-user-role {
+  color: rgba(255, 255, 255, 0.8) !important;
+}

@@ -1,0 +1,45 @@
+{% extends "admin_custom/modern/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="page-title">Grilles de Données</h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Configuration</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Modèle</label>
+          <select id="grid-model" class="form-control">
+            {% for model in models %}
+            <option value="{{ model.name }}" data-fields="{{ model.fields|join:',' }}">{{ model.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Colonnes (vide = tous les champs)</label>
+          <input type="text" id="grid-columns" class="form-control" placeholder="Laissez vide pour afficher tous les champs">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" id="grid-description" class="form-control" placeholder="Description de la grille">
+        </div>
+        <button id="generate-grid" class="btn btn-primary" style="width:100%;">
+          <i class="fa-solid fa-plus"></i> Créer la grille
+        </button>
+        <div id="grid-loading" class="alert alert-info mt-3" style="display:none;">
+          <i class="fa-solid fa-spinner fa-spin"></i> Création...
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div id="grids-container"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'admin_custom/js/admin_custom.js' %}"></script>
+{% endblock %}

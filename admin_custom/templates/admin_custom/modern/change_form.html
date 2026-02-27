@@ -1,0 +1,188 @@
+{% extends "admin_custom/modern/admin_base.html" %}
+{% load static i18n admin_urls admin_modify %}
+
+{% block title %}{% if errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/modern_admin_unified.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/themes_modern.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/theme_override.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/tabular_inline_fix.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% block content %}
+<div id="content-main" class="admin-frontend-changeform">
+  {% block object-tools %}
+  {% if change and not is_popup %}
+    <div class="object-tools" style="margin-bottom:var(--space-4);">
+      {% block object-tools-items %}
+        {% change_form_object_tools %}
+      {% endblock %}
+    </div>
+  {% endif %}
+  {% endblock %}
+
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-6);">
+    <h1 class="page-title" style="margin:0;">
+      {% if add %}
+        <i class="fa-solid fa-plus"></i> {% blocktranslate with name=opts.verbose_name %}Ajouter {{ name }}{% endblocktranslate %}
+      {% else %}
+        <i class="fa-solid fa-pen"></i> {% blocktranslate with name=opts.verbose_name %}Modifier {{ name }}{% endblocktranslate %}: {{ original|truncatewords:"18" }}
+      {% endif %}
+    </h1>
+  </div>
+
+  <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% csrf_token %}
+    {% block form_top %}{% endblock %}
+    
+    <div>
+      {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+      {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+      
+      {% if save_on_top %}
+        {% block submit_buttons_top %}
+          <div class="submit-row" style="margin-bottom:var(--space-6);">
+            <input type="submit" value="{% if add %}{% translate 'Add' %}{% else %}{% translate 'Save' %}{% endif %}" class="btn btn-primary" name="_save" style="color:#fff!important">
+            {% if not add %}
+              <input type="submit" value="{% translate 'Save and continue editing' %}" name="_continue" class="btn btn-secondary" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text);">
+              <input type="submit" value="{% translate 'Save and add another' %}" name="_addanother" class="btn btn-secondary" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text);">
+            {% endif %}
+            <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-secondary"><i class="fa-solid fa-times"></i> {% translate 'Cancel' %}</a>
+          </div>
+        {% endblock %}
+      {% endif %}
+
+      {% if errors %}
+        <div class="alert alert-danger" role="alert" style="margin-bottom:var(--space-6);">
+          <p class="errornote">
+            {% blocktranslate count counter=errors|length %}Veuillez corriger l'erreur ci-dessous.{% plural %}Veuillez corriger les erreurs ci-dessous.{% endblocktranslate %}
+          </p>
+          {{ adminform.form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      {% block field_sets %}
+      {% if inline_admin_formsets %}
+        {# Mode avec inlines : onglets pour parent et enfants #}
+        <div class="card mb-4 admin-parent-children-tabs">
+          <div class="card-header" style="border-bottom: 1px solid var(--color-border);">
+            <ul class="nav nav-tabs admin-inline-tabs" role="tablist" style="border-bottom: none;">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-parent-tab" data-bs-toggle="tab" data-bs-target="#tab-parent" type="button" role="tab" aria-controls="tab-parent" aria-selected="true">
+                  <i class="fa-solid fa-file-lines"></i> {{ opts.verbose_name|capfirst }}
+                </button>
+              </li>
+              {% for inline_admin_formset in inline_admin_formsets %}
+                {% with inline_id=inline_admin_formset.formset.prefix %}
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="inline-tab-{{ inline_id }}-tab" data-bs-toggle="tab" data-bs-target="#inline-tab-{{ inline_id }}" type="button" role="tab" aria-controls="inline-tab-{{ inline_id }}" aria-selected="false">
+                    <i class="fa-solid fa-list"></i> {{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
+                  </button>
+                </li>
+                {% endwith %}
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content admin-inline-tab-content">
+              <div class="tab-pane fade show active" id="tab-parent" role="tabpanel" aria-labelledby="tab-parent-tab">
+                {% for fieldset in adminform %}
+                  <div class="card mb-4">
+                    {% if fieldset.name %}
+                      <div class="card-header">
+                        <h3>{{ fieldset.name }}</h3>
+                        {% if fieldset.description %}
+                          <p class="description">{{ fieldset.description }}</p>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                    <div class="card-body">
+                      {% include "admin/includes/fieldset.html" with heading_level=3 prefix="fieldset" id_prefix=0 id_suffix=forloop.counter0 hide_heading=True %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              
+              {% for inline_admin_formset in inline_admin_formsets %}
+                {% with inline_id=inline_admin_formset.formset.prefix %}
+                <div class="tab-pane fade" id="inline-tab-{{ inline_id }}" role="tabpanel" aria-labelledby="inline-tab-{{ inline_id }}-tab">
+                  {% include inline_admin_formset.opts.template %}
+                </div>
+                {% endwith %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        {# Mode sans inlines : affichage simple des fieldsets #}
+        <div class="row g-4">
+          <div class="col-12">
+            {% for fieldset in adminform %}
+              <div class="card mb-4">
+                {% if fieldset.name %}
+                  <div class="card-header">
+                    <h3>{{ fieldset.name }}</h3>
+                    {% if fieldset.description %}
+                      <p class="description">{{ fieldset.description }}</p>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                <div class="card-body">
+                  {% include "admin/includes/fieldset.html" with heading_level=3 prefix="fieldset" id_prefix=0 id_suffix=forloop.counter0 hide_heading=True %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+      {% endblock %}
+
+      {% block after_field_sets %}{% endblock %}
+
+      {% block inline_field_sets %}
+      {# Les inlines sont déjà affichés dans les onglets si inline_admin_formsets existe #}
+      {# Sinon, ils seront affichés ici (cas rare où ils ne sont pas dans les onglets) #}
+      {% endblock %}
+
+      {% block after_related_objects %}{% endblock %}
+
+      {% block submit_buttons_bottom %}
+        <div class="submit-row" style="margin-top:var(--space-6);">
+          <input type="submit" value="{% if add %}{% translate 'Add' %}{% else %}{% translate 'Save' %}{% endif %}" class="btn btn-primary" name="_save" style="color:#fff!important">
+          {% if not add %}
+            <input type="submit" value="{% translate 'Save and continue editing' %}" name="_continue" class="btn btn-secondary" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text);">
+            <input type="submit" value="{% translate 'Save and add another' %}" name="_addanother" class="btn btn-secondary" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text);">
+          {% endif %}
+          <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-times"></i> {% translate 'Cancel' %}
+          </a>
+        </div>
+      {% endblock %}
+
+      {% block admin_change_form_document_ready %}
+        <script id="django-admin-form-add-constants"
+                src="{% static 'admin/js/change_form.js' %}"
+                {% if adminform and add %}
+                    data-model-name="{{ opts.model_name }}"
+                {% endif %}
+                async>
+        </script>
+      {% endblock %}
+
+      {# JavaScript for prepopulated fields #}
+      {% prepopulated_fields_js %}
+    </div>
+  </form>
+</div>
+{% endblock %}

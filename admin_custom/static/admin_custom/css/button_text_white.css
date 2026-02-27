@@ -1,0 +1,48 @@
+/**
+ * Force le texte des boutons à fond coloré en blanc.
+ * Charge en dernier pour écraser toute autre règle.
+ */
+/* Éviter que ::before ne masque le texte */
+.btn-primary::before, .btn-success::before, .btn-danger::before, .btn-warning::before, .btn-info::before {
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+a.btn-primary,
+a.btn-success,
+a.btn-danger,
+a.btn-warning,
+a.btn-info,
+button.btn-primary,
+button.btn-success,
+button.btn-danger,
+button.btn-warning,
+button.btn-info,
+input[type="submit"],
+input[type="submit"].btn-primary,
+input[type="submit"][name="_save"] {
+  color: #ffffff !important;
+}
+
+.btn-primary *,
+.btn-success *,
+.btn-danger *,
+.btn-warning *,
+.btn-info *,
+.btn-primary i,
+.btn-success i,
+.btn-danger i,
+.btn-warning i,
+.btn-info i,
+.btn-primary span,
+.btn-success span,
+.btn-danger span,
+.btn-warning span,
+.btn-info span {
+  color: #ffffff !important;
+}

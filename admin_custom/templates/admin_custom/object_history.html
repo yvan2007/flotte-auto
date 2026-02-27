@@ -1,0 +1,15 @@
+{% extends "admin/object_history.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-history"></i> Historique de {{ object|truncatewords:"18" }}
+        </h3>
+    </div>
+    <div class="card-body">
+        {{ block.super }}
+    </div>
+</div>
+{% endblock %}

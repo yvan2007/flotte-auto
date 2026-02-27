@@ -1,0 +1,54 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_custom/css/modern_admin_unified.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/themes_modern.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/theme_override.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-frontend-delete">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-6);">
+    <h1 class="page-title" style="margin:0; font-size:1.5rem; font-weight:700; color:var(--color-text);">
+      <i class="fa-solid fa-trash" style="color:var(--color-danger); margin-right:0.5rem;"></i> Confirmation de suppression
+    </h1>
+  </div>
+
+  <div class="card" style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:0.75rem; overflow:hidden;">
+    <div class="card-body" style="padding:1.5rem;">
+      {% if perms_lacking %}
+        <p style="margin-bottom:1rem;">{% blocktranslate with escaped_object=object %}La suppression de l'objet {{ object_name }} « {{ escaped_object }} » entraînerait la suppression d'objets liés, mais vous n'avez pas la permission de supprimer les types d'objets suivants :{% endblocktranslate %}</p>
+        <ul id="deleted-objects">{{ perms_lacking|unordered_list }}</ul>
+      {% elif protected %}
+        <p style="margin-bottom:1rem;">{% blocktranslate with escaped_object=object %}La suppression de l'objet {{ object_name }} « {{ escaped_object }} » nécessiterait la suppression des objets protégés liés suivants :{% endblocktranslate %}</p>
+        <ul id="deleted-objects">{{ protected|unordered_list }}</ul>
+      {% else %}
+        <p style="margin-bottom:1rem;">{% blocktranslate with escaped_object=object %}Êtes-vous sûr de vouloir supprimer l'objet {{ object_name }} « {{ escaped_object }} » ? Les éléments liés suivants seront également supprimés :{% endblocktranslate %}</p>
+        {% include "admin/includes/object_delete_summary.html" %}
+        <h2 style="font-size:1rem; font-weight:600; margin:1rem 0 0.5rem;">{% translate "Objets" %}</h2>
+        <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
+      {% endif %}
+    </div>
+    <div class="card-footer" style="padding:1rem 1.5rem; border-top:1px solid var(--color-border); display:flex; gap:0.75rem; flex-wrap:wrap;">
+    {% if perms_lacking or protected %}
+      <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> {% translate "Retour" %}</a>
+    {% else %}
+      <form method="post" style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+        {% csrf_token %}
+        <input type="hidden" name="post" value="yes">
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+        {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+        <button type="submit" class="btn btn-primary" style="background:var(--color-danger); color:white; border:none; padding:0.5rem 1rem; border-radius:0.5rem; font-weight:500; cursor:pointer;">
+          <i class="fa-solid fa-trash"></i> Oui, je suis sûr
+        </button>
+        <a href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-secondary" style="background:var(--color-surface); border:1px solid var(--color-border); color:var(--color-text); padding:0.5rem 1rem; border-radius:0.5rem; text-decoration:none; display:inline-flex; align-items:center;">
+          <i class="fa-solid fa-times"></i> {% translate "Non, revenir" %}
+        </a>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

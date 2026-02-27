@@ -1,0 +1,50 @@
+{% extends admin_base_template|default:"admin_custom/base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}" class="brand-link">
+        <img src="{% static 'admin_custom/image.png' %}" alt="Logo" class="admin-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <span class="admin-logo-fallback" style="display: none;">
+            <i class="fas fa-bolt"></i>
+        </span>
+        <span class="admin-title">{{ site_header|default:_('Django administration') }}</span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<!-- Bouton hamburger pour mobile -->
+<button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Menu" aria-expanded="false">
+    <span class="hamburger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+    </span>
+</button>
+<nav class="custom-admin-nav" id="main-nav">
+    <a href="{% url 'admin:index' %}" class="nav-link">
+        <i class="fas fa-home"></i> <span>Accueil</span>
+    </a>
+    <a href="{% url 'admin:admin_dashboard' %}" class="nav-link">
+        <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+    </a>
+    <a href="{% url 'admin:admin_charts' %}" class="nav-link">
+        <i class="fas fa-chart-pie"></i> <span>Graphiques</span>
+    </a>
+    <a href="{% url 'admin:admin_grids' %}" class="nav-link">
+        <i class="fas fa-table"></i> <span>Grilles</span>
+    </a>
+    {% if admin_interface == 'modern' %}
+    <a href="{% url 'admin:modern_settings' %}" class="nav-link" title="Paramètres et choix d'interface">
+        <i class="fas fa-gear"></i> <span>Paramètres</span>
+    </a>
+    {% else %}
+    <a href="{% url 'admin:classic_settings' %}" class="nav-link" title="Paramètres et choix d'interface">
+        <i class="fas fa-gear"></i> <span>Paramètres</span>
+    </a>
+    {% endif %}
+</nav>
+{% endblock %}

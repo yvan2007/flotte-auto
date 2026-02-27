@@ -1,0 +1,240 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} data-theme="default">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
+{% block extrastyle %}
+<!-- AdminLTE 3 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+<!-- Custom CSS - Design System Professionnel -->
+<link rel="stylesheet" href="{% static 'admin_custom/css/design_system.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/professional_admin.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/ux_enhancements.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/themes.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/admin_forms.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/admin_custom.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/modern_admin.css' %}">
+<!-- Dashboard cartes colorées -->
+<link rel="stylesheet" href="{% static 'admin_custom/css/dashboard_cards_colorful.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/nav_fluid.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/theme_icons.css' %}">
+<!-- CORRECTION CRITIQUE : TabularInline -->
+<link rel="stylesheet" href="{% static 'admin_custom/css/tabular_inline_fix.css' %}">
+<!-- RESPONSIVE : DOIT être chargé en TOUT DERNIER pour overrider -->
+<link rel="stylesheet" href="{% static 'admin_custom/css/responsive_admin.css' %}">
+<style id="theme-style"></style>
+{% endblock %}
+{% block extrahead %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<!-- AdminLTE 3 JS -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
+{% load i18n %}
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" data-admin-utc-offset="{% now "Z" %}">
+
+<!-- Container -->
+<div id="container">
+
+    {% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% block usertools %}
+        {% if has_permission %}
+        <div id="user-tools">
+            {% block welcome-msg %}
+                {% translate 'Welcome,' %}
+                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+            {% endblock %}
+            {% block userlinks %}
+                {% if site_url %}
+                    <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+                {% endif %}
+                {% if user.is_active and user.is_staff %}
+                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% if docsroot %}
+                        <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+                    {% endif %}
+                {% endif %}
+                {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+                {% endif %}
+                <form method="post" action="{% url 'admin:logout' %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:inherit;">{% translate 'Log out' %}</button>
+                </form>
+            {% endblock %}
+        </div>
+        {% endif %}
+        {% endblock %}
+        {% block nav-global %}{% endblock %}
+    </div>
+    <!-- END Header -->
+    {% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>
+    {% endblock %}
+    {% endif %}
+
+    {% block messages %}
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+        {% endfor %}</ul>
+        {% endif %}
+    {% endblock messages %}
+
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
+    <!-- END Content -->
+
+    {% block footer %}
+    <div id="footer"></div>
+    <!-- Theme Switcher -->
+    <div id="theme-switcher" class="theme-switcher">
+        <button id="theme-toggle" class="theme-toggle-btn">
+            <i class="fas fa-palette"></i>
+            <span class="theme-text">Thèmes</span>
+        </button>
+        <div id="theme-menu" class="theme-menu">
+            <div class="theme-menu-header">Choisir un thème</div>
+            <button class="theme-option" data-theme="nostalgie">
+                <span class="theme-preview nostalgie"></span>
+                <span>Nostalgie</span>
+            </button>
+            <button class="theme-option" data-theme="ocean">
+                <span class="theme-preview ocean"></span>
+                <span>Océan</span>
+            </button>
+            <button class="theme-option" data-theme="forest">
+                <span class="theme-preview forest"></span>
+                <span>Forêt</span>
+            </button>
+            <button class="theme-option" data-theme="dark">
+                <span class="theme-preview dark"></span>
+                <span>Sombre</span>
+            </button>
+            <button class="theme-option" data-theme="default">
+                <span class="theme-preview default"></span>
+                <span>Par défaut</span>
+            </button>
+        </div>
+    </div>
+    <script src="{% static 'admin_custom/js/admin_custom.js' %}"></script>
+    <!-- Script pour menu hamburger responsive -->
+    <script>
+    (function() {
+      'use strict';
+
+      function initHamburger() {
+        var btn = document.getElementById('mobile-menu-toggle');
+        var nav = document.getElementById('main-nav');
+        if (!btn || !nav) return;
+
+        // Creer l'overlay une seule fois
+        var overlay = document.querySelector('.mobile-nav-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'mobile-nav-overlay';
+          document.body.appendChild(overlay);
+        }
+
+        var isOpen = false;
+
+        function open() {
+          isOpen = true;
+          nav.classList.add('mobile-open');
+          overlay.classList.add('show');
+          btn.setAttribute('aria-expanded', 'true');
+          document.body.style.overflow = 'hidden';
+        }
+
+        function close() {
+          isOpen = false;
+          nav.classList.remove('mobile-open');
+          overlay.classList.remove('show');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+
+        function toggle(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (isOpen) { close(); } else { open(); }
+        }
+
+        // Toggle button
+        btn.addEventListener('click', toggle);
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          toggle(e);
+        }, { passive: false });
+
+        // Fermer via overlay
+        overlay.addEventListener('click', close);
+
+        // Fermer quand on clique sur un lien
+        nav.addEventListener('click', function(e) {
+          if (e.target.closest('.nav-link') || e.target.closest('a')) {
+            setTimeout(close, 200);
+          }
+        });
+
+        // Fermer si on passe en desktop
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(function() {
+            if (window.innerWidth > 768 && isOpen) {
+              close();
+            }
+          }, 100);
+        });
+
+        // Fermer avec Escape
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && isOpen) close();
+        });
+      }
+
+      // Init quand le DOM est pret
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHamburger);
+      } else {
+        initHamburger();
+      }
+    })();
+    </script>
+    {% endblock %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>

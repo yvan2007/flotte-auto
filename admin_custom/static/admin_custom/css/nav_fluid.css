@@ -1,0 +1,91 @@
+/**
+ * Navigation fluide - Icônes toujours visibles
+ * Barre de navigation (custom-admin-nav) et sidebar (interface moderne)
+ */
+
+/* === BARRE DE NAVIGATION CLASSIQUE (custom-admin-nav) === */
+
+.custom-admin-nav .nav-link {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-admin-nav .nav-link i,
+.custom-admin-nav .nav-link span {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Icônes Font Awesome - toujours visibles et correctement rendues */
+.custom-admin-nav .nav-link i.fa-solid,
+.custom-admin-nav .nav-link i.fa-regular,
+.custom-admin-nav .nav-link i.fas,
+.custom-admin-nav .nav-link i.far,
+.custom-admin-nav .nav-link i[class*="fa-"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  font-size: 1rem !important;
+  width: 1em !important;
+  text-align: center !important;
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free" !important;
+  font-weight: inherit !important;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-style: normal !important;
+  line-height: 1 !important;
+}
+
+/* Tous les états : actif, hover, défaut */
+.custom-admin-nav .nav-link i,
+.custom-admin-nav .nav-link.active i,
+.custom-admin-nav .nav-link:hover i,
+.custom-admin-nav .nav-link:not(.active) i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+}
+
+/* === SIDEBAR INTERFACE MODERNE === */
+
+.sidebar .nav-link i,
+.sidebar-nav .nav-link i,
+.nav-section .nav-link i,
+aside .nav-link i,
+.admin-layout .sidebar .nav-link i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.sidebar .nav-link span,
+.sidebar-nav .nav-link span,
+.nav-section .nav-link span,
+aside .nav-link span {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline !important;
+}
+
+/* Transitions fluides pour la sidebar */
+.sidebar .nav-link,
+.sidebar-nav .nav-link,
+.nav-section .nav-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === NAVIGATION FLUIDE - Animations douces === */
+
+.custom-admin-nav {
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Prévenir tout masquage accidentel des icônes */
+.custom-admin-nav .nav-link i[class*="fa-"],
+.sidebar .nav-link i[class*="fa-"],
+.nav-section .nav-link i[class*="fa-"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

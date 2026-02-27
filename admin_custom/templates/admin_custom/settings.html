@@ -1,0 +1,98 @@
+{% extends "admin_custom/base_site.html" %}
+{% load static i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_custom/css/settings_page.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1><i class="fas fa-cog"></i> Paramètres</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Paramètres</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-desktop"></i> Interface d'administration</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Choisissez l'interface d'administration que vous souhaitez utiliser.</p>
+                            <div class="row interface-switch-row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 interface-switch-card {% if current_interface == 'classic' %}border-primary{% endif %}">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-layer-group fa-3x text-secondary mb-2"></i>
+                                            <h5 class="card-title">Interface Classique</h5>
+                                            <p class="card-text text-muted small">AdminLTE, tableau de bord traditionnel</p>
+                                            {% if current_interface == 'classic' %}
+                                            <span class="badge badge-success"><i class="fas fa-check"></i> Actuelle</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a href="{{ switch_to_modern_url }}" class="text-decoration-none">
+                                        <div class="card h-100 interface-switch-card {% if current_interface == 'modern' %}border-primary{% else %}card-outline{% endif %}">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-gauge-high fa-3x {% if current_interface == 'modern' %}text-primary{% else %}text-secondary{% endif %} mb-2"></i>
+                                                <h5 class="card-title">Interface Moderne</h5>
+                                                <p class="card-text text-muted small">Design épuré, sidebar, thèmes</p>
+                                                {% if current_interface == 'modern' %}
+                                                <span class="badge badge-success"><i class="fas fa-check"></i> Actuelle</span>
+                                                {% else %}
+                                                <span class="badge badge-primary"><i class="fas fa-arrow-right"></i> Passer à cette interface</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-user"></i> Profil utilisateur</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Gérez votre profil et vos préférences.</p>
+                            <a href="{% url 'admin:auth_user_change' user.pk %}" class="btn btn-primary">
+                                <i class="fas fa-pen"></i> Modifier mon profil
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-key"></i> Sécurité</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Modifiez votre mot de passe pour sécuriser votre compte.</p>
+                            <a href="{% url 'admin:password_change' %}" class="btn btn-primary">
+                                <i class="fas fa-key"></i> Changer le mot de passe
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

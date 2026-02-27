@@ -1,0 +1,207 @@
+{% extends "admin_custom/modern/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="page-title">Paramètres</h1>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-4 col-xl-3">
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <a href="#profil" class="dropdown-item settings-nav-item active" style="border-radius:0; border-left:3px solid var(--color-primary);">Profil utilisateur</a>
+        <a href="#affichage" class="dropdown-item settings-nav-item" style="border-radius:0;">Préférences d'affichage</a>
+        <a href="#theme" class="dropdown-item settings-nav-item" style="border-radius:0;">Thème</a>
+        <a href="#interface" class="dropdown-item settings-nav-item" style="border-radius:0;">Interface</a>
+        <a href="#notifications" class="dropdown-item settings-nav-item" style="border-radius:0;">Notifications</a>
+        <a href="#securite" class="dropdown-item settings-nav-item" style="border-radius:0;">Sécurité</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-8 col-xl-9">
+    <div class="card mb-4" id="profil">
+      <div class="card-header">Profil utilisateur</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Nom complet</label>
+          <input type="text" class="form-control" value="{{ user.get_full_name|default:user.username }}" placeholder="Votre nom" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-control" value="{{ user.email|default:'' }}" placeholder="email@example.com" readonly>
+        </div>
+        <p style="font-size:var(--text-sm); color:var(--color-text-muted);">Pour modifier votre profil, utilisez le lien ci-dessous.</p>
+        <a href="{% url 'admin:auth_user_change' user.pk %}" class="btn btn-primary"><i class="fa-solid fa-pen"></i> Modifier mon profil</a>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="affichage">
+      <div class="card-header">Préférences d'affichage</div>
+      <div class="card-body">
+        <label style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); cursor:pointer;">
+          <input type="checkbox" id="sidebar-collapsed" style="width:1.25rem; height:1.25rem; accent-color:var(--color-primary);">
+          <span>Barre latérale réduite par défaut</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); cursor:pointer;">
+          <input type="checkbox" style="width:1.25rem; height:1.25rem; accent-color:var(--color-primary);">
+          <span>Afficher tous les résultats par défaut</span>
+        </label>
+        <div class="form-group">
+          <label class="form-label">Éléments par page</label>
+          <select class="form-control form-select" style="max-width:120px;">
+            <option>10</option>
+            <option selected>25</option>
+            <option>50</option>
+            <option>100</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="theme">
+      <div class="card-header">Thème</div>
+      <div class="card-body">
+        <p style="color:var(--color-text-muted); margin-bottom:var(--space-4);">Choisissez l'apparence de l'interface. La préférence est enregistrée localement.</p>
+        <div class="theme-selector-modern" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:var(--space-4);">
+          <button type="button" class="theme-option-modern active" data-theme="bleu-moderne" style="padding:var(--space-4); border:2px solid var(--color-primary); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; text-align:left;">
+            <span style="display:block; width:100%; height:60px; border-radius:var(--radius-md); background:linear-gradient(135deg, #3B82F6, #8B5CF6); margin-bottom:var(--space-2);"></span>
+            <strong>Bleu Moderne</strong>
+            <p style="margin:0; font-size:var(--text-xs); color:var(--color-text-muted);">Par défaut</p>
+          </button>
+          <button type="button" class="theme-option-modern" data-theme="emeraude" style="padding:var(--space-4); border:2px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; text-align:left;">
+            <span style="display:block; width:100%; height:60px; border-radius:var(--radius-md); background:linear-gradient(135deg, #10B981, #059669); margin-bottom:var(--space-2);"></span>
+            <strong>Émeraude</strong>
+            <p style="margin:0; font-size:var(--text-xs); color:var(--color-text-muted);">Professionnel</p>
+          </button>
+          <button type="button" class="theme-option-modern" data-theme="coucher-soleil" style="padding:var(--space-4); border:2px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; text-align:left;">
+            <span style="display:block; width:100%; height:60px; border-radius:var(--radius-md); background:linear-gradient(135deg, #F59E0B, #EF4444); margin-bottom:var(--space-2);"></span>
+            <strong>Coucher de soleil</strong>
+            <p style="margin:0; font-size:var(--text-xs); color:var(--color-text-muted);">Chaleureux</p>
+          </button>
+          <button type="button" class="theme-option-modern" data-theme="sombre" style="padding:var(--space-4); border:2px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; text-align:left;">
+            <span style="display:block; width:100%; height:60px; border-radius:var(--radius-md); background:linear-gradient(135deg, #6366F1, #0F172A); margin-bottom:var(--space-2);"></span>
+            <strong>Mode sombre</strong>
+            <p style="margin:0; font-size:var(--text-xs); color:var(--color-text-muted);">Confort visuel</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="interface">
+      <div class="card-header">Interface</div>
+      <div class="card-body">
+        <p style="color:var(--color-text-muted); margin-bottom:var(--space-4);">Choisissez l'interface d'administration que vous souhaitez utiliser.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:var(--space-4);">
+          {% if current_interface == 'modern' %}
+          <div style="padding:var(--space-4); border:2px solid var(--color-primary); border-radius:var(--radius-lg); background:var(--color-primary-light);">
+            <div style="font-size:2rem; margin-bottom:var(--space-2);"><i class="fa-solid fa-gauge-high" style="color:var(--color-primary);"></i></div>
+            <strong>Interface Moderne</strong>
+            <p style="margin:var(--space-1) 0 0 0; font-size:var(--text-sm); color:var(--color-text-muted);">Design épuré, sidebar</p>
+            <p style="margin:var(--space-2) 0 0 0; font-size:var(--text-xs); color:var(--color-success);"><i class="fa-solid fa-check"></i> Actuelle</p>
+          </div>
+          <a href="{{ switch_to_classic_url }}" style="text-decoration:none; color:inherit;">
+            <div style="padding:var(--space-4); border:2px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; transition:all 0.2s;">
+              <div style="font-size:2rem; margin-bottom:var(--space-2);"><i class="fa-solid fa-layer-group" style="color:var(--color-text-muted);"></i></div>
+              <strong>Interface Classique</strong>
+              <p style="margin:var(--space-1) 0 0 0; font-size:var(--text-sm); color:var(--color-text-muted);">AdminLTE, tableau de bord</p>
+              <p style="margin:var(--space-2) 0 0 0; font-size:var(--text-xs); color:var(--color-primary);"><i class="fa-solid fa-arrow-right"></i> Passer à cette interface</p>
+            </div>
+          </a>
+          {% else %}
+          <a href="{{ switch_to_modern_url }}" style="text-decoration:none; color:inherit;">
+            <div style="padding:var(--space-4); border:2px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-surface); cursor:pointer; transition:all 0.2s;">
+              <div style="font-size:2rem; margin-bottom:var(--space-2);"><i class="fa-solid fa-gauge-high" style="color:var(--color-text-muted);"></i></div>
+              <strong>Interface Moderne</strong>
+              <p style="margin:var(--space-1) 0 0 0; font-size:var(--text-sm); color:var(--color-text-muted);">Design épuré, sidebar</p>
+              <p style="margin:var(--space-2) 0 0 0; font-size:var(--text-xs); color:var(--color-primary);"><i class="fa-solid fa-arrow-right"></i> Passer à cette interface</p>
+            </div>
+          </a>
+          <div style="padding:var(--space-4); border:2px solid var(--color-primary); border-radius:var(--radius-lg); background:var(--color-primary-light);">
+            <div style="font-size:2rem; margin-bottom:var(--space-2);"><i class="fa-solid fa-layer-group" style="color:var(--color-primary);"></i></div>
+            <strong>Interface Classique</strong>
+            <p style="margin:var(--space-1) 0 0 0; font-size:var(--text-sm); color:var(--color-text-muted);">AdminLTE, tableau de bord</p>
+            <p style="margin:var(--space-2) 0 0 0; font-size:var(--text-xs); color:var(--color-success);"><i class="fa-solid fa-check"></i> Actuelle</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="notifications">
+      <div class="card-header">Paramètres de notification</div>
+      <div class="card-body">
+        <label style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); cursor:pointer;">
+          <input type="checkbox" checked style="width:1.25rem; height:1.25rem; accent-color:var(--color-primary);">
+          <span>Notifications par e-mail</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); cursor:pointer;">
+          <input type="checkbox" checked style="width:1.25rem; height:1.25rem; accent-color:var(--color-primary);">
+          <span>Alertes dans l'interface</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:var(--space-3); cursor:pointer;">
+          <input type="checkbox" style="width:1.25rem; height:1.25rem; accent-color:var(--color-primary);">
+          <span>Résumé quotidien</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card mb-4" id="securite">
+      <div class="card-header">Gestion de sécurité</div>
+      <div class="card-body">
+        <p style="color:var(--color-text-muted); margin-bottom:var(--space-4);">Modifiez votre mot de passe pour sécuriser votre compte.</p>
+        <a href="{% url 'admin:password_change' %}" class="btn btn-primary">
+          <i class="fa-solid fa-key"></i> Changer le mot de passe
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var themeOptions = document.querySelectorAll('.theme-option-modern');
+  themeOptions.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var theme = btn.getAttribute('data-theme');
+      if (typeof window.setModernTheme === 'function') {
+        window.setModernTheme(theme);
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('admin_modern_theme', theme);
+      }
+      themeOptions.forEach(function(b) {
+        b.classList.remove('active');
+        b.style.borderColor = 'var(--color-border)';
+      });
+      btn.classList.add('active');
+      btn.style.borderColor = 'var(--color-primary)';
+    });
+  });
+  var current = document.documentElement.getAttribute('data-theme') || 'bleu-moderne';
+  var activeBtn = document.querySelector('.theme-option-modern[data-theme="' + current + '"]');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.style.borderColor = 'var(--color-primary)';
+  }
+  document.getElementById('sidebar-collapsed')?.addEventListener('change', function() {
+    localStorage.setItem('admin_sidebar_collapsed', this.checked);
+    var sidebar = document.getElementById('sidebar');
+    var main = document.getElementById('main-wrapper');
+    if (sidebar) sidebar.classList.toggle('collapsed', this.checked);
+    if (main) main.classList.toggle('sidebar-collapsed', this.checked);
+  });
+  var collapsed = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+  document.getElementById('sidebar-collapsed') && (document.getElementById('sidebar-collapsed').checked = collapsed);
+  document.querySelectorAll('.settings-nav-item').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      document.querySelectorAll('.settings-nav-item').forEach(function(l) {
+        l.style.borderLeftColor = '';
+        l.classList.remove('active');
+      });
+      link.style.borderLeftColor = 'var(--color-primary)';
+      link.classList.add('active');
+    });
+  });
+})();
+</script>
+{% endblock %}

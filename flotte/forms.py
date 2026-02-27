@@ -323,6 +323,7 @@ class VehiculeForm(forms.ModelForm):
             'numero_immatriculation', 'date_premiere_immat',
             'consommation_moyenne', 'rejet_co2', 'puissance_fiscale',
             'km_prochaine_vidange', 'date_expiration_ct', 'date_expiration_assurance',
+            'proprietaire',
         )
         labels = {
             'origine_pays': "Pays d'origine ou d'achat",
@@ -358,6 +359,7 @@ class VehiculeForm(forms.ModelForm):
             'km_prochaine_vidange': forms.NumberInput(attrs={'class': 'form-input', 'min': 0}),
             'date_expiration_ct': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
             'date_expiration_assurance': forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}),
+            'proprietaire': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):

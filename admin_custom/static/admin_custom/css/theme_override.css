@@ -1,0 +1,315 @@
+/**
+ * Surcharges pour forcer l'application des thèmes sur TOUTE l'interface moderne.
+ * Charge en dernier pour écraser design_system, Django admin, Bootstrap, etc.
+ * Unifie les couleurs entre Dashboard et Section Contenu.
+ * S'applique avec ou sans .admin-layout pour couvrir tous les cas.
+ */
+
+/* === Bootstrap 5 - variables racine pour que card, table, form, etc. utilisent nos thèmes === */
+html[data-theme="bleu-moderne"],
+html[data-theme="emeraude"],
+html[data-theme="coucher-soleil"],
+html[data-theme="sombre"] {
+  --bs-body-bg: var(--color-background);
+  --bs-body-color: var(--color-text);
+  --bs-secondary-bg: var(--darkened-bg);
+  --bs-tertiary-bg: var(--color-background);
+  --bs-border-color: var(--color-border);
+  --bs-card-bg: var(--color-surface);
+  --bs-card-color: var(--color-text);
+  --bs-table-bg: var(--color-surface);
+  --bs-table-color: var(--color-text);
+  --bs-table-border-color: var(--color-border);
+  --bs-table-striped-bg: var(--darkened-bg);
+  --bs-table-hover-bg: var(--selected-bg);
+  --bs-input-bg: var(--color-surface);
+  --bs-input-color: var(--color-text);
+  --bs-input-border-color: var(--color-border);
+  --bs-dropdown-bg: var(--color-surface);
+  --bs-dropdown-link-color: var(--color-text);
+  --bs-dropdown-link-hover-bg: var(--darkened-bg);
+  --bs-modal-content-bg: var(--color-surface);
+  --bs-modal-header-border-color: var(--color-border);
+  --bs-modal-footer-border-color: var(--color-border);
+  --bs-link-color: var(--color-primary);
+  --bs-link-hover-color: var(--color-primary-hover);
+  --bs-primary: var(--color-primary);
+}
+
+/* === FORCER body et html avec les variables thème === */
+html,
+body {
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* Zone contenu même sans admin-layout (fallback pour pages admin Django) */
+#content,
+#content-main,
+#changelist,
+.changelist-form-container,
+.admin-frontend-changelist,
+.admin-frontend-changeform {
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* === ZONE CONTENU - Texte cohérent (ni blanc, ni tout bleu) === */
+.admin-layout .main-content,
+.admin-layout #content,
+.admin-layout .admin-modern-content,
+.admin-layout #content-main,
+.admin-layout .admin-frontend-changelist,
+.admin-layout .admin-frontend-changeform,
+.admin-layout .admin-frontend-delete,
+.admin-layout .admin-frontend-history {
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* Titres et textes dans la zone contenu - couleur thème */
+.admin-layout .main-content h1,
+.admin-layout .main-content h2,
+.admin-layout .main-content h3,
+.admin-layout .main-content h4,
+.admin-layout .main-content p,
+.admin-layout .main-content span,
+.admin-layout .main-content label,
+.admin-layout .main-content td,
+.admin-layout .main-content th,
+.admin-layout .page-title,
+.admin-layout .card-header,
+.admin-layout .card-body,
+.admin-layout .metric-content h3,
+.admin-layout .metric-content p {
+  color: var(--color-text) !important;
+}
+
+.admin-layout .metric-content .metric-trend,
+.admin-layout .main-content .text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+/* Liens uniquement en couleur primaire - pas tout le texte */
+.admin-layout .main-content a:link,
+.admin-layout .main-content a:visited,
+.admin-layout #result_list a:link,
+.admin-layout #result_list a:visited {
+  color: var(--color-primary) !important;
+}
+
+.admin-layout .main-content a:hover,
+.admin-layout #result_list a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Boutons - texte toujours visible (z-index au-dessus du ::before) */
+.btn,
+.admin-layout .btn {
+  position: relative;
+  z-index: 1;
+}
+
+.btn *,
+.admin-layout .btn * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Boutons - texte blanc sur tous les boutons à fond coloré */
+.admin-layout .btn-primary,
+.admin-layout .btn-success,
+.admin-layout .btn-danger,
+.admin-layout .btn-warning,
+.admin-layout .btn-info,
+.admin-layout input[type="submit"].btn-primary,
+.admin-layout input[type="submit"][name="_save"],
+.admin-layout input[type="submit"] {
+  color: white !important;
+}
+
+.admin-layout .btn-primary *,
+.admin-layout .btn-success *,
+.admin-layout .btn-danger *,
+.admin-layout .btn-warning *,
+.admin-layout .btn-info *,
+.admin-layout input[type="submit"] * {
+  color: white !important;
+}
+
+.admin-layout .btn-secondary,
+.admin-layout .btn-secondary * {
+  color: var(--color-text) !important;
+}
+
+/* Boutons hors admin-layout */
+.btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-info,
+input[type="submit"].btn-primary,
+input[type="submit"][name="_save"] {
+  color: white !important;
+}
+
+.btn-primary *, .btn-success *, .btn-danger *, .btn-warning *, .btn-info * {
+  color: white !important;
+}
+
+.btn-secondary,
+.btn-secondary * {
+  color: var(--color-text) !important;
+}
+
+/* Liens de pagination et dropdown - texte visible */
+.admin-layout .page-link,
+.admin-layout .dropdown-item {
+  color: var(--color-text) !important;
+}
+
+.admin-layout .page-link:hover,
+.admin-layout .dropdown-item:hover {
+  color: var(--color-primary) !important;
+}
+
+/* Cartes - fond et bordures thème */
+.admin-layout .card,
+.admin-layout .card-header,
+.admin-layout .card-body {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .card-header {
+  color: var(--color-text) !important;
+  background: var(--color-primary) !important;
+  color: white !important;
+  border-color: var(--color-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Design system override - card-header thème cohérent */
+.admin-layout .card .card-header {
+  background: var(--color-primary) !important;
+  color: white !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Surcharger design_system body (gray-900) - forcer couleurs thème */
+body {
+  color: var(--color-text) !important;
+  background-color: var(--color-background) !important;
+}
+
+/* Tableaux section Contenu - texte des cellules pas tout en bleu */
+.admin-layout #result_list td,
+.admin-layout #result_list th {
+  color: var(--color-text) !important;
+}
+
+/* Seuls les vrais liens dans le tableau sont bleus */
+.admin-layout #result_list td a {
+  color: var(--color-primary) !important;
+}
+
+/* === Éléments Django admin non couverts - module, results, changelist-filter === */
+.admin-layout .module,
+.admin-layout #changelist .module,
+.admin-layout .changelist-form-container .module {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .results,
+.admin-layout .results table,
+.admin-layout .table-wrapper,
+.admin-layout #result_list {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout .results thead th,
+.admin-layout .results tbody td,
+.admin-layout #result_list thead th,
+.admin-layout #result_list tbody td {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout .results tbody tr:hover td,
+.admin-layout #result_list tbody tr:hover td {
+  background: var(--selected-bg) !important;
+}
+
+/* Filtres latéraux (changelist-filter) */
+.admin-layout #changelist-filter,
+.admin-layout #changelist-filter h2,
+.admin-layout #changelist-filter h3,
+.admin-layout #changelist-filter li,
+.admin-layout #changelist-filter ul {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout #changelist-filter a {
+  color: var(--color-primary) !important;
+}
+
+.admin-layout #changelist-filter a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Formulaires - inputs, selects, labels */
+.admin-layout .form-control,
+.admin-layout .form-select,
+.admin-layout input[type="text"],
+.admin-layout input[type="email"],
+.admin-layout input[type="number"],
+.admin-layout input[type="search"],
+.admin-layout select,
+.admin-layout textarea {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout .form-control::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.admin-layout label {
+  color: var(--color-text) !important;
+}
+
+/* Pagination */
+.admin-layout .pagination,
+.admin-layout .pagination .page-link {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout .pagination .page-item.active .page-link {
+  background: var(--color-primary) !important;
+  color: white !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Design system - cartes sans admin-layout (fallback) */
+.card,
+.card-header,
+.card-body {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Table Bootstrap en dehors de admin-layout */
+.table,
+.table td,
+.table th {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}

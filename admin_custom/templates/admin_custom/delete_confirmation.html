@@ -1,0 +1,28 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load static i18n admin_urls %}
+
+{% block content %}
+<div class="card card-danger card-outline">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-exclamation-triangle"></i> Confirmation de suppression
+        </h3>
+    </div>
+    <div class="card-body">
+        {{ block.super }}
+    </div>
+    <div class="card-footer">
+        <form method="post">
+            {% csrf_token %}
+            <div class="btn-group" role="group">
+                <button type="submit" class="btn btn-danger btn-lg" name="confirm">
+                    <i class="fas fa-trash"></i> Oui, je suis sûr
+                </button>
+                <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

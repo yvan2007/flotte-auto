@@ -1,0 +1,193 @@
+{% extends "admin_custom/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_custom/css/admin_tools_cards.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/business_apps_hover.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">
+                        <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                    </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Bouton Personnaliser l'affichage -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <a href="{% url 'admin:dashboard_customize' %}" class="btn btn-info btn-sm" id="btn-customize-dashboard" title="Choisir les indicateurs affichés">
+                        <i class="fas fa-sliders-h"></i> Personnaliser l'affichage
+                    </a>
+                </div>
+            </div>
+            <!-- Cartes d'indicateurs (remplies par JS depuis l'API, pas d'URL en dur) -->
+            <div class="row" id="dashboard-metrics-row" data-customize-url="{% url 'admin:dashboard_customize' %}">
+                <div class="col-12">
+                    <div class="small-box bg-info-gradient">
+                        <div class="inner">
+                            <h3>-</h3>
+                            <p>Chargement des indicateurs…</p>
+                        </div>
+                        <div class="icon"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="small-box-footer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outils d'administration - Section séparée -->
+            <div class="row mb-4" style="margin-top: 3rem;">
+                <div class="col-12">
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-tools"></i> Outils d'administration
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <a href="{% url 'admin:admin_dashboard' %}" class="admin-tool-card admin-tool-blue">
+                                        <i class="fas fa-chart-line fa-2x mb-2"></i><br>
+                                        <strong>Dashboard</strong><br>
+                                        <small>Vue d'ensemble complète</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{% url 'admin:admin_charts' %}" class="admin-tool-card admin-tool-green">
+                                        <i class="fas fa-chart-pie fa-2x mb-2"></i><br>
+                                        <strong>Graphiques</strong><br>
+                                        <small>Créer des graphiques dynamiques</small>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{% url 'admin:admin_grids' %}" class="admin-tool-card admin-tool-purple">
+                                        <i class="fas fa-table fa-2x mb-2"></i><br>
+                                        <strong>Grilles de données</strong><br>
+                                        <small>Visualiser et analyser les données</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications métier - Interface simplifiée -->
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-folder-open"></i> Applications métier
+                    </h3>
+                    <hr>
+                </div>
+                {% for app in app_list %}
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-folder-open"></i> {{ app.name }}
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool collapse-toggle" data-card-widget="collapse">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="nav nav-pills flex-column">
+                                {% for model in app.models %}
+                                <li class="nav-item">
+                                    <a href="{% if model.admin_url %}{{ model.admin_url }}{% else %}#{% endif %}" class="nav-link d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-circle nav-icon"></i>
+                                            <span class="nav-text ml-2">{{ model.name }}</span>
+                                        </div>
+                                        {% if model.add_url %}
+                                        <a href="{{ model.add_url }}" class="btn btn-primary btn-sm btn-add-modern" title="Ajouter {{ model.name }}">
+                                            <i class="fas fa-plus"></i> Ajouter
+                                        </a>
+                                        {% endif %}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var CARD_COLORS = ['bg-info-gradient', 'bg-success-gradient', 'bg-warning-gradient', 'bg-danger-gradient', 'bg-primary', 'bg-secondary'];
+    var CARD_ICONS = ['fa-shopping-cart', 'fa-money-bill', 'fa-file-invoice', 'fa-box', 'fa-chart-bar', 'fa-database'];
+    function getCookie(n){var c=document.cookie||'';var p=c.split('; ');for(var i=0;i<p.length;i++){if(p[i].indexOf(n+'=')===0)return p[i].slice(n.length+1);}return null;}
+    function loadConfigFromBackend(){return fetch('/admin_custom/api/dashboard-config/',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){return Array.isArray(d.config)?d.config:[];});}
+    function saveConfigToBackend(config){return fetch('/admin_custom/api/dashboard-config/save/',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({config:config})}).then(function(r){return r.json();});}
+    function loadMetrics(config){return fetch('/admin_custom/api/dashboard-metrics/?config='+encodeURIComponent(JSON.stringify(config))).then(function(r){return r.json();});}
+    function renderCards(metrics, config) {
+        var row = document.getElementById('dashboard-metrics-row');
+        if (!row) return;
+        if (!metrics || metrics.length === 0) {
+            var customizeUrl = row.getAttribute('data-customize-url') || '/admin/dashboard-customize/';
+            row.innerHTML = '<div class="col-12"><div class="small-box bg-info-gradient"><div class="inner"><h3>&mdash;</h3><p>Aucun indicateur configuré</p></div><div class="icon"><i class="fas fa-sliders-h"></i></div><a href="' + customizeUrl + '" class="small-box-footer">Personnaliser l\'affichage <i class="fas fa-arrow-circle-right"></i></a></div></div>';
+            return;
+        }
+        row.innerHTML = metrics.map(function(m, i) {
+            var color = CARD_COLORS[i % CARD_COLORS.length];
+            var icon = CARD_ICONS[i % CARD_ICONS.length];
+            var displayVal = m.value;
+            if (typeof m.value === 'number') {
+                displayVal = m.value % 1 !== 0 ? m.value.toFixed(2) : m.value;
+                if (Math.abs(m.value) >= 1000) displayVal = (m.value || 0).toLocaleString('fr-FR', {maximumFractionDigits: 2});
+            }
+            var link = m.admin_url ? '<a href="' + m.admin_url + '" class="small-box-footer">Voir <i class="fas fa-arrow-circle-right"></i></a>' : '<div class="small-box-footer"></div>';
+            var delBtn = '<button type="button" class="btn-dash-remove" data-index="' + i + '" title="Supprimer cette colonne" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.2);border:none;border-radius:4px;color:#fff;cursor:pointer;padding:2px 6px;font-size:14px;">&times;</button>';
+            return '<div class="col-lg-3 col-6"><div class="small-box ' + color + '" style="position:relative;">' + delBtn + '<div class="inner"><h3>' + displayVal + '</h3><p>' + m.label + '</p></div><div class="icon"><i class="fas ' + icon + '"></i></div>' + link + '</div></div>';
+        }).join('');
+        row.querySelectorAll('.btn-dash-remove').forEach(function(btn) {
+            btn.onclick = function() {
+                var idx = parseInt(btn.dataset.index, 10);
+                loadConfigFromBackend().then(function(cfg) {
+                    cfg.splice(idx, 1);
+                    return saveConfigToBackend(cfg);
+                }).then(function() { refreshDashboard(); });
+            };
+        });
+    }
+    function refreshDashboard() {
+        loadConfigFromBackend().then(function(config) {
+            return loadMetrics(config).then(function(data) {
+                renderCards(data.metrics || [], config);
+            });
+        });
+    }
+    refreshDashboard();
+});
+</script>
+{% endblock %}

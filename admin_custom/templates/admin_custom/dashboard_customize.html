@@ -1,0 +1,187 @@
+{% extends "admin_custom/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1><i class="fas fa-sliders-h"></i> {{ title }}</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ index_url }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ dashboard_url }}">Tableau de bord</a></li>
+                        <li class="breadcrumb-item active">Personnaliser l'affichage</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-outline card-info">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-info-circle"></i> Choisir les indicateurs affichés</h3>
+                    <div class="card-tools">
+                        <a href="{{ dashboard_url }}" class="btn btn-tool" title="Retour au tableau de bord">
+                            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Les indicateurs du tableau de bord sont basés sur les modèles de votre base de données.
+                        Vous pouvez afficher le <strong>nombre</strong> d'enregistrements, la <strong>somme</strong> ou la <strong>moyenne</strong> d'un champ numérique.
+                    </p>
+
+                    <h5 class="mt-4 mb-2">Indicateurs actuellement affichés</h5>
+                    <div id="indicators-list" class="mb-4 p-3 border rounded bg-light">
+                        <span class="text-muted small">Chargement…</span>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">Ajouter un indicateur</h5>
+                    <p class="text-muted small">Sélectionnez un modèle (table) de la base, le type d'indicateur et éventuellement le champ pour somme/moyenne.</p>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label for="metric-model">Modèle (table)</label>
+                            <select id="metric-model" class="form-control form-control-sm">
+                                <option value="">-- Sélectionner un modèle --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label for="metric-type">Type</label>
+                            <select id="metric-type" class="form-control form-control-sm">
+                                <option value="count">Nombre</option>
+                                <option value="sum">Somme</option>
+                                <option value="avg">Moyenne</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label for="metric-field">Champ (si somme/moyenne)</label>
+                            <select id="metric-field" class="form-control form-control-sm">
+                                <option value="">--</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label for="metric-label">Libellé affiché</label>
+                            <input type="text" id="metric-label" class="form-control form-control-sm" placeholder="Ex: Revenus totaux">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-add-indicator">
+                        <i class="fas fa-plus"></i> Ajouter cet indicateur
+                    </button>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ dashboard_url }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                    <button type="button" class="btn btn-success" id="btn-save-and-back">
+                        <i class="fas fa-save"></i> Enregistrer et voir le tableau de bord
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dashboardUrl = '{{ dashboard_url|escapejs }}';
+    let currentConfig = [];
+
+    function getCookie(name) {
+        var c = document.cookie || '';
+        var parts = c.split('; ');
+        for (var i = 0; i < parts.length; i++) {
+            if (parts[i].indexOf(name + '=') === 0) return parts[i].slice(name.length + 1);
+        }
+        return null;
+    }
+    function loadConfigFromBackend() {
+        return fetch('/admin_custom/api/dashboard-config/', { credentials: 'same-origin' }).then(function(r) { return r.json(); }).then(function(d) { return d.config || []; });
+    }
+    function saveConfigToBackend(config) {
+        return fetch('/admin_custom/api/dashboard-config/save/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify({ config: config })
+        }).then(function(r) { return r.json(); });
+    }
+    function loadModels() { return fetch('/admin_custom/api/dashboard-models/').then(function(r) { return r.json(); }); }
+
+    function renderIndicatorsList() {
+        var list = document.getElementById('indicators-list');
+        if (!list) return;
+        if (currentConfig.length === 0) {
+            list.innerHTML = '<span class="text-muted">Aucun indicateur. Ajoutez-en un ci-dessous.</span>';
+            return;
+        }
+        list.innerHTML = currentConfig.map(function(c, i) {
+            var lbl = c.label || (c.model + ' (' + c.type + (c.field ? ' ' + c.field : '') + ')');
+            return '<span class="badge badge-info mr-1 mb-1 d-inline-flex align-items-center">' + lbl +
+                ' <button type="button" class="badge-remove ml-1" data-i="' + i + '" style="background:none;border:none;cursor:pointer;color:inherit;">&times;</button></span>';
+        }).join('');
+        list.querySelectorAll('.badge-remove').forEach(function(btn) {
+            btn.onclick = function() {
+                currentConfig.splice(parseInt(btn.dataset.i), 1);
+                renderIndicatorsList();
+            };
+        });
+    }
+
+    function onModelOrTypeChange() {
+        var modelOpt = document.getElementById('metric-model').value;
+        var type = document.getElementById('metric-type').value;
+        var fieldSel = document.getElementById('metric-field');
+        fieldSel.innerHTML = '<option value="">--</option>';
+        if (modelOpt && (type === 'sum' || type === 'avg')) {
+            var parts = modelOpt.split('|');
+            loadModels().then(function(data) {
+                var mod = (data.models || []).find(function(x) { return x.app === parts[0] && x.model === parts[1]; });
+                if (mod && mod.numeric_fields) mod.numeric_fields.forEach(function(f) { fieldSel.innerHTML += '<option value="' + f + '">' + f + '</option>'; });
+            });
+        }
+    }
+
+    loadModels().then(function(data) {
+        var sel = document.getElementById('metric-model');
+        var models = data.models || [];
+        sel.innerHTML = '<option value="">-- Sélectionner un modèle --</option>' + models.map(function(m) {
+            return '<option value="' + m.app + '|' + m.model + '">' + (m.verbose_name || m.model) + ' (' + m.app + '.' + m.model + ')</option>';
+        }).join('');
+    });
+    loadConfigFromBackend().then(function(config) {
+        currentConfig = Array.isArray(config) ? config : [];
+        renderIndicatorsList();
+    });
+
+    document.getElementById('metric-type').onchange = document.getElementById('metric-model').onchange = onModelOrTypeChange;
+
+    document.getElementById('btn-add-indicator').onclick = function() {
+        var modelOpt = document.getElementById('metric-model').value;
+        if (!modelOpt) return;
+        var parts = modelOpt.split('|');
+        if (parts.length !== 2) return;
+        var type = document.getElementById('metric-type').value || 'count';
+        var field = (type === 'sum' || type === 'avg') ? (document.getElementById('metric-field').value || '') : '';
+        currentConfig.push({ app: parts[0], model: parts[1], type: type, field: field, label: document.getElementById('metric-label').value || '' });
+        document.getElementById('metric-label').value = '';
+        renderIndicatorsList();
+    };
+
+    document.getElementById('btn-save-and-back').onclick = function() {
+        var btn = this;
+        btn.disabled = true;
+        saveConfigToBackend(currentConfig).then(function() {
+            window.location.href = dashboardUrl;
+        }).catch(function() { btn.disabled = false; });
+    };
+});
+</script>
+{% endblock %}

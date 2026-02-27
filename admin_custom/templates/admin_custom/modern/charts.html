@@ -1,0 +1,85 @@
+{% extends "admin_custom/modern/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="page-title">Graphiques Dynamiques</h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Configuration</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Modèle</label>
+          <select id="chart-model" class="form-control">
+            <option value="">-- Sélectionner un modèle --</option>
+            {% for model in models %}
+            <option value="{{ model.name }}" data-app="{{ model.app|default:'' }}">
+              {{ model.label }}{% if model.app %} ({{ model.app }}){% endif %}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Champ</label>
+          <select id="chart-field" class="form-control">
+            <option value="">-- Sélectionner un champ --</option>
+          </select>
+          <small class="form-text text-muted" id="field-help">Sélectionnez d'abord un modèle</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select id="chart-type" class="form-control">
+            <option value="line">Courbe</option>
+            <option value="bar">Histogramme</option>
+            <option value="pie">Camembert</option>
+            <option value="doughnut">Donut</option>
+            <option value="area">Aire</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fréquence</label>
+          <select id="chart-frequency" class="form-control">
+            <option value="day">Jour</option>
+            <option value="week">Semaine</option>
+            <option value="month" selected>Mois</option>
+            <option value="quarter">Trimestre</option>
+            <option value="year">Année</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Opération</label>
+          <select id="chart-operation" class="form-control">
+            <option value="sum" selected>Somme</option>
+            <option value="avg">Moyenne</option>
+            <option value="count">Nombre</option>
+          </select>
+        </div>
+        <button id="generate-chart" class="btn btn-primary" style="width:100%;">
+          <i class="fa-solid fa-magic"></i> Générer le graphique
+        </button>
+        <div id="chart-loading" class="alert alert-info mt-3" style="display:none;">
+          <i class="fa-solid fa-spinner fa-spin"></i> Génération...
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">Visualisation</div>
+      <div class="card-body">
+        <div id="chart-placeholder" class="text-center p-5" style="color:var(--color-text-muted);">
+          <i class="fa-solid fa-chart-line" style="font-size:3rem;"></i>
+          <p class="mt-3">Sélectionnez les paramètres et cliquez sur "Générer le graphique"</p>
+        </div>
+        <canvas id="chart-canvas" style="min-height:400px; display:none;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'admin_custom/js/admin_custom.js' %}"></script>
+{% endblock %}

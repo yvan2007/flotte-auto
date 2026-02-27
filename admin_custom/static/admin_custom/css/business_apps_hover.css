@@ -1,0 +1,214 @@
+/**
+ * Effet de survol pour les Applications métier
+ * Overlay transparent en thème sombre
+ */
+
+/* Effet de survol pour les cartes Applications métier en thème sombre */
+[data-theme="dark"] .card.card-outline.card-primary {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* Overlay transparent au survol */
+[data-theme="dark"] .card.card-outline.card-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="dark"] .card.card-outline.card-primary:hover::before {
+  opacity: 1;
+}
+
+/* Effet de soulèvement au survol */
+[data-theme="dark"] .card.card-outline.card-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: var(--primary-color, #6366F1);
+}
+
+/* S'assurer que le contenu reste au-dessus de l'overlay */
+[data-theme="dark"] .card.card-outline.card-primary .card-header,
+[data-theme="dark"] .card.card-outline.card-primary .card-body {
+  position: relative;
+  z-index: 2;
+}
+
+/* Animation des items de navigation au survol */
+[data-theme="dark"] .card.card-outline.card-primary .nav-link {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+[data-theme="dark"] .card.card-outline.card-primary .nav-link:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  padding-left: 20px;
+}
+
+/* Effet sur le bouton "Ajouter" */
+[data-theme="dark"] .card.card-outline.card-primary .btn-add-modern {
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .card.card-outline.card-primary .nav-link:hover .btn-add-modern {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Pour les autres thèmes - overlay très léger */
+[data-theme="default"] .card.card-outline.card-primary::before,
+[data-theme="liquid-glass"] .card.card-outline.card-primary::before,
+[data-theme="nostalgie"] .card.card-outline.card-primary::before,
+[data-theme="ocean"] .card.card-outline.card-primary::before,
+[data-theme="sunset"] .card.card-outline.card-primary::before,
+[data-theme="forest"] .card.card-outline.card-primary::before,
+[data-theme="black"] .card.card-outline.card-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.02);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="default"] .card.card-outline.card-primary:hover::before,
+[data-theme="liquid-glass"] .card.card-outline.card-primary:hover::before,
+[data-theme="nostalgie"] .card.card-outline.card-primary:hover::before,
+[data-theme="ocean"] .card.card-outline.card-primary:hover::before,
+[data-theme="sunset"] .card.card-outline.card-primary:hover::before,
+[data-theme="forest"] .card.card-outline.card-primary:hover::before,
+[data-theme="black"] .card.card-outline.card-primary:hover::before {
+  opacity: 1;
+}
+
+/* S'assurer que le contenu reste au-dessus pour tous les thèmes */
+.card.card-outline.card-primary .card-header,
+.card.card-outline.card-primary .card-body {
+  position: relative;
+  z-index: 2;
+}
+
+/* === Positionnement du header === */
+.card.card-outline.card-primary .card-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-right: 15px !important;
+}
+
+.card.card-outline.card-primary .card-title {
+  flex: 0 0 auto;
+  margin-right: auto;
+}
+
+.card.card-outline.card-primary .card-tools {
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* === Animation de l'icône dropdown === */
+
+/* Style de base pour le bouton de collapse - SANS carré */
+.collapse-toggle {
+  transition: all 0.3s ease;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: none !important;
+}
+
+.collapse-toggle:hover {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.collapse-toggle:focus,
+.collapse-toggle:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+/* Animation de rotation de l'icône chevron */
+.collapse-toggle i {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  font-size: 1rem;
+}
+
+/* Effet hover uniquement sur l'icône */
+.collapse-toggle:hover i {
+  transform: scale(1.2);
+}
+
+/* Quand la carte est fermée (collapsed), rotation de 180° */
+.card.collapsed-card .collapse-toggle i {
+  transform: rotate(-180deg);
+}
+
+.card.collapsed-card .collapse-toggle:hover i {
+  transform: rotate(-180deg) scale(1.2);
+}
+
+/* Quand la carte est ouverte, chevron vers le bas (état par défaut) */
+.card:not(.collapsed-card) .collapse-toggle i {
+  transform: rotate(0deg);
+}
+
+.card:not(.collapsed-card) .collapse-toggle:hover i {
+  transform: rotate(0deg) scale(1.2);
+}
+
+/* Couleur de l'icône selon le thème */
+[data-theme="dark"] .collapse-toggle i {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .collapse-toggle:hover i {
+  color: rgba(255, 255, 255, 1);
+}
+
+[data-theme="default"] .collapse-toggle i,
+[data-theme="liquid-glass"] .collapse-toggle i,
+[data-theme="nostalgie"] .collapse-toggle i,
+[data-theme="ocean"] .collapse-toggle i,
+[data-theme="sunset"] .collapse-toggle i,
+[data-theme="forest"] .collapse-toggle i {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="default"] .collapse-toggle:hover i,
+[data-theme="liquid-glass"] .collapse-toggle:hover i,
+[data-theme="nostalgie"] .collapse-toggle:hover i,
+[data-theme="ocean"] .collapse-toggle:hover i,
+[data-theme="sunset"] .collapse-toggle:hover i,
+[data-theme="forest"] .collapse-toggle:hover i {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="black"] .collapse-toggle i {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="black"] .collapse-toggle:hover i {
+  color: rgba(255, 255, 255, 1);
+}

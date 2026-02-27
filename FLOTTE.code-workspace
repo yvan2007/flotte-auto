@@ -4,10 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../../../Downloads/flotte"
-		},
-		{
-			"path": "../../../Downloads/ilovepdf_converted"
+			"path": "../../../Downloads/admin_custom/admin_custom"
 		}
 	],
 	"settings": {}

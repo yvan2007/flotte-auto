@@ -1,0 +1,228 @@
+{% extends "admin_custom/modern/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="page-title">Tableau de bord</h1>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+  <a href="{% url 'admin:dashboard_customize' %}" class="btn btn-sm btn-outline-primary" id="btn-customize-dashboard" title="Choisir les indicateurs affichés">
+    <i class="fa-solid fa-sliders"></i> Personnaliser l'affichage
+  </a>
+  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createChartModal" id="btn-create-chart">
+    <i class="fa-solid fa-plus"></i> Créer un graphique
+  </button>
+</div>
+
+<div class="row g-4 mb-5" id="dashboard-metrics-row" data-customize-url="{% url 'admin:dashboard_customize' %}" style="--bs-gutter-x:1.5rem; --bs-gutter-y:1.5rem;">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="metric-card">
+      <div class="metric-icon primary"><i class="fa-solid fa-users"></i></div>
+      <div class="metric-content">
+        <h3 id="stat-users">{{ stats.orders|default:0 }}</h3>
+        <p>Utilisateurs</p>
+        <span class="metric-trend">Données en temps réel</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="metric-card">
+      <div class="metric-icon success"><i class="fa-solid fa-cart-shopping"></i></div>
+      <div class="metric-content">
+        <h3 id="stat-orders">{{ stats.orders|default:0 }}</h3>
+        <p>Commandes</p>
+        <span class="metric-trend">Total</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="metric-card">
+      <div class="metric-icon warning"><i class="fa-solid fa-file-invoice"></i></div>
+      <div class="metric-content">
+        <h3 id="stat-invoices">{{ stats.invoices|default:0 }}</h3>
+        <p>Factures</p>
+        <span class="metric-trend">Total</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="metric-card">
+      <div class="metric-icon danger"><i class="fa-solid fa-box"></i></div>
+      <div class="metric-content">
+        <h3 id="stat-products">{{ stats.products|default:0 }}</h3>
+        <p>Produits</p>
+        <span class="metric-trend">{{ stats.revenue|default:0|floatformat:0 }} € revenus</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function getCookie(n){var c=document.cookie||'';var p=c.split('; ');for(var i=0;i<p.length;i++){if(p[i].indexOf(n+'=')===0)return p[i].slice(n.length+1);}return null;}
+  function loadConfigFromBackend(){return fetch('/admin_custom/api/dashboard-config/',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){return Array.isArray(d.config)?d.config:[];});}
+  function saveConfigToBackend(config){return fetch('/admin_custom/api/dashboard-config/save/',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({config:config})}).then(function(r){return r.json();});}
+  function loadMetrics(config){return fetch('/admin_custom/api/dashboard-metrics/?config='+encodeURIComponent(JSON.stringify(config))).then(function(r){return r.json();});}
+  function renderCards(metrics, config) {
+    var row = document.getElementById('dashboard-metrics-row');
+    if (!row) return;
+    if (!metrics || metrics.length === 0) {
+      var customizeUrl = row.getAttribute('data-customize-url') || '/admin/dashboard-customize/';
+      row.innerHTML = '<div class="col-12"><div class="metric-card" style="position:relative;"><div class="metric-icon primary"><i class="fa-solid fa-sliders"></i></div><div class="metric-content"><h3>&mdash;</h3><p>Aucun indicateur configuré</p><a href="' + customizeUrl + '" class="btn btn-primary btn-sm mt-2">Personnaliser l\'affichage</a></div></div></div>';
+      return;
+    }
+    var icons = ['fa-users', 'fa-cart-shopping', 'fa-file-invoice', 'fa-box', 'fa-chart-bar', 'fa-database'];
+    var iconClasses = ['primary', 'success', 'warning', 'danger', 'primary', 'secondary'];
+    row.innerHTML = metrics.map(function(m, i) {
+      var v = m.value;
+      if (typeof m.value === 'number') {
+        v = m.value % 1 !== 0 ? m.value.toFixed(2) : m.value;
+        if (Math.abs(m.value) >= 1000) v = (m.value || 0).toLocaleString('fr-FR', {maximumFractionDigits: 2});
+      }
+      var link = m.admin_url ? '<a href="' + m.admin_url + '" class="btn btn-primary btn-sm mt-2">Voir</a>' : '';
+      var delBtn = '<button type="button" class="btn-dash-remove" data-index="' + i + '" title="Supprimer cette colonne" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.15);border:none;border-radius:4px;color:inherit;cursor:pointer;padding:2px 8px;font-size:14px;">&times;</button>';
+      return '<div class="col-12 col-sm-6 col-xl-3"><div class="metric-card" style="position:relative;">' + delBtn + '<div class="metric-icon ' + iconClasses[i % iconClasses.length] + '"><i class="fa-solid ' + icons[i % icons.length] + '"></i></div><div class="metric-content"><h3>' + v + '</h3><p>' + m.label + '</p>' + link + '</div></div></div>';
+    }).join('');
+    row.querySelectorAll('.btn-dash-remove').forEach(function(btn) {
+      btn.onclick = function() {
+        var idx = parseInt(btn.dataset.index, 10);
+        loadConfigFromBackend().then(function(cfg) {
+          cfg.splice(idx, 1);
+          return saveConfigToBackend(cfg);
+        }).then(function() { refresh(); });
+      };
+    });
+  }
+  function refresh() {
+    loadConfigFromBackend().then(function(config) {
+      return loadMetrics(config).then(function(d) {
+        renderCards(d.metrics || [], config);
+      });
+    });
+  }
+  refresh();
+})();
+</script>
+
+<!-- Section Graphiques -->
+<div class="row g-4 mb-5" id="dashboard-charts-row">
+  <!-- Les graphiques seront chargés ici dynamiquement -->
+</div>
+
+<!-- Section Liens rapides - Pleine largeur -->
+<div class="row g-4 mb-5">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0"><i class="fa-solid fa-link"></i> Liens rapides</h3>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <a href="{% url 'admin:admin_charts' %}" class="btn btn-primary w-100">
+              <i class="fa-solid fa-chart-line"></i> Graphiques
+            </a>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <a href="{% url 'admin:admin_grids' %}" class="btn btn-secondary w-100">
+              <i class="fa-solid fa-table"></i> Grilles de données
+            </a>
+          </div>
+          {% for app in app_list %}
+          {% for model in app.models %}
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <a href="{{ model.admin_url }}" class="btn btn-outline-secondary w-100">
+              <i class="fa-solid fa-arrow-right"></i> {{ model.name }}
+            </a>
+          </div>
+          {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour créer/éditer un graphique -->
+<div class="modal fade" id="createChartModal" tabindex="-1" aria-labelledby="createChartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createChartModalLabel">Créer un graphique</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="chartForm">
+          <input type="hidden" id="chartId" name="id">
+          <div class="mb-3">
+            <label for="chartName" class="form-label">Nom du graphique *</label>
+            <input type="text" class="form-control" id="chartName" name="name" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="chartModel" class="form-label">Modèle *</label>
+              <select class="form-select" id="chartModel" name="model_name" required>
+                <option value="">-- Sélectionner un modèle --</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="chartField" class="form-label">Champ *</label>
+              <select class="form-select" id="chartField" name="field_name" required>
+                <option value="">-- Sélectionner un modèle d'abord --</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="chartType" class="form-label">Type de graphique *</label>
+              <select class="form-select" id="chartType" name="chart_type" required>
+                <option value="line">Courbe</option>
+                <option value="bar">Histogramme</option>
+                <option value="pie">Camembert</option>
+                <option value="doughnut">Donut</option>
+                <option value="area">Aire</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="chartFrequency" class="form-label">Fréquence *</label>
+              <select class="form-select" id="chartFrequency" name="frequency" required>
+                <option value="day">Jour</option>
+                <option value="week">Semaine</option>
+                <option value="month" selected>Mois</option>
+                <option value="quarter">Trimestre</option>
+                <option value="year">Année</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="chartOperation" class="form-label">Opération *</label>
+              <select class="form-select" id="chartOperation" name="operation" required>
+                <option value="sum" selected>Somme</option>
+                <option value="avg">Moyenne</option>
+                <option value="count">Nombre</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary" id="btn-preview-chart">
+              <i class="fa-solid fa-eye"></i> Aperçu
+            </button>
+          </div>
+          <div id="chartPreview" style="display:none;">
+            <canvas id="previewChartCanvas"></canvas>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="btn-save-chart">
+          <i class="fa-solid fa-save"></i> Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'admin_custom/js/dashboard_charts.js' %}"></script>
+{% endblock %}

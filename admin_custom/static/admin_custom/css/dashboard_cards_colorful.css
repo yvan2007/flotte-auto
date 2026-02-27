@@ -1,0 +1,597 @@
+/**
+ * Cartes colorées pour le dashboard
+ * Chaque carte a sa propre couleur harmonieuse
+ */
+
+/* === THÈME DEFAULT - Cartes multicolores vibrantes === */
+[data-theme="default"] .stats-card:nth-child(1),
+[data-theme="default"] .stat-card:nth-child(1),
+[data-theme="default"] .quick-action-card:nth-child(1) {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(1) *,
+[data-theme="default"] .stat-card:nth-child(1) *,
+[data-theme="default"] .quick-action-card:nth-child(1) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(2),
+[data-theme="default"] .stat-card:nth-child(2),
+[data-theme="default"] .quick-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(2) *,
+[data-theme="default"] .stat-card:nth-child(2) *,
+[data-theme="default"] .quick-action-card:nth-child(2) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(3),
+[data-theme="default"] .stat-card:nth-child(3),
+[data-theme="default"] .quick-action-card:nth-child(3) {
+  background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(3) *,
+[data-theme="default"] .stat-card:nth-child(3) *,
+[data-theme="default"] .quick-action-card:nth-child(3) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(4),
+[data-theme="default"] .stat-card:nth-child(4),
+[data-theme="default"] .quick-action-card:nth-child(4) {
+  background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(4) *,
+[data-theme="default"] .stat-card:nth-child(4) *,
+[data-theme="default"] .quick-action-card:nth-child(4) * {
+  color: #FFFFFF !important;
+}
+
+/* Cartes supplémentaires avec d'autres couleurs */
+[data-theme="default"] .stats-card:nth-child(5),
+[data-theme="default"] .stat-card:nth-child(5) {
+  background: linear-gradient(135deg, #10B981 0%, #14B8A6 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(5) *,
+[data-theme="default"] .stat-card:nth-child(5) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(6),
+[data-theme="default"] .stat-card:nth-child(6) {
+  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .stats-card:nth-child(6) *,
+[data-theme="default"] .stat-card:nth-child(6) * {
+  color: #FFFFFF !important;
+}
+
+/* === THÈME DARK - Cartes néon élégantes sur fond sombre === */
+
+/* Carte 1 - Violet électrique néon */
+[data-theme="dark"] .stats-card:nth-child(1),
+[data-theme="dark"] .stat-card:nth-child(1),
+[data-theme="dark"] .quick-action-card:nth-child(1) {
+  background: linear-gradient(135deg, #9333EA 0%, #C084FC 100%) !important;
+  border: 1px solid rgba(147, 51, 234, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(147, 51, 234, 0.5), 0 0 20px rgba(192, 132, 252, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(1) *,
+[data-theme="dark"] .stat-card:nth-child(1) *,
+[data-theme="dark"] .quick-action-card:nth-child(1) * {
+  color: #FFFFFF !important;
+}
+
+/* Carte 2 - Rose néon vibrant */
+[data-theme="dark"] .stats-card:nth-child(2),
+[data-theme="dark"] .stat-card:nth-child(2),
+[data-theme="dark"] .quick-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%) !important;
+  border: 1px solid rgba(236, 72, 153, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(236, 72, 153, 0.5), 0 0 20px rgba(244, 114, 182, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(2) *,
+[data-theme="dark"] .stat-card:nth-child(2) *,
+[data-theme="dark"] .quick-action-card:nth-child(2) * {
+  color: #FFFFFF !important;
+}
+
+/* Carte 3 - Bleu cyan électrique */
+[data-theme="dark"] .stats-card:nth-child(3),
+[data-theme="dark"] .stat-card:nth-child(3),
+[data-theme="dark"] .quick-action-card:nth-child(3) {
+  background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%) !important;
+  border: 1px solid rgba(14, 165, 233, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5), 0 0 20px rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(3) *,
+[data-theme="dark"] .stat-card:nth-child(3) *,
+[data-theme="dark"] .quick-action-card:nth-child(3) * {
+  color: #FFFFFF !important;
+}
+
+/* Carte 4 - Orange/Ambre lumineux */
+[data-theme="dark"] .stats-card:nth-child(4),
+[data-theme="dark"] .stat-card:nth-child(4),
+[data-theme="dark"] .quick-action-card:nth-child(4) {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5), 0 0 20px rgba(251, 191, 36, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(4) *,
+[data-theme="dark"] .stat-card:nth-child(4) *,
+[data-theme="dark"] .quick-action-card:nth-child(4) * {
+  color: #FFFFFF !important;
+}
+
+/* Carte 5 - Vert émeraude néon */
+[data-theme="dark"] .stats-card:nth-child(5),
+[data-theme="dark"] .stat-card:nth-child(5) {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5), 0 0 20px rgba(52, 211, 153, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(5) *,
+[data-theme="dark"] .stat-card:nth-child(5) * {
+  color: #FFFFFF !important;
+}
+
+/* Carte 6 - Rouge corail électrique */
+[data-theme="dark"] .stats-card:nth-child(6),
+[data-theme="dark"] .stat-card:nth-child(6) {
+  background: linear-gradient(135deg, #EF4444 0%, #F87171 100%) !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5), 0 0 20px rgba(248, 113, 113, 0.3) !important;
+}
+
+[data-theme="dark"] .stats-card:nth-child(6) *,
+[data-theme="dark"] .stat-card:nth-child(6) * {
+  color: #FFFFFF !important;
+}
+
+/* Effet hover sur les cartes */
+[data-theme="default"] .stats-card:hover,
+[data-theme="default"] .stat-card:hover,
+[data-theme="default"] .quick-action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .stats-card:hover,
+[data-theme="dark"] .stat-card:hover,
+[data-theme="dark"] .quick-action-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  filter: brightness(1.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Icônes dans les cartes dark - couleur blanche pure */
+[data-theme="dark"] .quick-action-card i,
+[data-theme="dark"] .stats-card i,
+[data-theme="dark"] .stat-card i {
+  color: #FFFFFF !important;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* === THÈME NOSTALGIE - Cartes ambre vintage, tons chauds === */
+[data-theme="nostalgie"] .stats-card:nth-child(1),
+[data-theme="nostalgie"] .stat-card:nth-child(1),
+[data-theme="nostalgie"] .quick-action-card:nth-child(1) {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 100%) !important;
+  border: 1px solid rgba(253, 186, 116, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(180, 83, 9, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(1) *,
+[data-theme="nostalgie"] .stat-card:nth-child(1) *,
+[data-theme="nostalgie"] .quick-action-card:nth-child(1) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(2),
+[data-theme="nostalgie"] .stat-card:nth-child(2),
+[data-theme="nostalgie"] .quick-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #C2410C 0%, #EA580C 100%) !important;
+  border: 1px solid rgba(253, 186, 116, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(194, 65, 12, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(2) *,
+[data-theme="nostalgie"] .stat-card:nth-child(2) *,
+[data-theme="nostalgie"] .quick-action-card:nth-child(2) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(3),
+[data-theme="nostalgie"] .stat-card:nth-child(3),
+[data-theme="nostalgie"] .quick-action-card:nth-child(3) {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%) !important;
+  border: 1px solid rgba(253, 186, 116, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(3) *,
+[data-theme="nostalgie"] .stat-card:nth-child(3) *,
+[data-theme="nostalgie"] .quick-action-card:nth-child(3) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(4),
+[data-theme="nostalgie"] .stat-card:nth-child(4),
+[data-theme="nostalgie"] .quick-action-card:nth-child(4) {
+  background: linear-gradient(135deg, #92400E 0%, #B45309 100%) !important;
+  border: 1px solid rgba(253, 186, 116, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(146, 64, 14, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="nostalgie"] .stats-card:nth-child(4) *,
+[data-theme="nostalgie"] .stat-card:nth-child(4) *,
+[data-theme="nostalgie"] .quick-action-card:nth-child(4) * {
+  color: #FFFFFF !important;
+}
+
+/* === THÈME OCÉAN - Cartes bleu profond, reflets de mer === */
+[data-theme="ocean"] .stats-card:nth-child(1),
+[data-theme="ocean"] .stat-card:nth-child(1),
+[data-theme="ocean"] .quick-action-card:nth-child(1) {
+  background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%) !important;
+  border: 1px solid rgba(186, 230, 253, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(1) *,
+[data-theme="ocean"] .stat-card:nth-child(1) *,
+[data-theme="ocean"] .quick-action-card:nth-child(1) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(2),
+[data-theme="ocean"] .stat-card:nth-child(2),
+[data-theme="ocean"] .quick-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%) !important;
+  border: 1px solid rgba(186, 230, 253, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(2) *,
+[data-theme="ocean"] .stat-card:nth-child(2) *,
+[data-theme="ocean"] .quick-action-card:nth-child(2) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(3),
+[data-theme="ocean"] .stat-card:nth-child(3),
+[data-theme="ocean"] .quick-action-card:nth-child(3) {
+  background: linear-gradient(135deg, #0C4A6E 0%, #0369A1 100%) !important;
+  border: 1px solid rgba(186, 230, 253, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(12, 74, 110, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(3) *,
+[data-theme="ocean"] .stat-card:nth-child(3) *,
+[data-theme="ocean"] .quick-action-card:nth-child(3) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(4),
+[data-theme="ocean"] .stat-card:nth-child(4),
+[data-theme="ocean"] .quick-action-card:nth-child(4) {
+  background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%) !important;
+  border: 1px solid rgba(186, 230, 253, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="ocean"] .stats-card:nth-child(4) *,
+[data-theme="ocean"] .stat-card:nth-child(4) *,
+[data-theme="ocean"] .quick-action-card:nth-child(4) * {
+  color: #FFFFFF !important;
+}
+
+/* === THÈME FORÊT - Cartes vert naturel, mousse et feuillage === */
+[data-theme="forest"] .stats-card:nth-child(1),
+[data-theme="forest"] .stat-card:nth-child(1),
+[data-theme="forest"] .quick-action-card:nth-child(1) {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+  border: 1px solid rgba(134, 239, 172, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(4, 120, 87, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(1) *,
+[data-theme="forest"] .stat-card:nth-child(1) *,
+[data-theme="forest"] .quick-action-card:nth-child(1) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(2),
+[data-theme="forest"] .stat-card:nth-child(2),
+[data-theme="forest"] .quick-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  border: 1px solid rgba(134, 239, 172, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(2) *,
+[data-theme="forest"] .stat-card:nth-child(2) *,
+[data-theme="forest"] .quick-action-card:nth-child(2) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(3),
+[data-theme="forest"] .stat-card:nth-child(3),
+[data-theme="forest"] .quick-action-card:nth-child(3) {
+  background: linear-gradient(135deg, #065F46 0%, #047857 100%) !important;
+  border: 1px solid rgba(134, 239, 172, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(6, 95, 70, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(3) *,
+[data-theme="forest"] .stat-card:nth-child(3) *,
+[data-theme="forest"] .quick-action-card:nth-child(3) * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(4),
+[data-theme="forest"] .stat-card:nth-child(4),
+[data-theme="forest"] .quick-action-card:nth-child(4) {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+  border: 1px solid rgba(134, 239, 172, 0.4) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="forest"] .stats-card:nth-child(4) *,
+[data-theme="forest"] .stat-card:nth-child(4) *,
+[data-theme="forest"] .quick-action-card:nth-child(4) * {
+  color: #FFFFFF !important;
+}
+
+/* Hover harmonieux pour Nostalgie, Océan, Forêt */
+[data-theme="nostalgie"] .stats-card:hover,
+[data-theme="nostalgie"] .stat-card:hover,
+[data-theme="nostalgie"] .quick-action-card:hover,
+[data-theme="ocean"] .stats-card:hover,
+[data-theme="ocean"] .stat-card:hover,
+[data-theme="ocean"] .quick-action-card:hover,
+[data-theme="forest"] .stats-card:hover,
+[data-theme="forest"] .stat-card:hover,
+[data-theme="forest"] .quick-action-card:hover {
+  transform: translateY(-4px);
+  transition: all 0.3s ease;
+  filter: brightness(1.05);
+}
+
+/* ============================================================
+   SMALL-BOX (cartes stats dashboard) - Couleurs par thème
+   Chaque carte a une couleur distincte selon le thème choisi
+   ============================================================ */
+
+/* DEFAULT - 4 couleurs différentes */
+[data-theme="default"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="default"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="default"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="default"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="default"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="default"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="default"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="default"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* DARK - Néon */
+[data-theme="dark"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="dark"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #9333EA 0%, #C084FC 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="dark"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="dark"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="dark"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="dark"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="dark"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="dark"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* NOSTALGIE - Tons ambre vintage */
+[data-theme="nostalgie"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="nostalgie"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #B45309 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="nostalgie"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="nostalgie"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #C2410C 0%, #EA580C 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="nostalgie"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="nostalgie"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="nostalgie"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="nostalgie"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #92400E 0%, #B45309 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* OCÉAN - Bleus profonds */
+[data-theme="ocean"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="ocean"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="ocean"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="ocean"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="ocean"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="ocean"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #0C4A6E 0%, #0369A1 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="ocean"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="ocean"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* FORÊT - Verts naturels */
+[data-theme="forest"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="forest"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="forest"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="forest"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="forest"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="forest"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #065F46 0%, #047857 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="forest"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="forest"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* SUNSET - Roses et coraux */
+[data-theme="sunset"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="sunset"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #F43F5E 0%, #FB7185 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="sunset"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="sunset"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #E11D48 0%, #F43F5E 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="sunset"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="sunset"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #FB7185 0%, #FDA4AF 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="sunset"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="sunset"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #BE123C 0%, #E11D48 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* LIQUID-GLASS - Turquoise et cyan */
+[data-theme="liquid-glass"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="liquid-glass"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #0891B2 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="liquid-glass"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="liquid-glass"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="liquid-glass"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="liquid-glass"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="liquid-glass"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="liquid-glass"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #22D3EE 0%, #67E8F9 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* BLACK - Cyan électrique */
+[data-theme="black"] .row .col-lg-3:nth-child(1) .small-box,
+[data-theme="black"] .row .col-6:nth-child(1) .small-box {
+  background: linear-gradient(135deg, #0891B2 0%, #06B6D4 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="black"] .row .col-lg-3:nth-child(2) .small-box,
+[data-theme="black"] .row .col-6:nth-child(2) .small-box {
+  background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="black"] .row .col-lg-3:nth-child(3) .small-box,
+[data-theme="black"] .row .col-6:nth-child(3) .small-box {
+  background: linear-gradient(135deg, #0E7490 0%, #0891B2 100%) !important;
+  color: #FFFFFF !important;
+}
+[data-theme="black"] .row .col-lg-3:nth-child(4) .small-box,
+[data-theme="black"] .row .col-6:nth-child(4) .small-box {
+  background: linear-gradient(135deg, #22D3EE 0%, #67E8F9 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* Texte blanc sur toutes les small-box colorées par thème */
+[data-theme] .row .col-lg-3 .small-box .inner,
+[data-theme] .row .col-lg-3 .small-box .inner h3,
+[data-theme] .row .col-lg-3 .small-box .inner p,
+[data-theme] .row .col-lg-3 .small-box .small-box-footer,
+[data-theme] .row .col-6 .small-box .inner,
+[data-theme] .row .col-6 .small-box .inner h3,
+[data-theme] .row .col-6 .small-box .inner p,
+[data-theme] .row .col-6 .small-box .small-box-footer {
+  color: #FFFFFF !important;
+}

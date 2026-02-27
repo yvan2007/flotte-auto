@@ -1,0 +1,148 @@
+/**
+ * Styles Design 1 pour listes et formulaires (mode moderne)
+ * Tableaux, cartes de recherche, inlines
+ */
+
+/* === TABLEAUX === */
+.modern-change-list .table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg, 0.5rem);
+  border: 1px solid var(--color-border, #e5e7eb);
+  background: var(--color-surface, #fff);
+}
+
+.modern-change-list #result_list,
+.modern-change-list .results {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.modern-change-list #result_list th,
+.modern-change-list #result_list td,
+.modern-change-list .results th,
+.modern-change-list .results td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.modern-change-list #result_list th,
+.modern-change-list .results th {
+  background: var(--color-background, #f9fafb);
+  font-weight: 600;
+  color: var(--color-text, #111);
+}
+
+.modern-change-list #result_list tbody tr:hover,
+.modern-change-list .results tbody tr:hover {
+  background: var(--color-background, #f9fafb);
+}
+
+/* Page header */
+.modern-change-list .page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* Search card */
+.modern-change-list .modern-search-card .card-body {
+  padding: 1rem 1.5rem;
+}
+
+/* Inlines (Django admin) - style Design 1 */
+.modern-change-list .inline-group,
+.modern-change-form .inline-group {
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 0.5rem);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.modern-change-form .inline-group h2,
+.modern-change-form .inline-group .inline-group-header {
+  background: var(--color-background, #f9fafb);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.modern-change-form .inline-related {
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  padding: 1rem 1.5rem;
+}
+
+.modern-change-form .inline-related:last-child {
+  border-bottom: none;
+}
+
+/* Form fields */
+.modern-change-form .form-row {
+  margin-bottom: 1rem;
+}
+
+.modern-change-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.modern-change-form input[type="text"],
+.modern-change-form input[type="password"],
+.modern-change-form input[type="email"],
+.modern-change-form input[type="number"],
+.modern-change-form select,
+.modern-change-form textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.badge-success { background: #D1FAE5; color: #065f46; }
+.badge-warning { background: #FEF3C7; color: #92400e; }
+.badge-danger { background: #FEE2E2; color: #991b1b; }
+
+/* Submit row - boutons d'action */
+.modern-submit-row {
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.modern-submit-row .btn-primary {
+  background: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.modern-submit-row .btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}

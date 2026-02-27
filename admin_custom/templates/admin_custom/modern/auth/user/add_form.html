@@ -1,0 +1,10 @@
+{% extends "admin_custom/modern/change_form.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+{% endblock %}
+
+{% block page_title %}Ajouter un utilisateur{% endblock %}
+
+{% block submit_button_text %}Créer l'utilisateur{% endblock %}

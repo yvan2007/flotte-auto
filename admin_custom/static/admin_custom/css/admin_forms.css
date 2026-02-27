@@ -1,0 +1,939 @@
+/**
+ * Formulaires Admin - Visuel moderne (daisyUI / SaaS)
+ * Logique Django inchangée ; espacements cohérents, états clairs, boutons hiérarchisés.
+ */
+
+/* Variables dédiées formulaires (réutilisent le thème) */
+#content,
+.content-wrapper {
+    --form-space-xs: 0.25rem;
+    --form-space-sm: 0.5rem;
+    --form-space-md: 0.75rem;
+    --form-space-lg: 1rem;
+    --form-space-xl: 1.25rem;
+    --form-space-2xl: 1.5rem;
+    --form-input-height: 2.5rem;
+    --form-radius: 8px;
+    --form-border-width: 1px;
+    --form-focus-ring: 2px;
+    --form-transition: 0.2s ease;
+}
+
+/* ========== Champs (input, select, textarea) ========== */
+#content input[type="text"],
+#content input[type="password"],
+#content input[type="email"],
+#content input[type="number"],
+#content input[type="url"],
+#content input[type="date"],
+#content input[type="datetime-local"],
+#content input[type="time"],
+#content input[type="search"],
+#content select,
+#content textarea,
+.content-wrapper input[type="text"],
+.content-wrapper input[type="password"],
+.content-wrapper input[type="email"],
+.content-wrapper input[type="number"],
+.content-wrapper input[type="url"],
+.content-wrapper input[type="date"],
+.content-wrapper input[type="datetime-local"],
+.content-wrapper input[type="time"],
+.content-wrapper select,
+.content-wrapper textarea,
+#content .form-control,
+.content-wrapper .form-control {
+    display: block;
+    width: 100%;
+    min-height: var(--form-input-height);
+    padding: var(--form-space-sm) var(--form-space-md);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--text-color, #111827);
+    background-color: var(--card-bg, #ffffff);
+    border: var(--form-border-width) solid var(--border-color, #e5e7eb);
+    border-radius: var(--form-radius);
+    transition: border-color var(--form-transition), box-shadow var(--form-transition), background-color var(--form-transition);
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+#content textarea,
+.content-wrapper textarea {
+    min-height: 5rem;
+    padding: var(--form-space-md);
+    resize: vertical;
+}
+
+#content select,
+.content-wrapper select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--form-space-md) center;
+    background-size: 12px;
+    padding-right: 2rem;
+}
+
+/* Focus */
+#content input:focus,
+#content select:focus,
+#content textarea:focus,
+.content-wrapper input:focus,
+.content-wrapper select:focus,
+.content-wrapper textarea:focus,
+#content .form-control:focus,
+.content-wrapper .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 var(--form-focus-ring) rgba(59, 130, 246, 0.2);
+}
+
+/* Error (champ avec erreur) */
+#content input.error,
+#content select.error,
+#content textarea.error,
+#content .form-row:has(.errorlist) input,
+#content .form-row:has(.errorlist) select,
+#content .form-row:has(.errorlist) textarea,
+.content-wrapper .form-row:has(.errorlist) input,
+.content-wrapper .form-row:has(.errorlist) select,
+.content-wrapper .form-row:has(.errorlist) textarea {
+    border-color: var(--error-color, #ef4444);
+    background-color: rgba(239, 68, 68, 0.04);
+}
+
+#content .form-row:has(.errorlist) input:focus,
+#content .form-row:has(.errorlist) select:focus,
+#content .form-row:has(.errorlist) textarea:focus {
+    box-shadow: 0 0 0 var(--form-focus-ring) rgba(239, 68, 68, 0.2);
+}
+
+/* Disabled */
+#content input:disabled,
+#content select:disabled,
+#content textarea:disabled,
+.content-wrapper input:disabled,
+.content-wrapper select:disabled,
+.content-wrapper textarea:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: var(--hover-bg, #f3f4f6);
+}
+
+/* Readonly (visuel doux) */
+#content input[readonly],
+#content textarea[readonly],
+.content-wrapper input[readonly],
+.content-wrapper textarea[readonly] {
+    background-color: var(--hover-bg, #f9fafb);
+    color: var(--text-secondary, #6b7280);
+}
+
+/* Placeholder */
+#content input::placeholder,
+#content textarea::placeholder,
+.content-wrapper input::placeholder,
+.content-wrapper textarea::placeholder {
+    color: var(--text-secondary, #9ca3af);
+}
+
+/* ========== Labels ========== */
+#content .form-row label,
+#content fieldset label,
+#content .module label,
+.content-wrapper .form-row label,
+.content-wrapper fieldset label,
+.content-wrapper .module label,
+#content .form-group label,
+.content-wrapper .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color, #111827);
+    margin-bottom: var(--form-space-xs);
+    line-height: 1.4;
+}
+
+/* Required (astérisque discret) */
+#content label.required::after,
+.content-wrapper label.required::after {
+    content: " *";
+    color: var(--error-color, #ef4444);
+    font-weight: 600;
+}
+
+/* ========== Form-row (ligne de champ) ========== */
+#content .form-row,
+.content-wrapper .form-row {
+    margin-bottom: var(--form-space-xl);
+    display: block;
+}
+
+/* TabularInline : les <tr> ont la classe .form-row — ne pas appliquer block/grid */
+#content .inline-group .tabular .form-row,
+.content-wrapper .inline-group .tabular .form-row {
+    display: table-row !important;
+    margin-bottom: 0 !important;
+}
+
+#content .form-row:last-child,
+.content-wrapper .form-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Aligned (label à gauche, champ à droite - Django admin) */
+#content .form-row.aligned,
+.content-wrapper .form-row.aligned {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: var(--form-space-lg);
+    align-items: flex-start;
+}
+
+#content .inline-group .tabular .form-row.aligned,
+.content-wrapper .inline-group .tabular .form-row.aligned {
+    display: table-row !important;
+    grid-template-columns: unset;
+}
+
+@media (max-width: 768px) {
+    #content .form-row.aligned,
+    .content-wrapper .form-row.aligned {
+        grid-template-columns: 1fr;
+    }
+}
+
+#content .form-row.aligned label,
+.content-wrapper .form-row.aligned label {
+    padding-top: calc((var(--form-input-height) - 1.4em) / 2);
+    margin-bottom: 0;
+}
+
+/* ========== Fieldset / module ========== */
+#content fieldset.module,
+.content-wrapper fieldset.module {
+    margin-bottom: var(--form-space-2xl);
+    padding: 0;
+    border: none;
+}
+
+#content fieldset.module h2,
+.content-wrapper fieldset.module h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color, #111827);
+    margin: 0 0 var(--form-space-lg) 0;
+    padding-bottom: var(--form-space-sm);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+#content fieldset.collapsed .form-row,
+.content-wrapper fieldset.collapsed .form-row {
+    display: none;
+}
+
+/* ========== Messages d'erreur (errorlist) ========== */
+#content .errorlist,
+.content-wrapper .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: var(--form-space-sm) 0 0 0;
+}
+
+#content .errorlist li,
+.content-wrapper .errorlist li {
+    font-size: 0.8125rem;
+    color: var(--error-color, #b91c1c);
+    background-color: rgba(239, 68, 68, 0.08);
+    border-left: 3px solid var(--error-color, #ef4444);
+    padding: var(--form-space-xs) var(--form-space-sm);
+    border-radius: 0  var(--form-radius) var(--form-radius) 0;
+    margin-top: var(--form-space-xs);
+}
+
+/* Erreur globale (errornote) */
+#content .errornote,
+.content-wrapper .errornote {
+    font-size: 0.875rem;
+    color: var(--error-color, #b91c1c);
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: var(--form-space-md);
+    border-radius: var(--form-radius);
+    margin-bottom: var(--form-space-lg);
+}
+
+/* ========== Aide (help text) ========== */
+#content .help,
+#content .form-row .help,
+.content-wrapper .help,
+.content-wrapper .form-row .help {
+    font-size: 0.8125rem;
+    color: var(--text-secondary, #6b7280);
+    margin-top: var(--form-space-xs);
+    line-height: 1.4;
+}
+
+/* ========== Submit row (boutons d'action) ========== */
+#content .submit-row,
+.content-wrapper .submit-row,
+#content .card-footer.bg-light,
+.content-wrapper .card-footer.bg-light {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--form-space-md);
+    padding: var(--form-space-xl) 0;
+    margin-top: var(--form-space-2xl);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    background: transparent !important;
+}
+
+#content .submit-row input[type="submit"],
+#content .submit-row button[type="submit"],
+#content .submit-row .btn,
+.content-wrapper .submit-row input[type="submit"],
+.content-wrapper .submit-row button[type="submit"],
+.content-wrapper .submit-row .btn,
+.content-wrapper .card-footer .btn {
+    min-height: var(--form-input-height);
+    padding: 0 var(--form-space-xl);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: var(--form-radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color var(--form-transition), border-color var(--form-transition), transform 0.15s ease;
+}
+
+#content .submit-row input[type="submit"]:active,
+#content .submit-row button[type="submit"]:active,
+.content-wrapper .submit-row .btn:active {
+    transform: scale(0.98);
+}
+
+/* Primaire (Enregistrer / Ajouter) */
+#content .submit-row input[name="_save"],
+#content .submit-row button[name="_save"],
+#content .submit-row .btn-primary,
+.content-wrapper .submit-row .btn-primary {
+    background: var(--gradient-box, var(--primary-color)) !important;
+    color: var(--header-content, #ffffff) !important;
+    border-color: transparent !important;
+}
+
+#content .submit-row input[name="_save"]:hover,
+#content .submit-row button[name="_save"]:hover,
+#content .submit-row .btn-primary:hover,
+.content-wrapper .submit-row .btn-primary:hover {
+    filter: brightness(1.05);
+}
+
+/* Secondaire (Enregistrer et continuer, Annuler) */
+#content .submit-row input[name="_continue"],
+#content .submit-row input[name="_addanother"],
+#content .submit-row .btn-secondary,
+#content .submit-row .btn-info,
+#content .submit-row .btn-success,
+.content-wrapper .submit-row .btn-secondary {
+    background-color: var(--card-bg, #ffffff) !important;
+    color: var(--text-color, #111827) !important;
+    border-color: var(--border-color, #e5e7eb) !important;
+}
+
+#content .submit-row .btn-secondary:hover,
+#content .submit-row .btn-info:hover,
+#content .submit-row .btn-success:hover,
+.content-wrapper .submit-row .btn-secondary:hover {
+    background-color: var(--hover-bg, #f3f4f6) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+#content .submit-row a.btn,
+.content-wrapper .submit-row a.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* ========== Checkbox & Radio ========== */
+#content input[type="checkbox"],
+#content input[type="radio"],
+.content-wrapper input[type="checkbox"],
+.content-wrapper input[type="radio"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    min-height: auto;
+    margin: 0 var(--form-space-sm) 0 0;
+    vertical-align: middle;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+#content .form-row input[type="checkbox"] + label,
+#content .form-row input[type="radio"] + label,
+.content-wrapper .form-row input[type="checkbox"] + label,
+.content-wrapper .form-row input[type="radio"] + label {
+    display: inline;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* ========== Inlines (formulaires imbriqués parent-enfant) ========== */
+
+/* Conteneur principal */
+#content .inline-group,
+.content-wrapper .inline-group {
+    margin-top: var(--form-space-2xl);
+    margin-bottom: var(--form-space-2xl);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: var(--form-radius);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow, rgba(0, 0, 0, 0.06));
+}
+
+/* Titre de l’inline (ex. « Lignes de commande ») */
+#content .inline-group h2,
+#content .inline-group h3,
+.content-wrapper .inline-group h2,
+.content-wrapper .inline-group h3 {
+    margin: 0;
+    padding: var(--form-space-md) var(--form-space-xl);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--header-content, #ffffff);
+    background: var(--gradient-box, var(--primary-color));
+    border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.2));
+}
+
+/* ----- Inline TABULAR (tableau) ----- */
+/* Forcer le layout TABLE : aucun flex/grid sur table, thead, tbody, tr, th, td */
+#content .inline-group .tabular,
+.content-wrapper .inline-group .tabular {
+    overflow-x: auto;
+    /* S'assurer que le conteneur ne force pas flex/grid */
+    display: block !important;
+}
+
+#content .inline-group .tabular table,
+.content-wrapper .inline-group .tabular table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    font-size: 0.875rem;
+    table-layout: auto !important;
+}
+
+#content .inline-group .tabular thead,
+.content-wrapper .inline-group .tabular thead {
+    display: table-header-group !important;
+}
+
+#content .inline-group .tabular tbody,
+.content-wrapper .inline-group .tabular tbody {
+    display: table-row-group !important;
+}
+
+#content .inline-group .tabular tr,
+.content-wrapper .inline-group .tabular tr {
+    display: table-row !important;
+    /* Annuler tout flex/grid qui pourrait être appliqué */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+}
+
+#content .inline-group .tabular th,
+#content .inline-group .tabular td,
+.content-wrapper .inline-group .tabular th,
+.content-wrapper .inline-group .tabular td {
+    display: table-cell !important;
+    position: relative;
+}
+
+/* S'assurer que les inputs/selects/textarea dans les <td> prennent toute la largeur */
+#content .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td textarea,
+.content-wrapper .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td textarea {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+#content .inline-group .tabular td p,
+.content-wrapper .inline-group .tabular td p {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+/* Les liens et icônes dans les cellules doivent être inline */
+#content .inline-group .tabular td a,
+#content .inline-group .tabular td .inlinechangelink,
+#content .inline-group .tabular td .inlineviewlink,
+.content-wrapper .inline-group .tabular td a,
+.content-wrapper .inline-group .tabular td .inlinechangelink,
+.content-wrapper .inline-group .tabular td .inlineviewlink {
+    display: inline-block !important;
+    width: auto !important;
+    margin-right: var(--form-space-xs);
+    vertical-align: middle;
+}
+
+#content .inline-group .tabular thead th,
+.content-wrapper .inline-group .tabular thead th {
+    padding: var(--form-space-sm) var(--form-space-md);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: left;
+    color: var(--text-color, #111827);
+    background: var(--hover-bg, #f9fafb);
+    border-bottom: 2px solid var(--border-color, #e5e7eb);
+    border-right: 1px solid var(--border-color, #e5e7eb);
+    white-space: nowrap;
+}
+
+#content .inline-group .tabular thead th:last-child,
+.content-wrapper .inline-group .tabular thead th:last-child {
+    border-right: none;
+}
+
+#content .inline-group .tabular tbody tr,
+.content-wrapper .inline-group .tabular tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+#content .inline-group .tabular tbody tr:hover,
+.content-wrapper .inline-group .tabular tbody tr:hover {
+    background: var(--hover-bg, #f9fafb);
+}
+
+#content .inline-group .tabular tbody tr:nth-child(even),
+.content-wrapper .inline-group .tabular tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+#content .inline-group .tabular tbody tr:nth-child(even):hover,
+.content-wrapper .inline-group .tabular tbody tr:nth-child(even):hover {
+    background: var(--hover-bg, #f3f4f6);
+}
+
+#content .inline-group .tabular tbody td,
+.content-wrapper .inline-group .tabular tbody td {
+    padding: var(--form-space-sm) var(--form-space-md);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    border-right: 1px solid var(--border-color, #e5e7eb);
+    position: relative;
+    overflow: visible;
+    max-width: none;
+}
+
+/* Cellules avec des champs : contenir le contenu */
+#content .inline-group .tabular tbody td > *,
+.content-wrapper .inline-group .tabular tbody td > * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Paragraphes dans les cellules : éviter le débordement */
+#content .inline-group .tabular tbody td p,
+.content-wrapper .inline-group .tabular tbody td p {
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Si le texte est trop long, le tronquer */
+#content .inline-group .tabular tbody td p:first-child,
+.content-wrapper .inline-group .tabular tbody td p:first-child {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 2.8em;
+}
+
+#content .inline-group .tabular tbody td:last-child,
+.content-wrapper .inline-group .tabular tbody td:last-child {
+    border-right: none;
+}
+
+#content .inline-group .tabular td input[type="text"],
+#content .inline-group .tabular td input[type="number"],
+#content .inline-group .tabular td input[type="email"],
+#content .inline-group .tabular td input[type="url"],
+#content .inline-group .tabular td input[type="date"],
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td textarea,
+.content-wrapper .inline-group .tabular td input[type="text"],
+.content-wrapper .inline-group .tabular td input[type="number"],
+.content-wrapper .inline-group .tabular td input[type="email"],
+.content-wrapper .inline-group .tabular td input[type="url"],
+.content-wrapper .inline-group .tabular td input[type="date"],
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td textarea {
+    min-height: 2.25rem;
+    padding: var(--form-space-xs) var(--form-space-sm);
+    font-size: 0.875rem;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 6px;
+    box-sizing: border-box;
+    display: block;
+    clear: both;
+}
+
+/* Selects/dropdowns : s'assurer qu'ils sont sur une nouvelle ligne après le texte */
+#content .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td select {
+    margin-top: 0.25rem;
+    clear: both;
+}
+
+#content .inline-group .tabular td input[type="checkbox"],
+.content-wrapper .inline-group .tabular td input[type="checkbox"] {
+    min-height: auto;
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+/* Liens « Supprimer » dans les inlines */
+#content .inline-group .inline-related .delete a,
+.content-wrapper .inline-group .inline-related .delete a {
+    font-size: 0.8125rem;
+    color: var(--error-color, #dc2626);
+    text-decoration: none;
+}
+
+#content .inline-group .inline-related .delete a:hover,
+.content-wrapper .inline-group .inline-related .delete a:hover {
+    text-decoration: underline;
+}
+
+/* Ligne « Ajouter un autre » */
+#content .inline-group .tabular .add-row,
+#content .inline-group .tabular tr.add-row td,
+.content-wrapper .inline-group .tabular .add-row,
+.content-wrapper .inline-group .tabular tr.add-row td {
+    padding: var(--form-space-md) var(--form-space-xl);
+    background: var(--hover-bg, #f9fafb);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    border-bottom: none;
+}
+
+#content .inline-group .tabular .add-row a,
+.content-wrapper .inline-group .tabular .add-row a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--form-space-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: var(--form-space-xs) 0;
+}
+
+#content .inline-group .tabular .add-row a:hover,
+.content-wrapper .inline-group .tabular .add-row a:hover {
+    text-decoration: underline;
+}
+
+/* Ligne vide (template caché Django) */
+#content .inline-group .tabular tr.empty-form,
+.content-wrapper .inline-group .tabular tr.empty-form {
+    display: none;
+}
+
+/* Colonne « Supprimer » (checkbox) */
+/* Colonne "original" : texte descriptif et liens */
+#content .inline-group .tabular th:first-child,
+#content .inline-group .tabular td.original,
+.content-wrapper .inline-group .tabular th:first-child,
+.content-wrapper .inline-group .tabular td.original {
+    width: 1%;
+    white-space: nowrap;
+    min-width: 0;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: var(--form-space-md);
+}
+
+/* Contenu de la colonne original : paragraphe avec texte */
+#content .inline-group .tabular td.original p,
+.content-wrapper .inline-group .tabular td.original p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.4;
+}
+
+/* Liens dans la colonne original : doivent être sur une nouvelle ligne ou inline */
+#content .inline-group .tabular td.original .inlinechangelink,
+#content .inline-group .tabular td.original .inlineviewlink,
+#content .inline-group .tabular td.original a,
+.content-wrapper .inline-group .tabular td.original .inlinechangelink,
+.content-wrapper .inline-group .tabular td.original .inlineviewlink,
+.content-wrapper .inline-group .tabular td.original a {
+    display: inline-block !important;
+    margin-left: var(--form-space-xs) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+/* ----- Inline STACKED (blocs empilés) ----- */
+#content .inline-group .stacked,
+.content-wrapper .inline-group .stacked {
+    border-top: none;
+}
+
+/* Styles bloc UNIQUEMENT pour StackedInline (pas pour Tabular, où .inline-related = <tr>) */
+#content .inline-group .stacked .inline-related,
+.content-wrapper .inline-group .stacked .inline-related {
+    padding: var(--form-space-xl);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    border-left: 3px solid var(--primary-color, #3b82f6);
+    background: var(--card-bg, #ffffff);
+    transition: background-color 0.15s ease;
+}
+
+#content .inline-group .stacked .inline-related:hover,
+.content-wrapper .inline-group .stacked .inline-related:hover {
+    background: var(--hover-bg, #f9fafb);
+}
+
+#content .inline-group .stacked .inline-related:last-child,
+.content-wrapper .inline-group .stacked .inline-related:last-child {
+    border-bottom: none;
+}
+
+#content .inline-group .stacked .inline-related h3,
+.content-wrapper .inline-group .stacked .inline-related h3 {
+    margin: 0 0 var(--form-space-md) 0;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color, #111827);
+    border: none;
+}
+
+#content .inline-group .stacked .inline-related .form-row,
+.content-wrapper .inline-group .stacked .inline-related .form-row {
+    margin-bottom: var(--form-space-lg);
+}
+
+#content .inline-group .stacked .inline-related .form-row:last-child,
+.content-wrapper .inline-group .stacked .inline-related .form-row:last-child {
+    margin-bottom: 0;
+}
+
+/* TabularInline : .inline-related est un <tr>, pas de style bloc */
+#content .inline-group .tabular tr.inline-related,
+#content .inline-group .tabular .inline-related,
+.content-wrapper .inline-group .tabular tr.inline-related,
+.content-wrapper .inline-group .tabular .inline-related {
+    padding: 0 !important;
+    border-left: none !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    display: table-row !important;
+    /* Annuler tous les styles de bloc qui pourraient être appliqués */
+    margin: 0 !important;
+    border-radius: 0 !important;
+}
+
+#content .inline-group .stacked .add-row,
+.content-wrapper .inline-group .stacked .add-row {
+    padding: var(--form-space-md) var(--form-space-xl);
+    background: var(--hover-bg, #f9fafb);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+#content .inline-group .stacked .add-row a,
+.content-wrapper .inline-group .stacked .add-row a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--form-space-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+#content .inline-group .stacked .add-row a:hover,
+.content-wrapper .inline-group .stacked .add-row a:hover {
+    text-decoration: underline;
+}
+
+/* Erreurs dans les inlines */
+#content .inline-group .errorlist,
+.content-wrapper .inline-group .errorlist {
+    margin-top: var(--form-space-xs);
+}
+
+#content .inline-group .tabular td .errorlist,
+.content-wrapper .inline-group .tabular td .errorlist {
+    margin-bottom: 0;
+}
+
+/* ========== Filtres & recherche (changelist) ========== */
+#content #changelist-search input,
+.content-wrapper #changelist-search input {
+    max-width: 100%;
+}
+
+#content #changelist-filter label,
+.content-wrapper #changelist-filter label {
+    font-size: 0.8125rem;
+}
+
+/* ========== Object tools (lien "Ajouter" au-dessus de la liste) ========== */
+#content .object-tools a,
+.content-wrapper .object-tools a {
+    min-height: var(--form-input-height);
+    padding: 0 var(--form-space-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--form-radius);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--form-space-sm);
+}
+
+/* ========== CORRECTION CRITIQUE : TabularInline - Forcer layout TABLE ========== */
+/* Cette section DOIT être en dernier pour surcharger toutes les autres règles */
+/* Spécificité maximale pour forcer le layout tableau */
+
+/* Conteneur tabular : pas de flex/grid */
+#content .inline-group .tabular,
+#content .inline-group .tabular.inline-related,
+.content-wrapper .inline-group .tabular,
+.content-wrapper .inline-group .tabular.inline-related {
+    display: block !important;
+    overflow-x: auto !important;
+}
+
+/* Table : layout tableau obligatoire */
+#content .inline-group .tabular table,
+#content .inline-group .tabular.inline-related table,
+.content-wrapper .inline-group .tabular table,
+.content-wrapper .inline-group .tabular.inline-related table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: auto !important;
+}
+
+/* Thead/Tbody : groupes de tableau */
+#content .inline-group .tabular thead,
+#content .inline-group .tabular.inline-related thead,
+.content-wrapper .inline-group .tabular thead,
+.content-wrapper .inline-group .tabular.inline-related thead {
+    display: table-header-group !important;
+}
+
+#content .inline-group .tabular tbody,
+#content .inline-group .tabular.inline-related tbody,
+.content-wrapper .inline-group .tabular tbody,
+.content-wrapper .inline-group .tabular.inline-related tbody {
+    display: table-row-group !important;
+}
+
+/* TR : lignes de tableau - CRITIQUE */
+#content .inline-group .tabular tr,
+#content .inline-group .tabular tr.form-row,
+#content .inline-group .tabular tr.inline-related,
+#content .inline-group .tabular .form-row,
+#content .inline-group .tabular .inline-related,
+#content .inline-group .tabular.inline-related tr,
+#content .inline-group .tabular.inline-related tr.form-row,
+#content .inline-group .tabular.inline-related tr.inline-related,
+.content-wrapper .inline-group .tabular tr,
+.content-wrapper .inline-group .tabular tr.form-row,
+.content-wrapper .inline-group .tabular tr.inline-related,
+.content-wrapper .inline-group .tabular .form-row,
+.content-wrapper .inline-group .tabular .inline-related,
+.content-wrapper .inline-group .tabular.inline-related tr,
+.content-wrapper .inline-group .tabular.inline-related tr.form-row,
+.content-wrapper .inline-group .tabular.inline-related tr.inline-related {
+    display: table-row !important;
+    /* Annuler TOUS les styles flex/grid */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    flex: unset !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    gap: unset !important;
+    /* Annuler les styles de bloc */
+    padding: 0 !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    width: auto !important;
+    min-width: unset !important;
+    max-width: unset !important;
+}
+
+/* TH/TD : cellules de tableau - CRITIQUE */
+#content .inline-group .tabular th,
+#content .inline-group .tabular td,
+#content .inline-group .tabular.inline-related th,
+#content .inline-group .tabular.inline-related td,
+.content-wrapper .inline-group .tabular th,
+.content-wrapper .inline-group .tabular td,
+.content-wrapper .inline-group .tabular.inline-related th,
+.content-wrapper .inline-group .tabular.inline-related td {
+    display: table-cell !important;
+    /* Annuler flex/grid sur les cellules */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    flex: unset !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    gap: unset !important;
+    vertical-align: middle !important;
+}
+
+/* Surcharger les règles .admin-layout et .modern-change-form si elles existent */
+.admin-layout .inline-group .tabular tr,
+.admin-layout .inline-group .tabular tr.form-row,
+.admin-layout .inline-group .tabular tr.inline-related,
+.modern-change-form .inline-group .tabular tr,
+.modern-change-form .inline-group .tabular tr.form-row,
+.modern-change-form .inline-group .tabular tr.inline-related {
+    display: table-row !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}

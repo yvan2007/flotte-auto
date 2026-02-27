@@ -149,6 +149,8 @@ def dashboard(request):
     from django.utils import timezone
     from datetime import timedelta
     qs = Vehicule.objects.all()
+    if not is_manager_or_admin(request):
+        qs = qs.filter(proprietaire=request.user)
     parc = qs.filter(statut='parc').count()
     import_ = qs.filter(statut='import').count()
     vendus = qs.filter(statut='vendu').count()
@@ -159,7 +161,10 @@ def dashboard(request):
     # Occupation de la flotte (véhicules en location vs total)
     vehicules_en_location_qs = Vehicule.objects.filter(
         locations__statut='en_cours'
-    ).distinct()
+    )
+    if not is_manager_or_admin(request):
+        vehicules_en_location_qs = vehicules_en_location_qs.filter(proprietaire=request.user)
+    vehicules_en_location_qs = vehicules_en_location_qs.distinct()
     nb_vehicules_en_location = vehicules_en_location_qs.count()
     # Disponibles : véhicules au parc sans location en cours
     vehicules_disponibles_qs = qs.filter(statut='parc').exclude(
@@ -172,41 +177,48 @@ def dashboard(request):
     # Alertes : locations dont CT ou assurance expire dans les 30 jours
     now = timezone.now().date()
     fin_alerte = now + timedelta(days=30)
-    alertes_ct = list(
-        Location.objects.filter(
-            date_expiration_ct__isnull=False,
-            date_expiration_ct__gte=now,
-            date_expiration_ct__lte=fin_alerte,
-            statut='en_cours',
-        ).select_related('vehicule').order_by('date_expiration_ct')[:10]
-    )
-    alertes_assurance = list(
-        Location.objects.filter(
+    base_loc_alertes = Location.objects.filter(
+        date_expiration_ct__isnull=False,
+        date_expiration_ct__gte=now,
+        date_expiration_ct__lte=fin_alerte,
+        statut='en_cours',
+    ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        base_loc_alertes = base_loc_alertes.filter(vehicule__proprietaire=request.user)
+    alertes_ct = list(base_loc_alertes.order_by('date_expiration_ct')[:10])
+
+    base_loc_assurance = Location.objects.filter(
             date_expiration_assurance__isnull=False,
             date_expiration_assurance__gte=now,
             date_expiration_assurance__lte=fin_alerte,
             statut='en_cours',
-        ).select_related('vehicule').order_by('date_expiration_assurance')[:10]
-    )
+        ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        base_loc_assurance = base_loc_assurance.filter(vehicule__proprietaire=request.user)
+    alertes_assurance = list(base_loc_assurance.order_by('date_expiration_assurance')[:10])
+
     # Alertes permis (conducteurs dont le permis expire dans les 30 jours)
-    alertes_permis = list(
-        Conducteur.objects.filter(
+    conducteurs_qs = Conducteur.objects.filter(
             actif=True,
             permis_date_expiration__isnull=False,
             permis_date_expiration__gte=now,
             permis_date_expiration__lte=fin_alerte,
-        ).order_by('permis_date_expiration')[:10]
-    )
+        )
+    if not is_manager_or_admin(request):
+        conducteurs_qs = conducteurs_qs.filter(user=request.user)
+    alertes_permis = list(conducteurs_qs.order_by('permis_date_expiration')[:10])
     # Alertes documents véhicule (échéance dans les 30 jours)
-    alertes_documents = list(
-        DocumentVehicule.objects.filter(
+    docs_qs = DocumentVehicule.objects.filter(
             date_echeance__isnull=False,
             date_echeance__gte=now,
             date_echeance__lte=fin_alerte,
-        ).select_related('vehicule').order_by('date_echeance')[:10]
-    )
+        ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        docs_qs = docs_qs.filter(vehicule__proprietaire=request.user)
+    alertes_documents = list(docs_qs.order_by('date_echeance')[:10])
+
     # CT et assurance au niveau véhicule (au parc sans location en cours, 30 jours)
-    vehicules_parc_sans_location = Vehicule.objects.filter(statut='parc').exclude(
+    vehicules_parc_sans_location = qs.filter(statut='parc').exclude(
         locations__statut='en_cours'
     ).distinct()
     alertes_ct_vehicule = list(
@@ -223,9 +235,10 @@ def dashboard(request):
             date_expiration_assurance__lte=fin_alerte,
         ).select_related('marque', 'modele').order_by('date_expiration_assurance')[:10]
     )
-    vehicules_import = list(
-        Vehicule.objects.filter(statut='import').select_related('marque', 'modele').order_by('-date_entree_parc')[:5]
-    )
+    vehicules_import_qs = Vehicule.objects.filter(statut='import').select_related('marque', 'modele')
+    if not is_manager_or_admin(request):
+        vehicules_import_qs = vehicules_import_qs.filter(proprietaire=request.user)
+    vehicules_import = list(vehicules_import_qs.order_by('-date_entree_parc')[:5])
     context = {
         'parc': parc,
         'import': import_,
@@ -255,25 +268,31 @@ def echeances(request):
     now = timezone.now().date()
     horizon = now + timedelta(days=90)
     # CT (locations en cours)
-    echeances_ct = list(
-        Location.objects.filter(
+    loc_ct_qs = Location.objects.filter(
             date_expiration_ct__isnull=False,
             date_expiration_ct__gte=now,
             date_expiration_ct__lte=horizon,
             statut='en_cours',
-        ).select_related('vehicule').order_by('date_expiration_ct')
-    )
+        ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        loc_ct_qs = loc_ct_qs.filter(vehicule__proprietaire=request.user)
+    echeances_ct = list(loc_ct_qs.order_by('date_expiration_ct'))
+
     # Assurance (locations en cours)
-    echeances_assurance = list(
-        Location.objects.filter(
+    loc_ass_qs = Location.objects.filter(
             date_expiration_assurance__isnull=False,
             date_expiration_assurance__gte=now,
             date_expiration_assurance__lte=horizon,
             statut='en_cours',
-        ).select_related('vehicule').order_by('date_expiration_assurance')
-    )
+        ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        loc_ass_qs = loc_ass_qs.filter(vehicule__proprietaire=request.user)
+    echeances_assurance = list(loc_ass_qs.order_by('date_expiration_assurance'))
     # CT et assurance au niveau véhicule (au parc sans location en cours)
-    vehicules_parc_sans_location = Vehicule.objects.filter(statut='parc').exclude(
+    base_vehicules = Vehicule.objects.filter(statut='parc')
+    if not is_manager_or_admin(request):
+        base_vehicules = base_vehicules.filter(proprietaire=request.user)
+    vehicules_parc_sans_location = base_vehicules.exclude(
         locations__statut='en_cours'
     ).distinct()
     echeances_ct_vehicule = list(
@@ -291,22 +310,25 @@ def echeances(request):
         ).select_related('marque', 'modele').order_by('date_expiration_assurance')
     )
     # Documents véhicule (date échéance)
-    echeances_documents = list(
-        DocumentVehicule.objects.filter(
+    docs_qs = DocumentVehicule.objects.filter(
             date_echeance__isnull=False,
             date_echeance__gte=now,
             date_echeance__lte=horizon,
-        ).select_related('vehicule').order_by('date_echeance')
-    )
+        ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        docs_qs = docs_qs.filter(vehicule__proprietaire=request.user)
+    echeances_documents = list(docs_qs.order_by('date_echeance'))
+
     # Permis conducteurs
-    echeances_permis = list(
-        Conducteur.objects.filter(
+    cond_qs = Conducteur.objects.filter(
             actif=True,
             permis_date_expiration__isnull=False,
             permis_date_expiration__gte=now,
             permis_date_expiration__lte=horizon,
-        ).order_by('permis_date_expiration')
-    )
+        )
+    if not is_manager_or_admin(request):
+        cond_qs = cond_qs.filter(user=request.user)
+    echeances_permis = list(cond_qs.order_by('permis_date_expiration'))
     # Maintenance à faire (date prévue dans l'horizon ou sans date)
     echeances_maintenance = list(
         Maintenance.objects.filter(statut='a_faire').filter(
@@ -315,18 +337,22 @@ def echeances(request):
     )
     # Vidange — km atteint ou dépassé (véhicule ou location)
     from django.db.models import F
+    vehicules_vidange_qs = Vehicule.objects.filter(
+        statut__in=['parc', 'import'],
+        km_prochaine_vidange__isnull=False,
+    )
+    if not is_manager_or_admin(request):
+        vehicules_vidange_qs = vehicules_vidange_qs.filter(proprietaire=request.user)
     alertes_vidange_vehicules = list(
-        Vehicule.objects.filter(
-            statut__in=['parc', 'import'],
-            km_prochaine_vidange__isnull=False,
-        ).filter(kilometrage_actuel__gte=F('km_prochaine_vidange')).select_related('marque', 'modele')
+        vehicules_vidange_qs.filter(kilometrage_actuel__gte=F('km_prochaine_vidange')).select_related('marque', 'modele')
     )
-    locations_km = list(
-        Location.objects.filter(
-            statut='en_cours',
-            km_prochaine_vidange__isnull=False,
-        ).select_related('vehicule')
-    )
+    locations_km_qs = Location.objects.filter(
+        statut='en_cours',
+        km_prochaine_vidange__isnull=False,
+    ).select_related('vehicule')
+    if not is_manager_or_admin(request):
+        locations_km_qs = locations_km_qs.filter(vehicule__proprietaire=request.user)
+    locations_km = list(locations_km_qs)
     alertes_vidange_locations = [
         loc for loc in locations_km
         if (loc.vehicule.kilometrage_actuel or 0) >= (loc.km_prochaine_vidange or 0)
@@ -495,13 +521,16 @@ def recherche(request):
     factures = []
     if q:
         # Véhicules : châssis, immat, marque, modèle, pays
-        vehicules = Vehicule.objects.filter(
+        vehicules_qs = Vehicule.objects.filter(
             Q(numero_chassis__icontains=q) |
             Q(numero_immatriculation__icontains=q) |
             Q(marque__nom__icontains=q) |
             Q(modele__nom__icontains=q) |
             Q(origine_pays__icontains=q)
-        ).select_related('marque', 'modele').order_by('-date_entree_parc')[:25]
+        ).select_related('marque', 'modele')
+        if not is_manager_or_admin(request):
+            vehicules_qs = vehicules_qs.filter(proprietaire=request.user)
+        vehicules = vehicules_qs.order_by('-date_entree_parc')[:25]
         # Locations : locataire, type, véhicule
         if is_manager_or_admin(request):
             locations = Location.objects.filter(
@@ -560,13 +589,16 @@ def recherche_api(request):
         return JsonResponse(out)
 
     # Véhicules
-    for v in Vehicule.objects.filter(
+    vehicules_qs = Vehicule.objects.filter(
         Q(numero_chassis__icontains=q) |
         Q(numero_immatriculation__icontains=q) |
         Q(marque__nom__icontains=q) |
         Q(modele__nom__icontains=q) |
         Q(origine_pays__icontains=q)
-    ).select_related('marque', 'modele').order_by('-date_entree_parc')[:15]:
+    ).select_related('marque', 'modele')
+    if not is_manager_or_admin(request):
+        vehicules_qs = vehicules_qs.filter(proprietaire=request.user)
+    for v in vehicules_qs.order_by('-date_entree_parc')[:15]:
         out['vehicules'].append({
             'id': v.pk,
             'label': '{} — {}'.format(v.libelle_court, v.numero_chassis) + (' · ' + v.numero_immatriculation if v.numero_immatriculation else ''),
@@ -602,9 +634,12 @@ def recherche_api(request):
             'url': reverse('flotte:vehicule_detail', args=[v.vehicule_id]),
         })
 
-    for c in Conducteur.objects.filter(
+    cond_search_qs = Conducteur.objects.filter(
         Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(email__icontains=q) | Q(telephone__icontains=q)
-    ).order_by('nom', 'prenom')[:15]:
+    )
+    if not is_manager_or_admin(request):
+        cond_search_qs = cond_search_qs.filter(user=request.user)
+    for c in cond_search_qs.order_by('nom', 'prenom')[:15]:
         out['conducteurs'].append({
             'id': c.pk,
             'label': '{} {}'.format(c.nom, c.prenom) + (' · ' + (c.email or c.telephone or '') if (c.email or c.telephone) else ''),
@@ -641,6 +676,9 @@ class ParcListView(ListView):
         qs = Vehicule.objects.select_related(
             'marque', 'modele', 'type_vehicule', 'type_carburant', 'type_transmission'
         ).order_by('-date_entree_parc', '-id')
+        # Utilisateur simple : ne voir que ses véhicules
+        if not is_manager_or_admin(self.request):
+            qs = qs.filter(proprietaire=self.request.user)
         statut = self.request.GET.get('statut')
         if statut:
             qs = qs.filter(statut=statut)
@@ -658,6 +696,8 @@ class ParcListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs = Vehicule.objects.all()
+        if not is_manager_or_admin(self.request):
+            qs = qs.filter(proprietaire=self.request.user)
         context['total'] = qs.count()
         context['parc_count'] = qs.filter(statut='parc').count()
         context['import_count'] = qs.filter(statut='import').count()
@@ -672,16 +712,17 @@ class ParcListView(ListView):
 @login_required
 def vehicule_detail(request, pk):
     """Fiche véhicule (détail) — démarches, dépenses, documents, réparations, locations, vente, coûts."""
-    vehicule = get_object_or_404(
-        Vehicule.objects.select_related(
-            'marque', 'modele', 'type_vehicule', 'type_carburant', 'type_transmission'
-        ).prefetch_related(
-            'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes',
-            'charges_import', 'parties_importees', 'photos',
-            Prefetch('factures', queryset=Facture.objects.prefetch_related('penalites').order_by('-date_facture', '-id')),
-        ),
-        pk=pk
+    qs = Vehicule.objects.select_related(
+        'marque', 'modele', 'type_vehicule', 'type_carburant', 'type_transmission'
+    ).prefetch_related(
+        'import_demarches', 'depenses', 'documents', 'reparations', 'locations', 'ventes',
+        'charges_import', 'parties_importees', 'photos',
+        Prefetch('factures', queryset=Facture.objects.prefetch_related('penalites').order_by('-date_facture', '-id')),
     )
+    # Utilisateur simple : ne peut consulter que ses propres véhicules
+    if not is_manager_or_admin(request):
+        qs = qs.filter(proprietaire=request.user)
+    vehicule = get_object_or_404(qs, pk=pk)
     total_depenses = vehicule.depenses.aggregate(s=Sum('montant'))['s'] or 0
     total_reparations = vehicule.reparations.aggregate(s=Sum('cout'))['s'] or 0
     total_charges_import = vehicule.charges_import.aggregate(s=Sum('cout_total'))['s'] or 0
@@ -1492,7 +1533,10 @@ def import_list(request):
 @login_required
 def reparations_list(request):
     """Liste des réparations."""
-    reps = Reparation.objects.select_related('vehicule').order_by('-date_reparation', '-id')[:200]
+    reps_qs = Reparation.objects.select_related('vehicule')
+    if not is_manager_or_admin(request):
+        reps_qs = reps_qs.filter(vehicule__proprietaire=request.user)
+    reps = reps_qs.order_by('-date_reparation', '-id')[:200]
     context = {'reparations': reps, **get_sidebar_context(request)}
     return render(request, 'flotte/reparations_list.html', context)
 
@@ -1515,7 +1559,10 @@ def contraventions_list(request):
 @login_required
 def documents_list(request):
     """Documents par véhicule."""
-    vehicules = Vehicule.objects.prefetch_related('documents').order_by('marque__nom', 'modele__nom')[:100]
+    vehicules_qs = Vehicule.objects.prefetch_related('documents')
+    if not is_manager_or_admin(request):
+        vehicules_qs = vehicules_qs.filter(proprietaire=request.user)
+    vehicules = vehicules_qs.order_by('marque__nom', 'modele__nom')[:100]
     context = {'vehicules': vehicules, **get_sidebar_context(request)}
     return render(request, 'flotte/documents_list.html', context)
 
@@ -1741,7 +1788,10 @@ def maintenance_list(request):
             default=Value(2),
             output_field=IntegerField(),
         )
-    ).order_by('statut_order', '-date_prevue', '-id')[:200]
+    )
+    if not is_manager_or_admin(request):
+        qs = qs.filter(vehicule__proprietaire=request.user)
+    qs = qs.order_by('statut_order', '-date_prevue', '-id')[:200]
     maintenances = qs
     context = {
         'maintenances': maintenances,
@@ -1753,7 +1803,10 @@ def maintenance_list(request):
 @login_required
 def carburant_list(request):
     """Liste des relevés carburant."""
-    releves = ReleveCarburant.objects.select_related('vehicule').order_by('-date_releve', '-id')[:200]
+    releves_qs = ReleveCarburant.objects.select_related('vehicule')
+    if not is_manager_or_admin(request):
+        releves_qs = releves_qs.filter(vehicule__proprietaire=request.user)
+    releves = releves_qs.order_by('-date_releve', '-id')[:200]
     context = {
         'releves': releves,
         **get_sidebar_context(request),
@@ -1764,7 +1817,10 @@ def carburant_list(request):
 @login_required
 def conducteurs_list(request):
     """Liste des conducteurs."""
-    conducteurs = Conducteur.objects.all().order_by('nom', 'prenom')
+    conducteurs_qs = Conducteur.objects.all()
+    if not is_manager_or_admin(request):
+        conducteurs_qs = conducteurs_qs.filter(user=request.user)
+    conducteurs = conducteurs_qs.order_by('nom', 'prenom')
     context = {
         'conducteurs': conducteurs,
         **get_sidebar_context(request),

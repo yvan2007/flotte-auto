@@ -1,0 +1,42 @@
+{% load i18n %}
+<div class="actions" style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+  {% block actions %}
+    {% block actions-form %}
+    {% for field in action_form %}
+        {% if field.label %}
+            <label style="display:flex; align-items:center; gap:0.5rem; margin:0;">
+                {{ field.label }}
+                <select name="{{ field.name }}" id="id_{{ field.name }}" style="padding:0.5rem; border-radius:var(--radius-md, 0.375rem); border:1px solid var(--color-border, #ddd); background:var(--color-surface, #fff); color:var(--color-text, #333); min-width:200px;">
+                    {% for choice in field.field.choices %}
+                        <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        {% else %}
+            {{ field }}
+        {% endif %}
+    {% endfor %}
+    {% endblock %}
+    {% block actions-submit %}
+    <button type="submit" class="btn btn-primary" title="{% translate "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}" style="color:#fff!important; padding:0.5rem 1rem; border-radius:var(--radius-md, 0.375rem);">
+        <i class="fa-solid fa-play"></i> {% translate "Go" %}
+    </button>
+    {% endblock %}
+    {% block actions-counter %}
+    {% if actions_selection_counter %}
+        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}" style="color:var(--color-text-muted, #666); font-size:0.875rem;">{{ selection_note }}</span>
+        {% if cl.result_count != cl.result_list|length %}
+        <span class="all hidden" style="display:none;">{{ selection_note_all }}</span>
+        <span class="question hidden" style="display:none;">
+            <a role="button" href="#" class="action-select-all-link" title="{% translate "Click here to select the objects across all pages" %}" style="color:var(--color-primary, #3B82F6); text-decoration:underline;">
+                {% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}
+            </a>
+        </span>
+        <span class="clear hidden" style="display:none;">
+            <a role="button" href="#" class="action-clear-link" style="color:var(--color-primary, #3B82F6); text-decoration:underline;">{% translate "Clear selection" %}</a>
+        </span>
+        {% endif %}
+    {% endif %}
+    {% endblock %}
+  {% endblock %}
+</div>

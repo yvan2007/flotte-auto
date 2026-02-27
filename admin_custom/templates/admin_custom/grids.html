@@ -1,0 +1,63 @@
+{% extends "admin_custom/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1><i class="fas fa-table"></i> Grilles de Données</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-cog"></i> Configuration
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Modèle:</label>
+                                <select id="grid-model" class="form-control">
+                                    {% for model in models %}
+                                    <option value="{{ model.name }}" data-fields="{{ model.fields|join:',' }}">{{ model.label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Colonnes (vide = tous les champs):</label>
+                                <input type="text" id="grid-columns" class="form-control" 
+                                       placeholder="Laissez vide pour afficher tous les champs">
+                                <small class="form-text text-muted">Laissez vide pour afficher tous les champs du modèle.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Description:</label>
+                                <input type="text" id="grid-description" class="form-control" 
+                                       placeholder="Description de la grille">
+                            </div>
+                            <button id="generate-grid" class="btn btn-primary btn-block btn-lg">
+                                <i class="fas fa-plus"></i> Créer la grille
+                            </button>
+                            <div id="grid-loading" class="alert alert-info mt-3" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Création de la grille...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div id="grids-container" class="grids-container"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

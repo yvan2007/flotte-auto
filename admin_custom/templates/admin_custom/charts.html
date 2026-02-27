@@ -1,0 +1,123 @@
+{% extends "admin_custom/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1><i class="fas fa-chart-pie"></i> Graphiques Dynamiques</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Graphiques</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">
+                                <i class="fas fa-cog"></i> Configuration
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Modèle:</label>
+                                <select id="chart-model" class="form-control">
+                                    <option value="">-- Sélectionner un modèle --</option>
+                                    {% for model in models %}
+                                    <option value="{{ model.name }}" 
+                                            data-app="{{ model.app|default:"" }}">
+                                        {{ model.label }}{% if model.app %} ({{ model.app }}){% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Champ:</label>
+                                <select id="chart-field" class="form-control">
+                                    <option value="">-- Sélectionner un champ --</option>
+                                </select>
+                                <small class="form-text text-muted" id="field-help">Sélectionnez d'abord un modèle</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Type de graphique:</label>
+                                <select id="chart-type" class="form-control">
+                                    <option value="line">Courbe</option>
+                                    <option value="bar">Histogramme</option>
+                                    <option value="pie">Camembert</option>
+                                    <option value="doughnut">Donut</option>
+                                    <option value="area">Aire</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fréquence:</label>
+                                <select id="chart-frequency" class="form-control">
+                                    <option value="day">Jour</option>
+                                    <option value="week">Semaine</option>
+                                    <option value="month" selected>Mois</option>
+                                    <option value="quarter">Trimestre</option>
+                                    <option value="year">Année</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Opération:</label>
+                                <select id="chart-operation" class="form-control">
+                                    <option value="sum" selected>Somme</option>
+                                    <option value="avg">Moyenne</option>
+                                    <option value="count">Nombre</option>
+                                </select>
+                            </div>
+                            <button id="generate-chart" class="btn btn-primary btn-block btn-lg">
+                                <i class="fas fa-magic"></i> Générer le graphique
+                            </button>
+                            <div id="chart-loading" class="alert alert-info mt-3" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Génération du graphique...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i> Visualisation
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" id="download-chart" style="display: none;">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-placeholder" class="text-center text-muted p-5">
+                                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                <p>Sélectionnez les paramètres et cliquez sur "Générer le graphique"</p>
+                            </div>
+                            <canvas id="chart-canvas" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%; display: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

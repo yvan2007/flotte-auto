@@ -1,0 +1,55 @@
+{% extends "admin/object_history.html" %}
+{% load static i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_custom/css/modern_admin_unified.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/themes_modern.css' %}">
+<link rel="stylesheet" href="{% static 'admin_custom/css/theme_override.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-frontend-history">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-6);">
+    <h1 class="page-title" style="margin:0;">Historique des modifications</h1>
+    <a href="{% url opts|admin_urlname:'change' object_id %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Retour à l'édition</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding:0;">
+      {% if action_list %}
+      <ul style="list-style:none; margin:0; padding:0;">
+        {% for action in action_list %}
+        <li style="padding:var(--space-4) var(--space-6); border-bottom:1px solid var(--color-border); display:flex; align-items:flex-start; gap:var(--space-4);">
+          <span style="width:40px; height:40px; border-radius:var(--radius-full); background:var(--color-primary-light, #DBEAFE); color:var(--color-primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-pen"></i></span>
+          <div style="flex:1;">
+            <strong>{{ action.get_change_message }}</strong>
+            <div style="font-size:var(--text-sm); color:var(--color-text-muted); margin-top:var(--space-1);">
+              Par {{ action.user.get_username }}{% if action.user.get_full_name %} ({{ action.user.get_full_name }}){% endif %}, le {{ action.action_time|date:"d/m/Y" }} à {{ action.action_time|time:"H:i" }}
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if pagination_required %}
+      <nav class="pagination" style="padding:var(--space-4) var(--space-6); border-top:1px solid var(--color-border);">
+        {% for i in page_range %}
+        {% if i == action_list.paginator.ELLIPSIS %}
+        {{ action_list.paginator.ELLIPSIS }}
+        {% elif i == action_list.number %}
+        <span class="page-link active">{{ i }}</span>
+        {% else %}
+        <a href="?p={{ i }}" class="page-link">{{ i }}</a>
+        {% endif %}
+        {% endfor %}
+      </nav>
+      {% endif %}
+      {% else %}
+      <p style="padding:var(--space-6); color:var(--color-text-muted);">
+        {% translate "This object doesn't have a change history. It probably wasn't added via this admin site." %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

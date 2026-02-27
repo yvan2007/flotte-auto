@@ -566,13 +566,116 @@ body.montants-masques .montant-fcfa[data-montant] { letter-spacing: 0.06em; }
 /* Notice contraventions (fiche location) */
 .contravention-notice { font-size: 0.9rem; line-height: 1.45; color: var(--text-muted); }
 
-@media (max-width: 768px) {
-  .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
-  .nav { flex-direction: row; flex-wrap: wrap; }
-  .header { flex-wrap: wrap; }
-  .search { width: 100%; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .form-row { grid-template-columns: 1fr; }
-  .theme-switcher select { max-width: 100px; }
-  .messages-toast { left: 1rem; right: 1rem; max-width: none; }
+/* ——— Responsive globale ——— */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 210px;
+  }
+  .content {
+    padding: 1.25rem;
+  }
+  .card {
+    padding: 1.15rem 1.3rem;
+  }
+  .table th,
+  .table td {
+    padding: 0.7rem 0.85rem;
+  }
 }
+
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+    flex-direction: column;
+    overflow-y: visible;
+  }
+  .logo {
+    padding: 0.9rem 1rem;
+  }
+  .nav {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0.4rem 0.6rem 0.6rem;
+    gap: 0.35rem;
+  }
+  .nav-link {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .sidebar-footer {
+    padding: 0.75rem;
+  }
+  .header {
+    padding: 0.9rem 1rem;
+    flex-wrap: wrap;
+  }
+  .page-title {
+    font-size: 1.25rem;
+  }
+  .content {
+    padding: 1rem;
+  }
+  .content-wrap {
+    max-width: 100%;
+  }
+  .toolbar {
+    padding: 0.75rem 0.9rem;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .theme-switcher select {
+    max-width: 110px;
+  }
+  .messages-toast {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+  .card-ca-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ca-hero {
+    padding: 1.25rem 1.4rem;
+  }
+  .ca-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-screen {
+    padding: 1rem;
+  }
+  .login-box {
+    padding: 1.7rem 1.6rem;
+  }
+  .header-actions {
+    justify-content: flex-start;
+  }
+  .theme-switcher {
+    width: 100%;
+  }
+  .user-badge {
+    max-width: 100%;
+  }
+  .messages-toast {
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+  }
+}
+

@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Administration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'admin_custom/css/design_system.css' %}">
+  <link rel="stylesheet" href="{% static 'admin_custom/css/themes_modern.css' %}">
+  <link rel="stylesheet" href="{% static 'admin_custom/css/modern_components.css' %}">
+  <style>
+    .login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--color-background); padding:1.5rem; }
+    .login-container { width:100%; max-width:480px; }
+    .login-header { text-align:center; margin-bottom:2rem; }
+    .interface-choices { display:flex; gap:1rem; margin-bottom:1.5rem; }
+    .interface-card {
+      flex:1; padding:1rem; border:2px solid var(--color-border); border-radius:0.75rem;
+      cursor:pointer; transition:all 0.2s; text-align:center; text-decoration:none; color:inherit;
+    }
+    .interface-card:hover { border-color:var(--color-primary); background:var(--color-primary-light); }
+    .interface-card.selected { border-color:var(--color-primary); background:var(--color-primary-light); }
+    .interface-card input { display:none; }
+    .login-logo { display:inline-flex; align-items:center; gap:0.75rem; color:var(--color-text); font-weight:700; font-size:1.5rem; text-decoration:none; }
+    .form-control:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+    .error-msg { color: var(--color-danger); font-size:0.875rem; margin-bottom:1rem; }
+  </style>
+</head>
+<body data-theme="bleu-moderne">
+<div class="login-page">
+  <div class="login-container">
+    <div class="login-header">
+      <a href="#" class="login-logo">
+        <i class="fa-solid fa-shield-halved" style="font-size:2.5rem; color:var(--color-primary);"></i>
+        <span>Admin Panel</span>
+      </a>
+      <h1 style="font-size:1.25rem; font-weight:600; color:var(--color-text); margin:1rem 0 0.5rem 0;">Connexion</h1>
+      <p style="font-size:0.875rem; color:var(--color-text-muted); margin:0;">Choisissez votre interface puis connectez-vous</p>
+    </div>
+
+    <form method="post" action="" id="login-form">
+      {% csrf_token %}
+      <div class="interface-choices">
+        <label class="interface-card {% if selected_interface == 'classic' %}selected{% endif %}" id="card-classic">
+          <input type="radio" name="admin_interface" value="classic" {% if selected_interface == 'classic' %}checked{% endif %}>
+          <i class="fa-solid fa-layer-group" style="font-size:1.5rem; display:block; margin-bottom:0.5rem; color:var(--color-primary);"></i>
+          <strong>Interface Classique</strong>
+          <div style="font-size:0.75rem; color:var(--color-text-muted); margin-top:0.25rem;">AdminLTE, tableau de bord traditionnel</div>
+        </label>
+        <label class="interface-card {% if selected_interface == 'modern' %}selected{% endif %}" id="card-modern">
+          <input type="radio" name="admin_interface" value="modern" {% if selected_interface == 'modern' %}checked{% endif %}>
+          <i class="fa-solid fa-gauge-high" style="font-size:1.5rem; display:block; margin-bottom:0.5rem; color:var(--color-primary);"></i>
+          <strong>Interface Moderne</strong>
+          <div style="font-size:0.75rem; color:var(--color-text-muted); margin-top:0.25rem;">Design épuré, sidebar moderne</div>
+        </label>
+      </div>
+
+      {% if error_message %}
+      <div class="error-msg"><i class="fa-solid fa-circle-exclamation"></i> {{ error_message }}</div>
+      {% endif %}
+
+      <div class="card" style="padding:1.5rem;">
+        <div class="form-group">
+          <label class="form-label" for="id_username">Nom d'utilisateur ou e-mail</label>
+          <input type="text" id="id_username" name="username" class="form-control" value="{{ username|default:'' }}" placeholder="admin@example.com" required autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="id_password">Mot de passe</label>
+          <input type="password" id="id_password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">
+          <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+(function() {
+  document.querySelectorAll('.interface-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.interface-card').forEach(function(c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      card.querySelector('input').checked = true;
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+/**
+ * CORRECTION CRITIQUE : TabularInline Layout Fix
+ * 
+ * Ce fichier DOIT être chargé en dernier pour surcharger toutes les autres règles CSS
+ * qui cassent le layout tableau des TabularInline Django.
+ * 
+ * Problème : Les règles globales .form-row { display: grid/flex } s'appliquent aussi
+ * aux <tr class="form-row"> des TabularInline, cassant le layout tableau.
+ * 
+ * Solution : Forcer display: table-row sur tous les <tr> et display: table-cell sur
+ * tous les <th>/<td> des TabularInline avec une spécificité maximale.
+ */
+
+/* ========== TABULAR INLINE - FORCER LAYOUT TABLE ========== */
+
+/* Conteneur : block pour permettre overflow-x */
+.inline-group .tabular,
+.inline-group .tabular.inline-related,
+#content .inline-group .tabular,
+#content .inline-group .tabular.inline-related,
+.content-wrapper .inline-group .tabular,
+.content-wrapper .inline-group .tabular.inline-related {
+    display: block !important;
+    overflow-x: auto !important;
+}
+
+/* Table : layout tableau obligatoire */
+.inline-group .tabular table,
+.inline-group .tabular.inline-related table,
+#content .inline-group .tabular table,
+#content .inline-group .tabular.inline-related table,
+.content-wrapper .inline-group .tabular table,
+.content-wrapper .inline-group .tabular.inline-related table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: auto !important;
+}
+
+/* Thead/Tbody : groupes de tableau */
+.inline-group .tabular thead,
+.inline-group .tabular.inline-related thead,
+#content .inline-group .tabular thead,
+#content .inline-group .tabular.inline-related thead,
+.content-wrapper .inline-group .tabular thead,
+.content-wrapper .inline-group .tabular.inline-related thead {
+    display: table-header-group !important;
+}
+
+.inline-group .tabular tbody,
+.inline-group .tabular.inline-related tbody,
+#content .inline-group .tabular tbody,
+#content .inline-group .tabular.inline-related tbody,
+.content-wrapper .inline-group .tabular tbody,
+.content-wrapper .inline-group .tabular.inline-related tbody {
+    display: table-row-group !important;
+}
+
+/* TR : lignes de tableau - CRITIQUE - Spécificité maximale */
+.inline-group .tabular tr,
+.inline-group .tabular tr.form-row,
+.inline-group .tabular tr.inline-related,
+.inline-group .tabular .form-row,
+.inline-group .tabular .inline-related,
+.inline-group .tabular.inline-related tr,
+.inline-group .tabular.inline-related tr.form-row,
+.inline-group .tabular.inline-related tr.inline-related,
+#content .inline-group .tabular tr,
+#content .inline-group .tabular tr.form-row,
+#content .inline-group .tabular tr.inline-related,
+#content .inline-group .tabular .form-row,
+#content .inline-group .tabular .inline-related,
+#content .inline-group .tabular.inline-related tr,
+#content .inline-group .tabular.inline-related tr.form-row,
+#content .inline-group .tabular.inline-related tr.inline-related,
+.content-wrapper .inline-group .tabular tr,
+.content-wrapper .inline-group .tabular tr.form-row,
+.content-wrapper .inline-group .tabular tr.inline-related,
+.content-wrapper .inline-group .tabular .form-row,
+.content-wrapper .inline-group .tabular .inline-related,
+.content-wrapper .inline-group .tabular.inline-related tr,
+.content-wrapper .inline-group .tabular.inline-related tr.form-row,
+.content-wrapper .inline-group .tabular.inline-related tr.inline-related {
+    display: table-row !important;
+    /* Annuler TOUS les styles flex/grid */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    flex: unset !important;
+    flex-basis: unset !important;
+    flex-grow: unset !important;
+    flex-shrink: unset !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    grid-area: unset !important;
+    gap: unset !important;
+    /* Annuler les styles de bloc */
+    padding: 0 !important;
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    width: auto !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    /* Annuler les alignements flex */
+    align-items: unset !important;
+    justify-content: unset !important;
+    align-content: unset !important;
+}
+
+/* TH/TD : cellules de tableau - CRITIQUE - Spécificité maximale */
+.inline-group .tabular th,
+.inline-group .tabular td,
+.inline-group .tabular.inline-related th,
+.inline-group .tabular.inline-related td,
+#content .inline-group .tabular th,
+#content .inline-group .tabular td,
+#content .inline-group .tabular.inline-related th,
+#content .inline-group .tabular.inline-related td,
+.content-wrapper .inline-group .tabular th,
+.content-wrapper .inline-group .tabular td,
+.content-wrapper .inline-group .tabular.inline-related th,
+.content-wrapper .inline-group .tabular.inline-related td {
+    display: table-cell !important;
+    /* Annuler flex/grid sur les cellules */
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    flex: unset !important;
+    flex-basis: unset !important;
+    flex-grow: unset !important;
+    flex-shrink: unset !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    grid-area: unset !important;
+    gap: unset !important;
+    vertical-align: middle !important;
+}
+
+/* Surcharger les règles spécifiques des autres fichiers CSS */
+.admin-layout .inline-group .tabular tr,
+.admin-layout .inline-group .tabular tr.form-row,
+.admin-layout .inline-group .tabular tr.inline-related,
+.modern-change-form .inline-group .tabular tr,
+.modern-change-form .inline-group .tabular tr.form-row,
+.modern-change-form .inline-group .tabular tr.inline-related {
+    display: table-row !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* S'assurer que les inputs dans les cellules ne cassent pas le layout */
+.inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+.inline-group .tabular td select,
+.inline-group .tabular td textarea,
+#content .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td textarea,
+.content-wrapper .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td textarea {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Les liens et icônes dans les cellules doivent être inline */
+.inline-group .tabular td a,
+.inline-group .tabular td .inlinechangelink,
+.inline-group .tabular td .inlineviewlink,
+#content .inline-group .tabular td a,
+#content .inline-group .tabular td .inlinechangelink,
+#content .inline-group .tabular td .inlineviewlink,
+.content-wrapper .inline-group .tabular td a,
+.content-wrapper .inline-group .tabular td .inlinechangelink,
+.content-wrapper .inline-group .tabular td .inlineviewlink {
+    display: inline-block !important;
+    width: auto !important;
+    margin-right: 0.25rem;
+    vertical-align: middle;
+}
+
+/* Colonne original : contenir le texte descriptif */
+.inline-group .tabular td.original,
+#content .inline-group .tabular td.original,
+.content-wrapper .inline-group .tabular td.original {
+    max-width: 250px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    padding-right: 0.5rem !important;
+}
+
+.inline-group .tabular td.original p,
+#content .inline-group .tabular td.original p,
+.content-wrapper .inline-group .tabular td.original p {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}
+
+/* S'assurer que les cellules avec des champs ne débordent pas */
+.inline-group .tabular td,
+#content .inline-group .tabular td,
+.content-wrapper .inline-group .tabular td {
+    overflow: visible !important;
+    position: relative !important;
+    /* Organiser le contenu verticalement pour éviter les chevauchements */
+    display: table-cell !important;
+}
+
+/* Structure générale des cellules : inputs et selects doivent être en block */
+.inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+.inline-group .tabular td select,
+.inline-group .tabular td textarea,
+#content .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td textarea,
+.content-wrapper .inline-group .tabular td input:not([type="checkbox"]):not([type="radio"]),
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td textarea {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 0.25rem !important;
+    clear: both !important;
+}
+
+/* Paragraphes : block pour forcer une nouvelle ligne */
+.inline-group .tabular td p,
+#content .inline-group .tabular td p,
+.content-wrapper .inline-group .tabular td p {
+    display: block !important;
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+}
+
+/* Exceptions : les éléments inline doivent rester inline */
+.inline-group .tabular td a,
+.inline-group .tabular td .inlinechangelink,
+.inline-group .tabular td .inlineviewlink,
+.inline-group .tabular td input[type="checkbox"],
+.inline-group .tabular td input[type="radio"],
+#content .inline-group .tabular td a,
+#content .inline-group .tabular td .inlinechangelink,
+#content .inline-group .tabular td .inlineviewlink,
+#content .inline-group .tabular td input[type="checkbox"],
+#content .inline-group .tabular td input[type="radio"],
+.content-wrapper .inline-group .tabular td a,
+.content-wrapper .inline-group .tabular td .inlinechangelink,
+.content-wrapper .inline-group .tabular td .inlineviewlink,
+.content-wrapper .inline-group .tabular td input[type="checkbox"],
+.content-wrapper .inline-group .tabular td input[type="radio"] {
+    display: inline-block !important;
+    width: auto !important;
+    margin-top: 0 !important;
+    clear: none !important;
+}
+
+/* Les cellules avec des selects/dropdowns doivent contenir leur contenu */
+.inline-group .tabular td select,
+.inline-group .tabular td .select2-container,
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td .select2-container,
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td .select2-container {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Texte qui pourrait déborder : le cacher ou le tronquer */
+.inline-group .tabular td p,
+.inline-group .tabular td .help,
+#content .inline-group .tabular td p,
+#content .inline-group .tabular td .help,
+.content-wrapper .inline-group .tabular td p,
+.content-wrapper .inline-group .tabular td .help {
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    display: block !important;
+    line-height: 1.4 !important;
+}
+
+/* S'assurer que les selects/dropdowns sont sur une nouvelle ligne après le texte */
+.inline-group .tabular td select,
+.inline-group .tabular td .select2-container,
+#content .inline-group .tabular td select,
+#content .inline-group .tabular td .select2-container,
+.content-wrapper .inline-group .tabular td select,
+.content-wrapper .inline-group .tabular td .select2-container {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 0.25rem !important;
+    clear: both !important;
+    box-sizing: border-box !important;
+}
+
+/* Les icônes et liens doivent être après le select, pas avant */
+.inline-group .tabular td .inlinechangelink,
+.inline-group .tabular td .inlineviewlink,
+.inline-group .tabular td a[href*="change"],
+.inline-group .tabular td a[href*="view"],
+#content .inline-group .tabular td .inlinechangelink,
+#content .inline-group .tabular td .inlineviewlink,
+#content .inline-group .tabular td a[href*="change"],
+#content .inline-group .tabular td a[href*="view"],
+.content-wrapper .inline-group .tabular td .inlinechangelink,
+.content-wrapper .inline-group .tabular td .inlineviewlink,
+.content-wrapper .inline-group .tabular td a[href*="change"],
+.content-wrapper .inline-group .tabular td a[href*="view"] {
+    display: inline-block !important;
+    margin-left: 0.25rem !important;
+    margin-top: 0.25rem !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+}
+
+/* Structure de la cellule PRODUCT : texte en haut, select au milieu, icônes en bas */
+.inline-group .tabular td.field-product,
+#content .inline-group .tabular td.field-product,
+.content-wrapper .inline-group .tabular td.field-product {
+    vertical-align: top !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* Forcer le texte descriptif à être sur une ligne séparée en haut */
+.inline-group .tabular td.field-product p:first-child,
+#content .inline-group .tabular td.field-product p:first-child,
+.content-wrapper .inline-group .tabular td.field-product p:first-child {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.75rem !important;
+    color: #6b7280 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}

@@ -1,0 +1,191 @@
+/**
+ * Couleurs des icônes adaptées à chaque thème
+ * Remplace le bleu par la couleur primaire du thème
+ */
+
+/* Icônes des en-têtes de contenu */
+[data-theme] .content-header h1 i,
+[data-theme] .content-header .m-0 i {
+  color: var(--primary-color) !important;
+}
+
+/* Icônes des en-têtes de cartes */
+[data-theme] .card-header .card-title i,
+[data-theme] .card-header i,
+[data-theme] .card-primary .card-header .card-title,
+[data-theme] .card-primary .card-header .card-title i,
+[data-theme] .card-primary.card-outline .card-header .card-title,
+[data-theme] .card-primary.card-outline .card-header i,
+[data-theme] .card-outline.card-info .card-header .card-title,
+[data-theme] .card-outline.card-info .card-header i {
+  color: var(--primary-color) !important;
+}
+
+/* Icônes dans les cartes Applications métier */
+[data-theme] .card.card-outline.card-primary .card-title i,
+[data-theme] .card.card-outline.card-primary .nav-link .nav-icon,
+[data-theme] .card.card-outline.card-primary .nav-link i.fa-circle {
+  color: var(--primary-color) !important;
+}
+
+/* Icônes .text-primary et .text-info */
+[data-theme] .text-primary,
+[data-theme] .text-primary i,
+[data-theme] i.text-primary {
+  color: var(--primary-color) !important;
+}
+
+[data-theme] .text-info,
+[data-theme] .text-info i,
+[data-theme] i.text-info {
+  color: var(--info-color) !important;
+}
+
+/* Icônes dans les small-box - conservent la couleur du fond (blanc sur cartes colorées) */
+
+/* Icônes du collapse/card-tools */
+[data-theme] .card-tools .btn i,
+[data-theme] .card-tools i {
+  color: var(--primary-color) !important;
+}
+
+/* Icônes dans les titres de section */
+[data-theme] h1 i, [data-theme] h2 i, [data-theme] h3 i {
+  color: var(--primary-color) !important;
+}
+
+/* === Bouton "Ajouter" - Fond adapté au thème (sauf thème noir) === */
+[data-theme="default"] .btn-add-modern,
+[data-theme="default"] .btn-add-item {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="default"] .btn-add-modern:hover,
+[data-theme="default"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.45) !important;
+}
+
+[data-theme="default"] .btn-add-modern i,
+[data-theme="default"] .btn-add-modern *,
+[data-theme="default"] .btn-add-item i,
+[data-theme="default"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="liquid-glass"] .btn-add-modern,
+[data-theme="liquid-glass"] .btn-add-item {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="liquid-glass"] .btn-add-modern:hover,
+[data-theme="liquid-glass"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.45) !important;
+}
+
+[data-theme="liquid-glass"] .btn-add-modern i,
+[data-theme="liquid-glass"] .btn-add-modern *,
+[data-theme="liquid-glass"] .btn-add-item i,
+[data-theme="liquid-glass"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="nostalgie"] .btn-add-modern,
+[data-theme="nostalgie"] .btn-add-item {
+  background: var(--gradient-secondary) !important;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="nostalgie"] .btn-add-modern:hover,
+[data-theme="nostalgie"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.45) !important;
+}
+
+[data-theme="nostalgie"] .btn-add-modern i,
+[data-theme="nostalgie"] .btn-add-modern *,
+[data-theme="nostalgie"] .btn-add-item i,
+[data-theme="nostalgie"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="ocean"] .btn-add-modern,
+[data-theme="ocean"] .btn-add-item {
+  background: var(--gradient-secondary) !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="ocean"] .btn-add-modern:hover,
+[data-theme="ocean"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.45) !important;
+}
+
+[data-theme="ocean"] .btn-add-modern i,
+[data-theme="ocean"] .btn-add-modern *,
+[data-theme="ocean"] .btn-add-item i,
+[data-theme="ocean"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="sunset"] .btn-add-modern,
+[data-theme="sunset"] .btn-add-item {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="sunset"] .btn-add-modern:hover,
+[data-theme="sunset"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.45) !important;
+}
+
+[data-theme="sunset"] .btn-add-modern i,
+[data-theme="sunset"] .btn-add-modern *,
+[data-theme="sunset"] .btn-add-item i,
+[data-theme="sunset"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="forest"] .btn-add-modern,
+[data-theme="forest"] .btn-add-item {
+  background: var(--gradient-secondary) !important;
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="forest"] .btn-add-modern:hover,
+[data-theme="forest"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.45) !important;
+}
+
+[data-theme="forest"] .btn-add-modern i,
+[data-theme="forest"] .btn-add-modern *,
+[data-theme="forest"] .btn-add-item i,
+[data-theme="forest"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .btn-add-modern,
+[data-theme="dark"] .btn-add-item {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 2px 8px rgba(167, 139, 250, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .btn-add-modern:hover,
+[data-theme="dark"] .btn-add-item:hover {
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.45) !important;
+}
+
+[data-theme="dark"] .btn-add-modern i,
+[data-theme="dark"] .btn-add-modern *,
+[data-theme="dark"] .btn-add-item i,
+[data-theme="dark"] .btn-add-item * {
+  color: #FFFFFF !important;
+}
+
+/* Thème noir : conservé tel quel (pas de changement) */

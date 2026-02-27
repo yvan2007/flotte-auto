@@ -1,0 +1,907 @@
+/**
+ * Interface moderne - Style unifié pour listes, formulaires et inlines
+ * Thèmes (bleu moderne, émeraude, coucher de soleil, sombre) appliqués
+ * à tous les éléments de la section Contenu via var(--color-*)
+ */
+
+/* === CONTAINER SECTION CONTENU - Héritage thème === */
+.admin-layout #content-main,
+.admin-layout #changelist,
+.admin-layout .changelist-form-container,
+.admin-layout .module {
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* === ZONE CONTENU MODERNE === */
+.admin-layout .admin-modern-content,
+.admin-layout .main-content {
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.5;
+  background: var(--color-background);
+}
+
+#content.admin-modern-content {
+  background: var(--color-background);
+  color: var(--color-text);
+  padding: 0;
+}
+
+.admin-frontend-changelist,
+.admin-frontend-changeform,
+.admin-frontend-delete {
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .page-title {
+  color: var(--color-text) !important;
+}
+
+/* === FORMULAIRES - Champs unifiés === */
+.admin-layout input[type="text"],
+.admin-layout input[type="password"],
+.admin-layout input[type="email"],
+.admin-layout input[type="number"],
+.admin-layout input[type="url"],
+.admin-layout input[type="date"],
+.admin-layout input[type="datetime-local"],
+.admin-layout input[type="time"],
+.admin-layout select,
+.admin-layout textarea {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.375rem !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-layout input:focus,
+.admin-layout select:focus,
+.admin-layout textarea:focus {
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-primary-light) !important;
+}
+
+.admin-layout label {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text) !important;
+}
+
+/* Django form-row et fieldBox */
+.admin-layout .form-row {
+  margin-bottom: 1rem;
+}
+
+.admin-layout .form-row label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.admin-layout fieldset {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 1.5rem 0 !important;
+}
+
+.admin-layout fieldset .fieldset-heading {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.75rem !important;
+  color: var(--color-text) !important;
+}
+
+/* === TABLEAUX (change_list) === */
+.admin-layout #result_list,
+.admin-layout .results {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 0.875rem !important;
+  font-family: inherit !important;
+}
+
+.admin-layout #result_list th,
+.admin-layout #result_list td,
+.admin-layout .results th,
+.admin-layout .results td {
+  padding: 0.75rem 1rem !important;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-family: inherit !important;
+}
+
+.admin-layout #result_list th,
+.admin-layout .results th {
+  background: var(--color-surface) !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout #result_list td,
+.admin-layout .results td {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout #result_list tbody tr:hover td,
+.admin-layout .results tbody tr:hover td {
+  background: var(--color-background) !important;
+}
+
+.admin-layout .table-wrapper {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* Liens dans le tableau - respect du thème */
+.admin-layout #result_list a,
+.admin-layout .results a {
+  color: var(--color-primary) !important;
+}
+
+.admin-layout #result_list a:hover,
+.admin-layout .results a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Boutons dans le tableau */
+.admin-layout #result_list .btn,
+.admin-layout .results .btn {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  padding: 0.375rem 0.5rem !important;
+  border-radius: 0.375rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+}
+
+.admin-layout .actions a {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+}
+
+/* Actions Voir / Modifier par ligne */
+.admin-layout .modern-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.admin-layout .modern-row-actions .action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.375rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  overflow: hidden;
+}
+
+.admin-layout .modern-row-actions .action-icon i {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.admin-layout .modern-row-actions .action-icon:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.admin-layout .modern-row-actions .view-icon:hover {
+  color: var(--color-info);
+}
+
+.admin-layout .modern-row-actions .edit-icon:hover {
+  color: var(--color-primary);
+}
+
+.admin-layout .modern-row-actions .delete-icon:hover {
+  color: var(--color-danger) !important;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Icône notifications header */
+.admin-layout .header-notification-btn:hover {
+  color: var(--color-primary) !important;
+  background: var(--color-primary-light);
+}
+
+/* Badges statut */
+.admin-layout .badge,
+.admin-layout span[style*="background"] {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 9999px !important;
+}
+
+/* === CARTES === */
+.admin-layout .card {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.75rem !important;
+  font-family: inherit !important;
+}
+
+.admin-layout .card-header {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  background: var(--color-surface) !important;
+  padding: 0.75rem 1.5rem !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.admin-layout .card-body {
+  padding: 1rem 1.5rem !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+
+/* === BOUTONS === */
+.admin-layout .btn,
+.admin-layout .button,
+.admin-layout input[type="submit"] {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-layout .btn-primary,
+.admin-layout input[type="submit"][name="_save"] {
+  background: var(--color-primary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.admin-layout .btn-primary:hover,
+.admin-layout input[type="submit"][name="_save"]:hover {
+  background: var(--color-primary-hover) !important;
+}
+
+.admin-layout .btn-secondary {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.admin-layout .btn-secondary:hover {
+  background: var(--color-background) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+.admin-layout .btn-danger {
+  background: var(--color-danger) !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* === INLINES === */
+.admin-layout .inline-group {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  font-family: inherit !important;
+}
+
+.admin-layout .inline-group h2,
+.admin-layout .inline-group h3 {
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  background: var(--color-background) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  margin: 0 !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .inline-related {
+  padding: 1rem 1.5rem !important;
+  border-bottom: 1px solid var(--color-border);
+  font-family: inherit !important;
+}
+
+.admin-layout .inline-related:last-child {
+  border-bottom: none;
+}
+
+.admin-layout .inline-related .form-row {
+  margin-bottom: 0.75rem;
+}
+
+.admin-layout .add-row a,
+.admin-layout .add-row button {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.5rem;
+}
+
+/* Selector widget (filter_horizontal) */
+.admin-layout .selector {
+  font-family: inherit !important;
+}
+
+.admin-layout .selector select {
+  font-family: inherit !important;
+}
+
+/* === RECHERCHE ADMIN === */
+.admin-layout #changelist-search {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.admin-layout #changelist-search input {
+  font-family: inherit !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.admin-layout #changelist-search input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--color-primary-light) !important;
+}
+
+.admin-layout #changelist-search label {
+  font-family: inherit !important;
+  color: var(--color-text) !important;
+}
+
+/* === PAGINATION === */
+.admin-layout .pagination,
+.admin-layout .paginator {
+  font-family: inherit !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .pagination a,
+.admin-layout .pagination span {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: var(--color-primary) !important;
+}
+
+.admin-layout .pagination a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+.admin-layout .pagination .this-page {
+  color: var(--color-text) !important;
+  font-weight: 600;
+}
+
+.admin-layout .paginator a {
+  color: var(--color-primary) !important;
+}
+
+.admin-layout .paginator a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* En-têtes de tableau triables */
+.admin-layout #result_list th.sorted a,
+.admin-layout #result_list th a {
+  color: var(--color-text) !important;
+}
+
+.admin-layout #result_list th.sorted a:hover,
+.admin-layout #result_list th a:hover {
+  color: var(--color-primary) !important;
+}
+
+/* === FILTRES === */
+.admin-layout #changelist-filter {
+  font-family: inherit !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: var(--color-text) !important;
+}
+
+.admin-layout #changelist-filter h2 {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  background: var(--color-background) !important;
+  border-color: var(--color-border) !important;
+}
+
+.admin-layout #changelist-filter-extra-actions {
+  margin-bottom: 1rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .filter-action-item {
+  display: block !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .filter-action-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  padding: 0.25rem 0 !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .filter-action-link:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .filter-action-link i {
+  flex-shrink: 0 !important;
+  width: 1rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .filter-action-link span {
+  line-height: 1.5 !important;
+}
+
+/* Masquer complètement les anciennes icônes Django (viewlink/hidelink) */
+.admin-layout #changelist-filter-extra-actions .viewlink::before,
+.admin-layout #changelist-filter-extra-actions .hidelink::before,
+.admin-layout #changelist-filter-extra-actions .viewlink::after,
+.admin-layout #changelist-filter-extra-actions .hidelink::after {
+  display: none !important;
+  content: none !important;
+}
+
+.admin-layout #changelist-filter-extra-actions .viewlink img,
+.admin-layout #changelist-filter-extra-actions .hidelink img,
+.admin-layout #changelist-filter-extra-actions .viewlink svg,
+.admin-layout #changelist-filter-extra-actions .hidelink svg {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Masquer aussi les icônes dans les classes viewlink/hidelink elles-mêmes */
+.admin-layout .viewlink img,
+.admin-layout .hidelink img {
+  display: none !important;
+}
+
+
+.admin-layout #changelist-filter li,
+.admin-layout #changelist-filter ul {
+  color: var(--color-text) !important;
+}
+
+.admin-layout #changelist-filter a {
+  font-size: 0.8125rem !important;
+  color: var(--color-primary) !important;
+}
+
+.admin-layout #changelist-filter a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Supprimer tout style Django admin qui crée des décalages */
+.admin-layout .module h2,
+.admin-layout .module h3 {
+  font-family: inherit !important;
+}
+
+.admin-layout .errornote {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+}
+
+/* Changelist avec filtres - layout */
+.admin-layout #changelist.filtered {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.admin-layout #changelist-filter {
+  flex: 0 0 200px;
+  order: -1;
+}
+
+.admin-layout .changelist-form-container {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Recherche Django - barre longue + petit bouton Search */
+.admin-layout .changelist-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-layout .changelist-search-wrap #toolbar {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-layout .changelist-search-wrap .changelist-search-form-long {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.admin-layout .changelist-search-wrap .changelist-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.admin-layout .changelist-search-wrap .changelist-search-row label {
+  flex-shrink: 0;
+  margin: 0 !important;
+}
+
+.admin-layout .changelist-search-wrap #searchbar,
+.admin-layout .changelist-search-wrap .changelist-search-row input[type="text"] {
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.admin-layout .changelist-search-wrap .btn-search-small {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap;
+  background: var(--color-primary) !important;
+  color: white !important;
+  border: 1px solid var(--color-primary) !important;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+/* Hide duplicate title from content_title when we have page-title */
+.admin-frontend-changelist .content-title { display: none; }
+
+/* Actions dropdown dans changelist - alignement parfait */
+.admin-layout .actions {
+  display: inline-flex !important;
+  align-items: stretch !important;
+  gap: 0.5rem !important;
+  flex-wrap: nowrap !important;
+}
+
+.admin-layout .actions > * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-layout .actions label {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: var(--color-text) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 0.5rem 0 0 !important;
+}
+
+.admin-layout .actions select {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: var(--color-text) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+  display: inline-block !important;
+}
+
+.admin-layout .actions button[type="submit"],
+.admin-layout .actions button {
+  font-family: inherit !important;
+  background: var(--color-primary) !important;
+  color: white !important;
+  border: 1px solid var(--color-primary) !important;
+  padding: 0 1rem !important;
+  border-radius: 0.5rem !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.admin-layout .actions span,
+.admin-layout .actions .action-counter {
+  font-size: 0.875rem !important;
+  color: var(--color-text-muted) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 0 0 0.5rem !important;
+}
+
+/* Liens dans les filtres */
+.admin-layout #changelist-filter a {
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
+}
+
+.admin-layout #changelist-filter a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Checkboxes */
+.admin-layout input[type="checkbox"] {
+  width: 1rem !important;
+  height: 1rem !important;
+  accent-color: var(--color-primary);
+}
+
+/* Date hierarchy */
+.admin-layout .xfull {
+  font-family: inherit !important;
+  margin-bottom: 1rem;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .xfull a {
+  font-size: 0.875rem !important;
+  color: var(--color-primary) !important;
+}
+
+.admin-layout .xfull a:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* Dropdown dans zone contenu (Export, etc.) */
+.admin-layout .admin-frontend-changelist .dropdown-menu,
+.admin-layout .admin-frontend-changeform .dropdown-menu {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.admin-layout .dropdown-item {
+  color: var(--color-text) !important;
+}
+
+.admin-layout .dropdown-item:hover {
+  background: var(--color-background) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Messages/errors */
+.admin-layout .errorlist {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0.25rem 0 0 0 !important;
+  font-size: 0.8125rem !important;
+  color: var(--color-danger) !important;
+}
+
+.admin-layout .errornote {
+  padding: 0.75rem 1rem !important;
+  background: var(--color-danger);
+  color: white !important;
+  border-radius: 0.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Description dans fieldsets */
+.admin-layout .description {
+  font-size: 0.8125rem !important;
+  color: var(--color-text-muted) !important;
+  margin-bottom: 0.75rem !important;
+  padding: 0.5rem 0.75rem !important;
+  background: var(--color-background) !important;
+  border-radius: 0.375rem !important;
+  border-left: 3px solid var(--color-primary) !important;
+}
+
+.admin-layout .help,
+.admin-layout .help-block {
+  font-size: 0.8125rem !important;
+  color: var(--color-text-muted) !important;
+  font-family: inherit !important;
+}
+
+/* === INLINES TABULAIRE (tableaux) === */
+.admin-layout .inline-group .tabular {
+  overflow-x: auto;
+}
+
+.admin-layout .inline-group .tabular table {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 0.875rem !important;
+  font-family: inherit !important;
+}
+
+.admin-layout .inline-group .tabular th,
+.admin-layout .inline-group .tabular td {
+  padding: 0.5rem 0.75rem !important;
+  border: 1px solid var(--color-border) !important;
+  vertical-align: middle !important;
+  font-family: inherit !important;
+}
+
+.admin-layout .inline-group .tabular th {
+  background: var(--color-background) !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  white-space: nowrap;
+}
+
+.admin-layout .inline-group .tabular td input,
+.admin-layout .inline-group .tabular td select,
+.admin-layout .inline-group .tabular td textarea {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  padding: 0.375rem 0.5rem !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.375rem !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  width: 100%;
+  max-width: 100%;
+}
+
+.admin-layout .inline-group .tabular .add-row {
+  padding: 0.75rem 1rem !important;
+  background: var(--color-background) !important;
+  border-top: 1px solid var(--color-border) !important;
+}
+
+.admin-layout .inline-group .tabular .add-row a {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: var(--color-primary) !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-layout .inline-group .tabular .add-row a:hover {
+  text-decoration: underline;
+}
+
+/* === INLINES STACKED === */
+.admin-layout .inline-group .inline-related {
+  padding: 1rem 1.5rem !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  background: var(--color-surface) !important;
+}
+
+.admin-layout .inline-group .inline-related:last-of-type {
+  border-bottom: none;
+}
+
+.admin-layout .inline-group .inline-related .form-row {
+  margin-bottom: 0.75rem !important;
+}
+
+.admin-layout .inline-group .inline-related .form-row:last-child {
+  margin-bottom: 0 !important;
+}
+
+.admin-layout .inline-group .inline-related input,
+.admin-layout .inline-group .inline-related select,
+.admin-layout .inline-group .inline-related textarea {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+}
+
+.admin-layout .inline-group .stacked .add-row {
+  padding: 0.75rem 1.5rem !important;
+  background: var(--color-background) !important;
+  border-top: 1px solid var(--color-border) !important;
+}
+
+.admin-layout .inline-group .stacked .add-row a {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  color: var(--color-primary) !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* === FORMULAIRE change_form - Ciblage explicite === */
+.admin-frontend-changeform .module,
+.admin-frontend-changeform fieldset.module {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 1.5rem 0 !important;
+}
+
+.admin-frontend-changeform .form-row label {
+  font-weight: 500 !important;
+  color: var(--color-text) !important;
+}
+
+.admin-frontend-changeform .submit-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+  margin-top: 1.5rem !important;
+  padding: 1rem 0 !important;
+  border-top: 1px solid var(--color-border) !important;
+}
+
+.admin-frontend-changeform .submit-row input[type="submit"],
+.admin-frontend-changeform .submit-row .btn {
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+}
+
+/* === SUPPRESSION - Pages de confirmation === */
+.admin-layout .delete-confirmation,
+.admin-layout .admin-frontend-delete .card,
+.admin-layout .object-tools {
+  font-family: inherit !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .admin-frontend-delete .card-body,
+.admin-layout .admin-frontend-delete .card-footer {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .delete-confirmation ul,
+.admin-layout .admin-frontend-delete ul {
+  margin: 1rem 0 !important;
+  padding-left: 1.5rem !important;
+  color: var(--color-text) !important;
+}
+
+.admin-layout .delete-confirmation p,
+.admin-layout .admin-frontend-delete p {
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  color: var(--color-text) !important;
+}

@@ -149,6 +149,15 @@ class Vehicule(models.Model):
         'Date expiration assurance (véhicule au parc)', null=True, blank=True,
         help_text='Pour véhicules non loués : échéance assurance'
     )
+    proprietaire = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='vehicules_flotte',
+        verbose_name='Propriétaire (utilisateur)',
+        help_text="Si renseigné, ce véhicule et ses données associées ne sont visibles que par cet utilisateur (et par les managers / administrateurs).",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

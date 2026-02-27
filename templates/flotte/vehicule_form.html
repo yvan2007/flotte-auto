@@ -139,6 +139,13 @@
         {{ form.km_prochaine_vidange.errors }}
       </div>
     </div>
+    {% if is_manager_or_admin %}
+    <div class="form-group">
+      <label>{{ form.proprietaire.label }}</label>
+      {{ form.proprietaire }}
+      {{ form.proprietaire.errors }}
+    </div>
+    {% endif %}
     <div class="form-actions">
       <a href="{% url 'flotte:parc' %}" class="btn btn-ghost">Annuler</a>
       <button type="submit" class="btn btn-primary">Enregistrer</button>
